@@ -1,3 +1,5 @@
+package com.github.krystalics.d10.scheduler.core;
+
 import com.cronutils.builder.CronBuilder;
 import com.cronutils.descriptor.CronDescriptor;
 import com.cronutils.mapper.ConstantsMapper;
