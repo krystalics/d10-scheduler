@@ -1,8 +1,15 @@
 package com.github.krystalics.d10.scheduler.web;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
+/**
+ * @author krysta
+ */
+
+@ComponentScan(basePackages = {"com.github.krystalics.d10.scheduler"})
 @SpringBootApplication
 public class WebApplication {
 

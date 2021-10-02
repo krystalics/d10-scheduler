@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper">
+    <sql id="fields">
+        task_id          as taskId,
+        task_name        as taskName,
+        type             as type,
+        frequency        as frequency,
+        schedule_type    as scheduleType,
+        concurrency      as concurrency,
+        crontab          as crontab,
+        owner_mail       as ownerMail,
+        creator_mail     as creatorMail,
+        jobConf          as jobConf,
+        retry_times      as retryTimes,
+        state            as state,
+        priority         as priority,
+        ctime            as ctime,
+        mtime            as mtime
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            <if test="appIdLike != null and appIdLike != ''">
+                app_id like concat('%', #{appIdLike}, '%')
+            </if>
+            <if test="appNameLike != null and appNameLike != ''">
+                and app_name like concat('%', #{appNameLike}, '%')
+            </if>
+            <if test="ownerNameLike != null and ownerNameLike != ''">
+                and owner_name like concat('%', #{ownerNameLike}, '%')
+            </if>
+            <if test="ownerMailLike != null and ownerMailLike != ''">
+                and owner_mail like concat('%', #{ownerMailLike}, '%')
+            </if>
+            <if test="valid != 0">
+                and valid = #{valid}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="table">
+        base_application
+    </sql>
+
+    <sql id="where_permission_sql">
+        <where>
+            <if test="permissionTypeLike != null and permissionTypeLike!= ''">
+                p.permission_type like concat('%', #{permissionTypeLike}, '%')
+            </if>
+            <if test="valid != 0">
+                and p.valid = #{valid}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        <include refid="table"/>(
+        app_id,
+        app_name,
+        space_name,
+        org_id,
+        org_name,
+        owner_name,
+        owner_mail,
+        created_by,
+        last_modified_by)
+        value(
+        #{appId},
+        #{appName},
+        #{spaceName},
+        #{orgId},
+        #{orgName},
+        #{ownerName},
+        #{ownerMail},
+        #{createdBy},
+        #{lastModifiedBy})
+    </insert>
+
+    <update id="invalidate">
+        update
+        <include refid="table"/>
+        <set>
+            valid=-1
+        </set>
+        where id=#{id}
+    </update>
+
+    <update id="update">
+        update
+        <include refid="table"/>
+        <set>
+            <if test="appId != null and appId != ''">
+                app_id = #{appId},
+            </if>
+            <if test="appName != null and appName != ''">
+                app_name = #{appName},
+            </if>
+            <if test="spaceName != null and spaceName != ''">
+                space_name = #{spaceName},
+            </if>
+            <if test="orgId != null and orgId != ''">
+                org_id = #{orgId},
+            </if>
+            <if test="orgName != null and orgName != ''">
+                org_name = #{orgName},
+            </if>
+            <if test="ownerName != null and ownerName != ''">
+                owner_name = #{ownerName},
+            </if>
+            <if test="ownerMail != null and ownerMail != ''">
+                owner_mail = #{ownerMail},
+            </if>
+            <if test="valid != 0">
+                valid = #{valid},
+            </if>
+            <if test="lastModifiedBy != null and lastModifiedBy != ''">
+                last_modified_by = #{lastModifiedBy}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getById" resultType="com.ke.bigdata.web.base.model.basic.App">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        where id=#{id}
+    </select>
+</mapper>

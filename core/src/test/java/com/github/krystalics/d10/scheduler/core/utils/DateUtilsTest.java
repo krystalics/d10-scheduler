@@ -1,11 +1,8 @@
 package com.github.krystalics.d10.scheduler.core.utils;
 
-import com.github.krystalics.d10.scheduler.core.common.Constant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**

@@ -9,12 +9,14 @@
         <outputRelativeToContentRoot value="true" />
         <module name="core" />
         <module name="distributed" />
+        <module name="dao" />
         <module name="web" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="core" target="1.8" />
       <module name="d10-scheduler" target="1.8" />
+      <module name="dao" target="8" />
       <module name="distributed" target="8" />
       <module name="web" target="1.8" />
     </bytecodeTargetLevel>
@@ -22,6 +24,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="core" options="-parameters" />
+      <module name="dao" options="-parameters" />
       <module name="distributed" options="-parameters" />
       <module name="web" options="-parameters" />
     </option>
