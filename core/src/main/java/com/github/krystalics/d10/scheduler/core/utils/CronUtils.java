@@ -6,7 +6,6 @@ import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
 import com.github.krystalics.d10.scheduler.core.exception.IllegalCntException;
-import org.joda.time.DateTime;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -33,9 +32,6 @@ public class CronUtils {
     private static final CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(QUARTZ);
     private static final CronParser parser = new CronParser(cronDefinition);
 
-    private String versionNo(DateTime dateTime, String crontab) {
-        return "";
-    }
 
     /**
      * @param dateTime 参照时间
@@ -93,11 +89,11 @@ public class CronUtils {
      * offset=-3 cnt=4 => 三个prev一个next
      * 以0为分界、分开执行; 下面-1是因为包含了0这个原点
      *
-     * @param dateTime
-     * @param crontab
-     * @param offset
-     * @param cnt
-     * @return
+     * @param dateTime 参考时间
+     * @param crontab 任务的周期参数
+     * @param offset 依赖的原点
+     * @param cnt 依赖的数量
+     * @return 具体依赖任务的哪几个执行版本
      */
     public static List<ZonedDateTime> rangeExecutionDate(ZonedDateTime dateTime, String crontab, int offset, int cnt) {
         if (cnt <= 0) {
@@ -122,6 +118,7 @@ public class CronUtils {
         }
 
         return dateTimes;
-
     }
+
+
 }
