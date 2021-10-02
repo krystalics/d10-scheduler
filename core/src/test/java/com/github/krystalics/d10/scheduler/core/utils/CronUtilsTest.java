@@ -1,8 +1,7 @@
-package com.github.krystalics.d10.scheduler.core;
+package com.github.krystalics.d10.scheduler.core.utils;
 
 import com.cronutils.builder.CronBuilder;
 import com.cronutils.descriptor.CronDescriptor;
-import com.cronutils.mapper.ConstantsMapper;
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinition;
 import com.cronutils.model.definition.CronDefinitionBuilder;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -33,7 +33,7 @@ public class CronUtilsTest {
     CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(QUARTZ);
     CronParser parser = new CronParser(cronDefinition);
 
-    String crontab = "0 23 * ? * 1-5 *";
+    String crontab = "0 23 * ? * 1-5";
 
 
     @Test
@@ -101,6 +101,31 @@ public class CronUtilsTest {
         final Optional<Duration> timeToNextExecution = executionTime.timeToNextExecution(now);
         System.out.println(timeToNextExecution.get().toHours());
 
+    }
+
+    @Test
+    public void range() {
+        ZonedDateTime now = ZonedDateTime.now();
+        final List<ZonedDateTime> times = CronUtils.rangeExecutionDate(now, crontab, -3, 4);
+        System.out.println(times);
+
+        final List<ZonedDateTime> times2 = CronUtils.rangeExecutionDate(now, crontab, -3, 2);
+        System.out.println(times2);
+
+        final List<ZonedDateTime> times3 = CronUtils.rangeExecutionDate(now, crontab, 3, 2);
+        System.out.println(times3);
+
+        final List<ZonedDateTime> times4 = CronUtils.rangeExecutionDate(now, crontab, 0, 1);
+        System.out.println(times4);
+
+        final List<ZonedDateTime> times5 = CronUtils.rangeExecutionDate(now, crontab, 0, 0);
+        System.out.println(times5);
+
+        final List<ZonedDateTime> times6 = CronUtils.rangeExecutionDate(now, crontab, 0, -1);
+        System.out.println(times6);
+
+        final List<ZonedDateTime> times7 = CronUtils.rangeExecutionDate(now, crontab, -2, -1);
+        System.out.println(times7);
     }
 
 

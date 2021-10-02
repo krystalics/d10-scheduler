@@ -1,13 +1,15 @@
-package com.github.krystalics.d10.scheduler.core.cron;
+package com.github.krystalics.d10.scheduler.core.utils;
 
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinition;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
+import com.github.krystalics.d10.scheduler.core.exception.IllegalCntException;
 import org.joda.time.DateTime;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +64,64 @@ public class CronUtils {
         return parse(dateTime, crontab, false);
     }
 
+    /**
+     * @param dateTime
+     * @param crontab
+     * @param offset   =0时 意味着next的开始、实际是1、
+     * @return
+     */
+    private static List<ZonedDateTime> rangeExecutionDate(ZonedDateTime dateTime, String crontab, int offset) {
+        List<ZonedDateTime> times = new ArrayList<>();
+        int start = Math.abs(offset);
+
+        if (offset < 0) {
+            for (int i = 0; i < start; i++) {
+                dateTime = prevExecutionDate(dateTime, crontab);
+                times.add(dateTime);
+            }
+        } else {
+            for (int i = 0; i <= start; i++) {
+                dateTime = nextExecutionDate(dateTime, crontab);
+                times.add(dateTime);
+            }
+        }
+
+        return times;
+    }
+
+    /**
+     * offset=-3 cnt=4 => 三个prev一个next
+     * 以0为分界、分开执行; 下面-1是因为包含了0这个原点
+     *
+     * @param dateTime
+     * @param crontab
+     * @param offset
+     * @param cnt
+     * @return
+     */
     public static List<ZonedDateTime> rangeExecutionDate(ZonedDateTime dateTime, String crontab, int offset, int cnt) {
-        return null;
+        if (cnt <= 0) {
+            throw new IllegalCntException("task rely's count [cnt] can't <= 0, now the [cnt] is " + cnt);
+        }
+
+        List<ZonedDateTime> dateTimes;
+        ZonedDateTime origin = ZonedDateTime.of(dateTime.getYear(), dateTime.getMonthValue(), dateTime.getDayOfMonth(), dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond(), dateTime.getNano(), dateTime.getZone());
+
+        if (offset < 0) {
+            dateTimes = rangeExecutionDate(dateTime, crontab, offset);
+            if (offset + cnt > 0) {
+                dateTimes.addAll(rangeExecutionDate(origin, crontab, cnt + offset - 1));
+            } else {
+                dateTimes = dateTimes.subList(dateTimes.size() - cnt, dateTimes.size());
+            }
+        } else if (offset == 0) {
+            dateTimes = rangeExecutionDate(dateTime, crontab, offset);
+        } else {
+            dateTimes = rangeExecutionDate(dateTime, crontab, offset - 1);
+            dateTimes = rangeExecutionDate(dateTimes.get(dateTimes.size() - 1), crontab, cnt - 1);
+        }
+
+        return dateTimes;
+
     }
 }
