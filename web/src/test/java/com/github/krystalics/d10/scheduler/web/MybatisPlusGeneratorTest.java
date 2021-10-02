@@ -16,17 +16,16 @@ import java.util.Collections;
 public class MybatisPlusGeneratorTest extends SprintBootBaseTest {
     @Test
     public void generate() {
-        FastAutoGenerator.create("127.0.0.1:3306", "root", "root")
+        FastAutoGenerator.create("jdbc:mysql://127.0.0.1:3306/scheduler?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC", "root", "root")
                 .globalConfig(builder -> {
                     builder.author("krysta") // 设置作者
-                            .enableSwagger() // 开启 swagger 模式
                             .fileOverride() // 覆盖已生成文件
-                            .outputDir("D://"); // 指定输出目录
+                            .outputDir("/tmp/gen"); // 指定输出目录
                 })
                 .packageConfig(builder -> {
-                    builder.parent("com.github.krystalics.d10.scheduler.dao") // 设置父包名
+                    builder.parent("com.github.krystalics.d10.scheduler") // 设置父包名
                             .moduleName("dao") // 设置父包模块名
-                            .pathInfo(Collections.singletonMap(OutputFile.mapperXml, "D://")); // 设置mapperXml生成路径
+                            .pathInfo(Collections.singletonMap(OutputFile.mapperXml, "/tmp/gen")); // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {
                     builder.addInclude("task") // 设置需要生成的表名
