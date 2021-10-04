@@ -1,6 +1,8 @@
 package com.github.krystalics.d10.scheduler.dao.entity;
 
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
  * @author krysta
  * @since 2021-10-02
  */
+@Data
 public class Instance implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -84,145 +87,4 @@ public class Instance implements Serializable {
      * 记录最后更改时间
      */
     private LocalDateTime mtime;
-
-    public Long getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
-    }
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-
-    public Long getVersionId() {
-        return versionId;
-    }
-
-    public void setVersionId(Long versionId) {
-        this.versionId = versionId;
-    }
-
-    public Integer getScheduleType() {
-        return scheduleType;
-    }
-
-    public void setScheduleType(Integer scheduleType) {
-        this.scheduleType = scheduleType;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public LocalDateTime getStartTimeTheory() {
-        return startTimeTheory;
-    }
-
-    public void setStartTimeTheory(LocalDateTime startTimeTheory) {
-        this.startTimeTheory = startTimeTheory;
-    }
-
-    public String getJobConf() {
-        return jobConf;
-    }
-
-    public void setJobConf(String jobConf) {
-        this.jobConf = jobConf;
-    }
-
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
-    }
-
-    public String getJobLogAddress() {
-        return jobLogAddress;
-    }
-
-    public void setJobLogAddress(String jobLogAddress) {
-        this.jobLogAddress = jobLogAddress;
-    }
-
-    public LocalDateTime getRunStartTime() {
-        return runStartTime;
-    }
-
-    public void setRunStartTime(LocalDateTime runStartTime) {
-        this.runStartTime = runStartTime;
-    }
-
-    public LocalDateTime getRunEndTime() {
-        return runEndTime;
-    }
-
-    public void setRunEndTime(LocalDateTime runEndTime) {
-        this.runEndTime = runEndTime;
-    }
-
-    public String getNode() {
-        return node;
-    }
-
-    public void setNode(String node) {
-        this.node = node;
-    }
-
-    public Integer getAutoStart() {
-        return autoStart;
-    }
-
-    public void setAutoStart(Integer autoStart) {
-        this.autoStart = autoStart;
-    }
-
-    public LocalDateTime getCtime() {
-        return ctime;
-    }
-
-    public void setCtime(LocalDateTime ctime) {
-        this.ctime = ctime;
-    }
-
-    public LocalDateTime getMtime() {
-        return mtime;
-    }
-
-    public void setMtime(LocalDateTime mtime) {
-        this.mtime = mtime;
-    }
-
-    @Override
-    public String toString() {
-        return "Instance{" +
-                "instanceId=" + instanceId +
-                ", taskId=" + taskId +
-                ", versionId=" + versionId +
-                ", scheduleType=" + scheduleType +
-                ", type=" + type +
-                ", startTimeTheory=" + startTimeTheory +
-                ", jobConf=" + jobConf +
-                ", state=" + state +
-                ", jobLogAddress=" + jobLogAddress +
-                ", runStartTime=" + runStartTime +
-                ", runEndTime=" + runEndTime +
-                ", node=" + node +
-                ", autoStart=" + autoStart +
-                ", ctime=" + ctime +
-                ", mtime=" + mtime +
-                "}";
-    }
 }

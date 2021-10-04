@@ -1,6 +1,8 @@
 package com.github.krystalics.d10.scheduler.dao.entity;
 
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
  * @author krysta
  * @since 2021-10-02
  */
+@Data
 public class Version implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -58,82 +61,4 @@ public class Version implements Serializable {
      */
     private LocalDateTime mtime;
 
-    public Long getVersionId() {
-        return versionId;
-    }
-
-    public void setVersionId(Long versionId) {
-        this.versionId = versionId;
-    }
-    public String getVersionNo() {
-        return versionNo;
-    }
-
-    public void setVersionNo(String versionNo) {
-        this.versionNo = versionNo;
-    }
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-    public Long getLastInstanceId() {
-        return lastInstanceId;
-    }
-
-    public void setLastInstanceId(Long lastInstanceId) {
-        this.lastInstanceId = lastInstanceId;
-    }
-    public Integer getRetryRemainTimes() {
-        return retryRemainTimes;
-    }
-
-    public void setRetryRemainTimes(Integer retryRemainTimes) {
-        this.retryRemainTimes = retryRemainTimes;
-    }
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
-    }
-    public String getUpRelies() {
-        return upRelies;
-    }
-
-    public void setUpRelies(String upRelies) {
-        this.upRelies = upRelies;
-    }
-    public LocalDateTime getCtime() {
-        return ctime;
-    }
-
-    public void setCtime(LocalDateTime ctime) {
-        this.ctime = ctime;
-    }
-    public LocalDateTime getMtime() {
-        return mtime;
-    }
-
-    public void setMtime(LocalDateTime mtime) {
-        this.mtime = mtime;
-    }
-
-    @Override
-    public String toString() {
-        return "Version{" +
-            "versionId=" + versionId +
-            ", versionNo=" + versionNo +
-            ", taskId=" + taskId +
-            ", lastInstanceId=" + lastInstanceId +
-            ", retryRemainTimes=" + retryRemainTimes +
-            ", state=" + state +
-            ", upRelies=" + upRelies +
-            ", ctime=" + ctime +
-            ", mtime=" + mtime +
-        "}";
-    }
 }

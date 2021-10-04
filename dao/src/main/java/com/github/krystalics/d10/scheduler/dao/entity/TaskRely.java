@@ -1,6 +1,8 @@
 package com.github.krystalics.d10.scheduler.dao.entity;
 
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -11,7 +13,7 @@ import java.io.Serializable;
  * @author krysta
  * @since 2021-10-02
  */
-
+@Data
 public class TaskRely implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,54 +44,4 @@ public class TaskRely implements Serializable {
      */
     private Integer cnt;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-
-    public Long getUpTaskId() {
-        return upTaskId;
-    }
-
-    public void setUpTaskId(Long upTaskId) {
-        this.upTaskId = upTaskId;
-    }
-
-    public Integer getOffset() {
-        return offset;
-    }
-
-    public void setOffset(Integer offset) {
-        this.offset = offset;
-    }
-
-    public Integer getCnt() {
-        return cnt;
-    }
-
-    public void setCnt(Integer cnt) {
-        this.cnt = cnt;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskRely{" +
-                "id=" + id +
-                ", taskId=" + taskId +
-                ", upTaskId=" + upTaskId +
-                ", offset=" + offset +
-                ", cnt=" + cnt +
-                "}";
-    }
 }

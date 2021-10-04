@@ -4,6 +4,7 @@ package com.github.krystalics.d10.scheduler.dao.mapper;
 import com.github.krystalics.d10.scheduler.dao.BaseMapper;
 import com.github.krystalics.d10.scheduler.dao.entity.Instance;
 import com.github.krystalics.d10.scheduler.dao.qm.InstanceQM;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
@@ -13,6 +14,7 @@ import com.github.krystalics.d10.scheduler.dao.qm.InstanceQM;
  * @author krysta
  * @since 2021-10-02
  */
+@Mapper
 public interface InstanceMapper extends BaseMapper<Instance, InstanceQM> {
 
 }

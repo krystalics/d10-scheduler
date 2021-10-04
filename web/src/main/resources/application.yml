@@ -1,4 +1,3 @@
-
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -12,4 +11,9 @@ spring:
 mybatis:
   type-aliases-package: com.github.krystalics.d10.scheduler.dao.entity
   #指定映射文件的位置
-  mapper-locations: classpath:mapper/*.xml
+  mapper-locations: classpath:mapper/*Mapper.xml
+
+logging:
+  level:
+    org:
+      springframework: error
