@@ -1,38 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.VersionMapper">
+<mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.TaskRelyMapper">
     <sql id="table">
-        version
+        task_rely
     </sql>
 
     <sql id="fields">
-        task_id          as taskId,
-        task_name        as taskName,
-        type             as type,
-        frequency        as frequency,
-        schedule_type    as scheduleType,
-        concurrency      as concurrency,
-        crontab          as crontab,
-        owner_mail_prefix       as ownerMail,
-        creator_mail_prefix     as creatorMail,
-        job_conf          as jobConf,
-        retry_times      as retryTimes,
-        state            as state,
-        note             as note,
-        priority         as priority,
-        ctime            as ctime,
-        mtime            as mtime
+        id          as id,
+        task_id     as taskId,
+        up_task_id  as upTaskId,
+        offset      as offset,
+        cnt         as cnt
     </sql>
 
     <sql id="where_sql">
         <where>
-            <if test="taskName != null and taskName != ''">
-                task_name like concat('%', #{taskName}, '%')
+            1 = 1
+            <if test="taskId != null and taskId != ''">
+                and task_id = #{taskId}
             </if>
 
-            <if test="ownerMailLike != null and ownerMailLike != ''">
-                and owner_mail_prefix like concat('%', #{ownerMailLike}, '%')
+            <if test="upTaskId != null and upTaskId != ''">
+                and up_task_id = #{upTaskId}
             </if>
 
         </where>
@@ -42,38 +32,20 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into
         <include refid="table"/>(
-        task_id
-        task_name
-        type
-        frequency
-        schedule_type
-        concurrency
-        crontab
-        owner_mail_prefix,
-        creator_mail_prefix,
-        jobConf
-        retry_times
-        state
-        note
-        priority)
+        id,
+        task_d,
+        up_task_id,
+        offset,
+        cnt)
         value(
+        #{id},
         #{taskId},
-        #{taskName},
-        #{type},
-        #{frequency},
-        #{scheduleType},
-        #{concurrency},
-        #{crontab},
-        #{ownerMail},
-        #{creatorMail},
-        #{jobConf},
-        #{retryTimes},
-        #{state},
-        #{note},
-        #{priority})
+        #{upTaskId},
+        #{offset},
+        #{cnt})
     </insert>
 
-    <select id="list" resultType="com.github.krystalics.d10.scheduler.dao.entity.Version">
+    <select id="list" resultType="com.github.krystalics.d10.scheduler.dao.entity.TaskRely">
         select
         <include refid="fields"/>
         from
@@ -100,14 +72,18 @@
         update
         <include refid="table"/>
         <set>
-            <if test="state != null and state != ''">
-                state = #{state},
+            <if test="offset != null and offset != ''">
+                offset = #{offset},
+            </if>
+
+            <if test="cnt != null and cnt != ''">
+                cnt = #{cnt},
             </if>
         </set>
         <include refid="where_sql"/>
     </update>
 
-    <select id="getById" resultType="com.github.krystalics.d10.scheduler.dao.entity.Version">
+    <select id="getById" resultType="com.github.krystalics.d10.scheduler.dao.entity.TaskRely">
         select
         <include refid="fields"/>
         from

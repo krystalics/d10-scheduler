@@ -27,8 +27,9 @@
 
     <sql id="where_sql">
         <where>
+            1 = 1
             <if test="taskName != null and taskName != ''">
-                task_name like concat('%', #{taskName}, '%')
+               and task_name like concat('%', #{taskName}, '%')
             </if>
 
             <if test="ownerMailLike != null and ownerMailLike != ''">
@@ -42,19 +43,19 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into
         <include refid="table"/>(
-        task_id
-        task_name
-        type
-        frequency
-        schedule_type
-        concurrency
-        crontab
+        task_id,
+        task_name,
+        type,
+        frequency,
+        schedule_type,
+        concurrency,
+        crontab,
         owner_mail_prefix,
         creator_mail_prefix,
-        jobConf
-        retry_times
-        state
-        note
+        job_conf,
+        retry_times,
+        state,
+        note,
         priority)
         value(
         #{taskId},

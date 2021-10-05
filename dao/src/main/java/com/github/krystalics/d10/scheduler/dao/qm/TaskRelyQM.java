@@ -12,4 +12,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TaskRelyQM extends BaseQM {
+    private Long taskId;
+    private Long upTaskId;
 }

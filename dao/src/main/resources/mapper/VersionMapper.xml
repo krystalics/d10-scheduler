@@ -7,32 +7,28 @@
     </sql>
 
     <sql id="fields">
-        task_id          as taskId,
-        task_name        as taskName,
-        type             as type,
-        frequency        as frequency,
-        schedule_type    as scheduleType,
-        concurrency      as concurrency,
-        crontab          as crontab,
-        owner_mail_prefix       as ownerMail,
-        creator_mail_prefix     as creatorMail,
-        job_conf          as jobConf,
-        retry_times      as retryTimes,
-        state            as state,
-        note             as note,
-        priority         as priority,
-        ctime            as ctime,
-        mtime            as mtime
+        version_id          as versionId,
+        task_id             as taskId,
+        version_no          as versionNo,
+        last_instance_id    as lastInstanceId,
+        retry_remain_times  as retryRemainTimes,
+        ctime               as ctime,
+        mtime               as mtime
     </sql>
 
     <sql id="where_sql">
         <where>
-            <if test="taskName != null and taskName != ''">
-                task_name like concat('%', #{taskName}, '%')
+            1 = 1
+            <if test="versionId != null and versionId != ''">
+                and version_id = #{versionId}
             </if>
 
-            <if test="ownerMailLike != null and ownerMailLike != ''">
-                and owner_mail_prefix like concat('%', #{ownerMailLike}, '%')
+            <if test="taskId != null and taskId != ''">
+                and task_id = #{taskId}
+            </if>
+
+            <if test="versionNo != null and versionNo != ''">
+                and version_no = #{versionNo}
             </if>
 
         </where>
@@ -42,35 +38,17 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into
         <include refid="table"/>(
-        task_id
-        task_name
-        type
-        frequency
-        schedule_type
-        concurrency
-        crontab
-        owner_mail_prefix,
-        creator_mail_prefix,
-        jobConf
-        retry_times
-        state
-        note
-        priority)
+        version_id,
+        task_id,
+        version_no,
+        last_instance_id,
+        retry_remain_times)
         value(
+        #{versionId},
         #{taskId},
-        #{taskName},
-        #{type},
-        #{frequency},
-        #{scheduleType},
-        #{concurrency},
-        #{crontab},
-        #{ownerMail},
-        #{creatorMail},
-        #{jobConf},
-        #{retryTimes},
-        #{state},
-        #{note},
-        #{priority})
+        #{versionNo},
+        #{lastInstanceId},
+        #{retryRemainTimes})
     </insert>
 
     <select id="list" resultType="com.github.krystalics.d10.scheduler.dao.entity.Version">
@@ -100,9 +78,10 @@
         update
         <include refid="table"/>
         <set>
-            <if test="state != null and state != ''">
-                state = #{state},
+            <if test="retryRemainTimes != null and retryRemainTimes != ''">
+                retry_remain_times = #{retryRemainTimes},
             </if>
+
         </set>
         <include refid="where_sql"/>
     </update>

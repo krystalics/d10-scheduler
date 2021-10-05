@@ -6,10 +6,13 @@ import lombok.EqualsAndHashCode;
 
 /**
  * @author linjiabao001
- * @date 2021/10/2
+ * @date 2021/10/5
  * @description
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class VersionQM extends BaseQM {
+    private Long versionId;
+    private Long taskId;
+    private String versionNo;
 }

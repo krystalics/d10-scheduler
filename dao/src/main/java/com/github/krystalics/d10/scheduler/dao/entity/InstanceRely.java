@@ -4,10 +4,11 @@ package com.github.krystalics.d10.scheduler.dao.entity;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author krysta
@@ -20,8 +21,11 @@ public class InstanceRely implements Serializable {
 
     private Integer id;
 
-    private Integer versionId;
+    private Long instanceId;
 
-    private Integer upVersionId;
+    private Long upTaskId;
 
+    private String upVersionNo;
+
+    private LocalDateTime ctime;
 }

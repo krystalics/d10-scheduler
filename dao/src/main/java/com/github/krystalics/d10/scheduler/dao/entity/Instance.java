@@ -37,10 +37,6 @@ public class Instance implements Serializable {
     /**
      * 实例的调度类型:1时间调度 2事件调度.对于日常例行实例,与任务的调度类型一样.如果是手动修复且忽略上游,则应该是时间触发.
      */
-    private Integer scheduleType;
-
-    private Integer type;
-
     /**
      * 实例将被调起的 物理时间点,形如"20140802 10:30",根据crontab填入
      */
