@@ -29,8 +29,8 @@ import static com.cronutils.model.CronType.QUARTZ;
  */
 public class CronUtils {
 
-    private static final CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(QUARTZ);
-    private static final CronParser parser = new CronParser(cronDefinition);
+    private static final CronDefinition CRON_DEFINITION = CronDefinitionBuilder.instanceDefinitionFor(QUARTZ);
+    private static final CronParser PARSER = new CronParser(CRON_DEFINITION);
 
 
     /**
@@ -40,7 +40,7 @@ public class CronUtils {
      * @return 获得下次或者上次应该执行的时间
      */
     private static ZonedDateTime parse(ZonedDateTime dateTime, String crontab, boolean flag) {
-        final Cron cron = parser.parse(crontab);
+        final Cron cron = PARSER.parse(crontab);
         cron.validate();
         ExecutionTime executionTime = ExecutionTime.forCron(cron);
         Optional<ZonedDateTime> execution;
