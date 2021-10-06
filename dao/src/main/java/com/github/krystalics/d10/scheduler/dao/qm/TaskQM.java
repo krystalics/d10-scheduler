@@ -13,5 +13,6 @@ import lombok.EqualsAndHashCode;
 @Data
 public class TaskQM extends BaseQM {
     private String taskName;
-    private String ownerMailLike;
+    private Integer type;
+    private Integer state;
 }

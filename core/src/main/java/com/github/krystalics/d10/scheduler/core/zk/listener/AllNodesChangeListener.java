@@ -29,7 +29,7 @@ public class AllNodesChangeListener implements PathChildrenCacheListener {
         switch (pathChildrenCacheEvent.getType()) {
             case CHILD_ADDED:
                 final String newNode = new String(pathChildrenCacheEvent.getData().getData());
-                log.info("new node is {}" + newNode);
+                log.info("new node is {}" , newNode);
                 ClusterInfo.addToAllNodes(newNode);
                 break;
             case CHILD_UPDATED:

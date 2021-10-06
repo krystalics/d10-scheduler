@@ -7,7 +7,8 @@
     </sql>
 
     <sql id="fields">
-        task_id          as taskId,
+        task_id
+        as taskId,
         task_name        as taskName,
         type             as type,
         frequency        as frequency,
@@ -29,11 +30,15 @@
         <where>
             1 = 1
             <if test="taskName != null and taskName != ''">
-               and task_name like concat('%', #{taskName}, '%')
+                and task_name like concat('%', #{taskName}, '%')
             </if>
 
-            <if test="ownerMailLike != null and ownerMailLike != ''">
-                and owner_mail_prefix like concat('%', #{ownerMailLike}, '%')
+            <if test="type != null and type != ''">
+                and type = #{type}
+            </if>
+
+            <if test="state != null and state != ''">
+                and state = #{state}
             </if>
 
         </where>

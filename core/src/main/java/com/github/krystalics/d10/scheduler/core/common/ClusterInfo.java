@@ -1,6 +1,9 @@
 package com.github.krystalics.d10.scheduler.core.common;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public final class ClusterInfo {
@@ -27,6 +30,11 @@ public final class ClusterInfo {
      * these will be persistent znodes，线程安全考虑
      */
     private final Set<String> allNodes = new CopyOnWriteArraySet<>();
+
+    /**
+     * node address -> task_id 上界
+     */
+    private final Map<String, Long> nodeTaskRange = new ConcurrentHashMap<>();
 
     private String master;
 
@@ -66,20 +74,48 @@ public final class ClusterInfo {
         return CLUSTER_INFO.allNodes;
     }
 
-    public static void addToLiveNodes(String node){
+    public static void addToLiveNodes(String node) {
         CLUSTER_INFO.liveNodes.add(node);
     }
 
-    public static void addToAllNodes(String node){
+    public static void addToLiveNodes(List<String> nodes) {
+        CLUSTER_INFO.liveNodes.addAll(nodes);
+    }
+
+    public static boolean isNewHere(String node) {
+        return !CLUSTER_INFO.liveNodes.contains(node);
+    }
+
+    public static void addToAllNodes(String node) {
         CLUSTER_INFO.allNodes.add(node);
     }
 
-    public static void removeFromLiveNodes(String node){
+    public static void removeFromLiveNodes(String node) {
         CLUSTER_INFO.liveNodes.remove(node);
     }
 
-    public static void removeFromAllNodes(String node){
+    public static void removeFromAllNodes(String node) {
         CLUSTER_INFO.allNodes.remove(node);
+    }
+
+    public static void setNodeRange(String address, long upperLimit) {
+        CLUSTER_INFO.nodeTaskRange.put(address, upperLimit);
+    }
+
+    public static long getNodeUpperLimit(String address) {
+        return CLUSTER_INFO.nodeTaskRange.getOrDefault(address, -1L);
+    }
+
+    public static String getNode(long taskId) {
+        final String[] node = {""};
+
+        CLUSTER_INFO.nodeTaskRange.forEach((k, v) -> {
+            if (taskId < v) {
+                node[0] = k;
+            }
+        });
+
+        return node[0];
     }
 
     @Override
@@ -87,6 +123,7 @@ public final class ClusterInfo {
         return "ClusterInfo{" +
                 "liveNodes=" + liveNodes +
                 ", allNodes=" + allNodes +
+                ", nodeTaskRange=" + nodeTaskRange +
                 ", master='" + master + '\'' +
                 ", selfAddress='" + selfAddress + '\'' +
                 '}';

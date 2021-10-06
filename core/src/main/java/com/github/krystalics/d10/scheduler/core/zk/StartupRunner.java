@@ -2,6 +2,7 @@ package com.github.krystalics.d10.scheduler.core.zk;
 
 import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.common.Constant;
+import com.github.krystalics.d10.scheduler.core.service.impl.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.core.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.zk.listener.AllNodesChangeListener;
 import com.github.krystalics.d10.scheduler.core.zk.listener.ElectionListener;
@@ -19,6 +20,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @author krysta
@@ -48,6 +50,9 @@ public class StartupRunner implements CommandLineRunner {
     @Autowired
     private LiveNodesChangeListener liveNodesChangeListener;
 
+    @Autowired
+    private RebalanceServiceImpl rebalanceService;
+
     String address = "";
 
     /**
@@ -59,7 +64,7 @@ public class StartupRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         address = IPUtils.getHost() + ":" + port;
-        log.info("init action begin! this node address is {}",address);
+        log.info("init action begin! this node address is {}", address);
         initZkPaths();
         initCuratorCaches();
         ClusterInfo.setSelf(address);
@@ -68,7 +73,7 @@ public class StartupRunner implements CommandLineRunner {
         leaderLatch.addListener(electionListener);
         leaderLatch.start();
 
-        if(Constant.SCHEDULE_HA_POLICY_MASTER_SLAVE.equals(haPolicy)){
+        if (Constant.SCHEDULE_HA_POLICY_MASTER_SLAVE.equals(haPolicy)) {
             /**
              * 阻塞至成为新的leader
              */
@@ -76,9 +81,10 @@ public class StartupRunner implements CommandLineRunner {
             leaderLatch.await();
             System.out.println("new leader");
 
-        }else {
+        } else {
             System.out.println("multi");
 
+//            rebalanceService.rebalance();
         }
 
 
@@ -90,8 +96,10 @@ public class StartupRunner implements CommandLineRunner {
         createNode(Constant.ZK_LIVE_NODES, "cluster live ips", CreateMode.PERSISTENT);
         createNode(Constant.ZK_ALL_NODES, "cluster all ips", CreateMode.PERSISTENT);
 
-        createNode(Constant.ZK_ALL_NODES + "/" + address, address, CreateMode.PERSISTENT);
+        final List<String> liveNodes = client.getChildren().forPath(Constant.ZK_LIVE_NODES);
+        ClusterInfo.addToLiveNodes(liveNodes);
 
+        createNode(Constant.ZK_ALL_NODES + "/" + address, address, CreateMode.PERSISTENT);
         //在live中为临时节点
         createNode(Constant.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
     }
