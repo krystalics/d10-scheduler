@@ -30,6 +30,9 @@ public class StartupRunner implements CommandLineRunner {
     @Value("${server.port}")
     private int port;
 
+    @Value("${schedule.ha.policy}")
+    private String haPolicy;
+
     @Autowired
     private CuratorFramework client;
 
@@ -65,7 +68,18 @@ public class StartupRunner implements CommandLineRunner {
         leaderLatch.addListener(electionListener);
         leaderLatch.start();
 
+        if(Constant.SCHEDULE_HA_POLICY_MASTER_SLAVE.equals(haPolicy)){
+            /**
+             * 阻塞至成为新的leader
+             */
+            System.out.println("master");
+            leaderLatch.await();
+            System.out.println("new leader");
 
+        }else {
+            System.out.println("multi");
+
+        }
 
 
     }

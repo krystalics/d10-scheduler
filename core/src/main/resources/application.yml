@@ -27,3 +27,8 @@ logging:
 
 server:
   port: 8082
+
+#  高可用策略 有两种 master-slave 主从 | multi-live 多活
+schedule:
+  ha:
+    policy: master-slave

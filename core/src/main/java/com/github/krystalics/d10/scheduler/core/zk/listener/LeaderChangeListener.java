@@ -27,7 +27,7 @@ public class LeaderChangeListener implements CuratorCacheListener {
         switch (type) {
             case NODE_CREATED:
                 final String modifyData = new String(after.getData());
-                log.info("the leader node is created " + modifyData);
+                log.info("the leader node is " + modifyData);
                 ClusterInfo.setMaster(modifyData);
                 break;
             case NODE_CHANGED:
