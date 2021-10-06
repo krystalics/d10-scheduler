@@ -4,6 +4,7 @@ zk:
     username: lin
     password: lin
 
+
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -23,3 +24,5 @@ logging:
   level:
     org:
       springframework: error
+server:
+  port: 8081

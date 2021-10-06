@@ -18,7 +18,6 @@
 
     <modules>
         <module>core</module>
-        <module>distributed</module>
         <module>web</module>
         <module>dao</module>
     </modules>

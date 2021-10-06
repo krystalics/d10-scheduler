@@ -16,9 +16,18 @@ public class Constant {
     public final static String DAY_VERSION_NO_FORMAT = "yyyyMMdd000000";
 
 
-    /**
-     * zk
-     */
+    //============================== zk ===================================
 
     public final static String ZK_ELECTION = "/election";
+    /**
+     * 用于集群节点确定leader是哪个
+     */
+    public final static String ZK_LEADER = "/election/leader";
+
+    public final static String ZK_LIVE_NODES = "/live";
+
+    public final static String ZK_ALL_NODES = "/all";
+
+
+
 }

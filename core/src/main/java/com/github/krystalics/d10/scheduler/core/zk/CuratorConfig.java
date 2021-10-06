@@ -32,10 +32,17 @@ public class CuratorConfig {
     @Value("${zk.scheduler.password}")
     private String password;
 
-    private int sessionTimeout = 5000;
+    /**
+     * 1分钟的会话超时
+     * 10s的连接超时
+     */
+    private int sessionTimeout = 60000;
 
-    private int connectTimeout = 5000;
+    private int connectTimeout = 10000;
 
+    /**
+     * 设置digest权限：基于账号密码的授权模式，这里的密码只能使用加密之后的密码
+     */
     private static final String SCHEME = "digest";
 
     @Bean
@@ -59,8 +66,8 @@ public class CuratorConfig {
                 .aclProvider(aclProvider)
                 .authorization(SCHEME, auth.getBytes(StandardCharsets.UTF_8))
                 .connectString(zkAddress)
-                .sessionTimeoutMs(1000)
-                .connectionTimeoutMs(10000)
+                .sessionTimeoutMs(sessionTimeout)
+                .connectionTimeoutMs(connectTimeout)
                 .retryPolicy(retryPolicy)
                 .build();
 
@@ -70,8 +77,7 @@ public class CuratorConfig {
     }
 
     private String getAuth() {
-        String auth = username + ":" + password;
-        return auth;
+        return username + ":" + password;
     }
 
     public List<ACL> aclList() {
