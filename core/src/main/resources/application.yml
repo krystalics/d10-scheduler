@@ -24,5 +24,6 @@ logging:
   level:
     org:
       springframework: error
+
 server:
-  port: 8081
+  port: 8082

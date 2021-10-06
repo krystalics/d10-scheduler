@@ -1,5 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.zk;
 
+import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.common.Constant;
 import com.github.krystalics.d10.scheduler.core.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.zk.listener.AllNodesChangeListener;
@@ -12,8 +13,6 @@ import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.zookeeper.CreateMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -60,13 +59,14 @@ public class StartupRunner implements CommandLineRunner {
         log.info("init action begin! this node address is {}",address);
         initZkPaths();
         initCuratorCaches();
-
         ClusterInfo.setSelf(address);
-
         log.info("try to be a leader!");
         final LeaderLatch leaderLatch = new LeaderLatch(client, Constant.ZK_ELECTION, address, LeaderLatch.CloseMode.NOTIFY_LEADER);
         leaderLatch.addListener(electionListener);
         leaderLatch.start();
+
+
+
 
     }
 

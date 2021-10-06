@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.zk;
+package com.github.krystalics.d10.scheduler.core.common;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;

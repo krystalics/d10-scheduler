@@ -1,12 +1,10 @@
 package com.github.krystalics.d10.scheduler.core.zk.listener;
 
 import com.github.krystalics.d10.scheduler.core.common.Constant;
-import com.github.krystalics.d10.scheduler.core.zk.ClusterInfo;
+import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,7 +23,7 @@ public class ElectionListener implements LeaderLatchListener {
 
     @Override
     public void isLeader() {
-        log.info("i'm leader");
+        log.info("i'm the leader");
         try {
             ClusterInfo.setMaster(ClusterInfo.getSelf());
             client.setData().forPath(Constant.ZK_LEADER, ClusterInfo.getSelf().getBytes(StandardCharsets.UTF_8));
@@ -42,7 +40,7 @@ public class ElectionListener implements LeaderLatchListener {
      */
     @Override
     public void notLeader() {
-        log.info("i'm not leader");
+        log.info("i'm not the leader like before");
     }
 
 
