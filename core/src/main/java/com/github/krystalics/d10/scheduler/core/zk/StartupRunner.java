@@ -5,7 +5,6 @@ import com.github.krystalics.d10.scheduler.core.common.Constant;
 import com.github.krystalics.d10.scheduler.core.service.impl.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.core.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.zk.listener.AllNodesChangeListener;
-import com.github.krystalics.d10.scheduler.core.zk.listener.ConnectionStateChangeListener;
 import com.github.krystalics.d10.scheduler.core.zk.listener.ElectionListener;
 import com.github.krystalics.d10.scheduler.core.zk.listener.LeaderChangeListener;
 import com.github.krystalics.d10.scheduler.core.zk.listener.LiveNodesChangeListener;
@@ -18,6 +17,7 @@ import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -51,10 +51,20 @@ public class StartupRunner implements CommandLineRunner {
     @Autowired
     private LiveNodesChangeListener liveNodesChangeListener;
 
+
     @Autowired
     private RebalanceServiceImpl rebalanceService;
 
+    @Bean
+    public LeaderLatch leaderLatch() {
+        String address = IPUtils.getHost() + ":" + port;
+        return new LeaderLatch(client, Constant.ZK_ELECTION, address, LeaderLatch.CloseMode.NOTIFY_LEADER);
+    }
+
     String address = "";
+
+    @Autowired
+    private LeaderLatch leaderLatch;
 
     /**
      * 作为leader的话、会将自身的id或者 ip 写进 /election节点中
@@ -70,7 +80,7 @@ public class StartupRunner implements CommandLineRunner {
         initCuratorCaches();
         ClusterInfo.setSelf(address);
         log.info("try to be a leader!");
-        final LeaderLatch leaderLatch = new LeaderLatch(client, Constant.ZK_ELECTION, address, LeaderLatch.CloseMode.NOTIFY_LEADER);
+
         leaderLatch.addListener(electionListener);
         leaderLatch.start();
 
@@ -105,6 +115,14 @@ public class StartupRunner implements CommandLineRunner {
         createNode(Constant.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
     }
 
+    /**
+     * curator cache中的 afterInitialized
+     * 可以让listener在节点初始化完后再加入 监听，
+     *
+     * 没加它之前：之前存在的node、都是会触发对应的 child_add事件
+     * 加了它就没了，之前存在的节点对它来说不影响。
+     * 看场景使用吧
+     */
     public void initCuratorCaches() {
         log.info("create listeners for nodes changed!");
 
@@ -116,7 +134,7 @@ public class StartupRunner implements CommandLineRunner {
         allNodesCache.listenable().addListener(allNodesCacheListener);
 
         CuratorCache liveNodesCache = CuratorCache.build(client, Constant.ZK_LIVE_NODES);
-        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(Constant.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
+        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().forPathChildrenCache(Constant.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
         liveNodesCache.listenable().addListener(liveNodesCacheListener);
 
         leaderChangeCache.start();

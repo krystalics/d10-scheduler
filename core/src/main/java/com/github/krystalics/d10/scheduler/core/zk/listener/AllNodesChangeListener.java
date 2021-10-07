@@ -25,7 +25,7 @@ public class AllNodesChangeListener implements PathChildrenCacheListener {
      * @throws Exception
      */
     @Override
-    public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
+    public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent){
         switch (pathChildrenCacheEvent.getType()) {
             case CHILD_ADDED:
                 final String newNode = new String(pathChildrenCacheEvent.getData().getData());

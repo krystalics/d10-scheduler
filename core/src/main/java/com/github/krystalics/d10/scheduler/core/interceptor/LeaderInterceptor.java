@@ -1,6 +1,7 @@
 package com.github.krystalics.d10.scheduler.core.interceptor;
 
 import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
+import com.github.krystalics.d10.scheduler.core.utils.LeaderUtils;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -23,11 +24,16 @@ public class LeaderInterceptor implements HandlerInterceptor {
         String requestURI = request.getRequestURI();
         //todo 节点与zk失联策略
         if (ClusterInfo.getLostState()) {
+            log.error("i can't connect to zk, fuck");
 
         }
 
+        //todo 节点是leader
+        if(LeaderUtils.isLeader()){
+            log.info("i'm the leader,to process something special");
+        }
 
-        return HandlerInterceptor.super.preHandle(request, response, handler);
+        return true;
     }
 
     @Override

@@ -129,6 +129,10 @@ public final class ClusterInfo {
         CLUSTER_INFO.lost.compareAndSet(true, false);
     }
 
+    /**
+     * 并发中出现一些漏网之鱼 进入节点是可以接受的，概率比较小。
+     * @return
+     */
     public static boolean getLostState(){
         return CLUSTER_INFO.lost.get();
     }

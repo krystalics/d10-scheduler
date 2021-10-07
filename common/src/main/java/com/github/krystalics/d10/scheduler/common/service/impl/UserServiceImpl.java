@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private RedissonClient client;
+//    @Autowired
+//    private RedissonClient client;
 
     @Override
     public SessionUser login(long userId) {

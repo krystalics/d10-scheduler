@@ -1,5 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.zk;
 
+import com.github.krystalics.d10.scheduler.core.zk.listener.ConnectionStateChangeListener;
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -9,6 +10,7 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +47,9 @@ public class CuratorConfig {
      */
     private static final String SCHEME = "digest";
 
+    @Autowired
+    private ConnectionStateChangeListener connectionStateChangeListener;
+
     @Bean
     public CuratorFramework curator() {
         final RetryNTimes retryPolicy = new RetryNTimes(3, 500);
@@ -70,6 +75,8 @@ public class CuratorConfig {
                 .connectionTimeoutMs(connectTimeout)
                 .retryPolicy(retryPolicy)
                 .build();
+
+        client.getConnectionStateListenable().addListener(connectionStateChangeListener);
 
         client.start();
 
