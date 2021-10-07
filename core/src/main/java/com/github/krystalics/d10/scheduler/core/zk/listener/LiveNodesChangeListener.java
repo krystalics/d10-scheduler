@@ -22,6 +22,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
 
     /**
      * 临时节点发生一些异常情况、就直接移除
+     * @important 临时节点 没有CONNECTION_RECONCTED事件
      * @param curatorFramework
      * @param pathChildrenCacheEvent
      * @throws Exception
@@ -30,7 +31,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
     public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
         switch (pathChildrenCacheEvent.getType()) {
             case CHILD_ADDED:
-            case CONNECTION_RECONNECTED:
+//            case CONNECTION_RECONNECTED: 临时节点 没有CONNECTION_RECONCTED事件
                 add(pathChildrenCacheEvent);
                 break;
             case CHILD_UPDATED:

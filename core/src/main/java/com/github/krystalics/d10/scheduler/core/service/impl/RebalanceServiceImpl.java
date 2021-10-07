@@ -2,7 +2,6 @@ package com.github.krystalics.d10.scheduler.core.service.impl;
 
 import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.service.RebalanceService;
-import com.github.krystalics.d10.scheduler.core.service.ZookeeperService;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,7 @@ public class RebalanceServiceImpl implements RebalanceService {
     private TaskMapper taskMapper;
 
     @Autowired
-    private ZookeeperService zookeeperService;
+    private ZookeeperServiceImpl zookeeperService;
 
     @Override
     public void rebalance() throws Exception {

@@ -1,12 +1,13 @@
 package com.github.krystalics.d10.scheduler.core.service.impl;
 
 import com.github.krystalics.d10.scheduler.core.common.Constant;
-import com.github.krystalics.d10.scheduler.core.service.ZookeeperService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class ZookeeperServiceImpl implements ZookeeperService {
+public class ZookeeperServiceImpl  {
 
     @Autowired
     private CuratorFramework client;
@@ -27,8 +28,17 @@ public class ZookeeperServiceImpl implements ZookeeperService {
      * @return
      * @throws Exception
      */
-    @Override
     public List<String> liveNodes() throws Exception {
         return client.getChildren().forPath(Constant.ZK_LIVE_NODES);
     }
+
+    public void createNodeIfNotExist(String path, String data, CreateMode mode) throws Exception {
+        if (client.checkExists().forPath(path) != null) {
+            return;
+        }
+        client.create().creatingParentsIfNeeded()
+                .withMode(mode)
+                .forPath(path, data.getBytes(StandardCharsets.UTF_8));
+    }
+
 }

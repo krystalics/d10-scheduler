@@ -1,10 +1,15 @@
 package com.github.krystalics.d10.scheduler.core.zk.listener;
 
 import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
+import com.github.krystalics.d10.scheduler.core.common.Constant;
+import com.github.krystalics.d10.scheduler.core.service.impl.ZookeeperServiceImpl;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.zookeeper.CreateMode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -16,10 +21,16 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class ConnectionStateChangeListener implements ConnectionStateListener {
 
+    @Autowired
+    private ZookeeperServiceImpl zookeeperService;
+
     /**
      * 当节点与zk的连接状态发生变化时、在这里处理
      * leaderLatch中 已经封装了ConnectionStateListener、但只有leader角色才会有这待遇。
      * 代码参考:阅读理解
+     *
+     * @param curatorFramework
+     * @param connectionState
      * @see org.apache.curator.framework.CuratorFrameworkFactory.Builder
      * 在默认的 CuratorFramework client builder中采用的是StandardConnectionStateErrorPolicy()
      * 它对于错误状态的定义就是 Lost和SUSPENDED
@@ -31,10 +42,8 @@ public class ConnectionStateChangeListener implements ConnectionStateListener {
      * 通过设置系统的全局变量，在拦截器拦截所有的请求、如果节点lost变量处于true状态，请求就转发到其他节点中
      * <p>
      * 2。不只与zk失联，可能还与集群其他的节点失联(可能其他节点挂了)。这时候转发请求也会失败
-     *
-     * @param curatorFramework
-     * @param connectionState
      */
+    @SneakyThrows
     @Override
     public void stateChanged(CuratorFramework curatorFramework, ConnectionState connectionState) {
         switch (connectionState) {
@@ -52,6 +61,9 @@ public class ConnectionStateChangeListener implements ConnectionStateListener {
                 //当zk节点出现问题、会出现只读的情况、不过我们这里不需要处理
                 break;
             case RECONNECTED:
+                //todo 将临时节点补回来
+//                createNode(Constant.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
+                zookeeperService.createNodeIfNotExist(Constant.ZK_LIVE_NODES + "/" + ClusterInfo.getSelf(), ClusterInfo.getSelf(), CreateMode.EPHEMERAL);
                 log.info("i reconnect to zk,wow");
                 ClusterInfo.connected();
                 break;
