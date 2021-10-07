@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class ClusterInfo {
 
@@ -39,6 +40,8 @@ public final class ClusterInfo {
     private String master;
 
     private String selfAddress;
+
+    private AtomicBoolean lost = new AtomicBoolean(false);
 
     public static void setSelf(String address) {
         CLUSTER_INFO.selfAddress = address;
@@ -118,6 +121,18 @@ public final class ClusterInfo {
         return node[0];
     }
 
+    public static void setLost() {
+        CLUSTER_INFO.lost.compareAndSet(false, true);
+    }
+
+    public static void connected() {
+        CLUSTER_INFO.lost.compareAndSet(true, false);
+    }
+
+    public static boolean getLostState(){
+        return CLUSTER_INFO.lost.get();
+    }
+
     @Override
     public String toString() {
         return "ClusterInfo{" +
@@ -126,6 +141,7 @@ public final class ClusterInfo {
                 ", nodeTaskRange=" + nodeTaskRange +
                 ", master='" + master + '\'' +
                 ", selfAddress='" + selfAddress + '\'' +
+                ", lost='" + lost.get() + '\'' +
                 '}';
     }
 }

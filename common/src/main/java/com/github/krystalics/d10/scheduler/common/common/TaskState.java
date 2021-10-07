@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.common;
+package com.github.krystalics.d10.scheduler.common.common;
 
 /**
  * @author linjiabao001

@@ -5,6 +5,7 @@ import com.github.krystalics.d10.scheduler.core.common.Constant;
 import com.github.krystalics.d10.scheduler.core.service.impl.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.core.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.zk.listener.AllNodesChangeListener;
+import com.github.krystalics.d10.scheduler.core.zk.listener.ConnectionStateChangeListener;
 import com.github.krystalics.d10.scheduler.core.zk.listener.ElectionListener;
 import com.github.krystalics.d10.scheduler.core.zk.listener.LeaderChangeListener;
 import com.github.krystalics.d10.scheduler.core.zk.listener.LiveNodesChangeListener;
@@ -115,7 +116,7 @@ public class StartupRunner implements CommandLineRunner {
         allNodesCache.listenable().addListener(allNodesCacheListener);
 
         CuratorCache liveNodesCache = CuratorCache.build(client, Constant.ZK_LIVE_NODES);
-        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().forPathChildrenCache(Constant.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
+        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(Constant.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
         liveNodesCache.listenable().addListener(liveNodesCacheListener);
 
         leaderChangeCache.start();

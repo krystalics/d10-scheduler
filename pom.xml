@@ -20,6 +20,7 @@
         <module>core</module>
         <module>web</module>
         <module>dao</module>
+        <module>common</module>
     </modules>
 
     <dependencies>
@@ -56,6 +57,10 @@
             <version>3.12.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
 
     </dependencies>
 </project>

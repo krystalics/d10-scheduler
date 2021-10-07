@@ -2,8 +2,8 @@
 //
 //
 //import com.github.krystalics.d10.scheduler.core.common.Constant;
-//import com.github.krystalics.d10.scheduler.core.common.FrequencyGranularity;
-//import com.github.krystalics.d10.scheduler.core.common.VersionState;
+//import com.github.krystalics.d10.scheduler.common.common.FrequencyGranularity;
+//import com.github.krystalics.d10.scheduler.common.common.VersionState;
 //import com.github.krystalics.d10.scheduler.core.utils.CronUtils;
 //import com.github.krystalics.d10.scheduler.core.utils.DateUtils;
 //import com.github.krystalics.d10.scheduler.core.utils.SpringUtils;

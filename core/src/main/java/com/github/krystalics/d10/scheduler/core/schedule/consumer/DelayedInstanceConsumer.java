@@ -1,6 +1,6 @@
 //package com.github.krystalics.d10.scheduler.core.schedule.consumer;
 //
-//import com.github.krystalics.d10.scheduler.core.common.VersionState;
+//import com.github.krystalics.d10.scheduler.common.common.VersionState;
 //import com.github.krystalics.d10.scheduler.core.utils.SpringUtils;
 //import com.github.krystalics.d10.scheduler.dao.entity.Instance;
 //import com.github.krystalics.d10.scheduler.core.schedule.delay.DelayedInstance;

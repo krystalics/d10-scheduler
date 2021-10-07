@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.common;
+package com.github.krystalics.d10.scheduler.common.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,4 +13,9 @@ import lombok.Data;
 public class Pair<L, R> {
     L l;
     R r;
+
+    public static <L, R> Pair<L, R> of(L l, R r) {
+
+        return new Pair<>(l, r);
+    }
 }
