@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.zk.listener;
 
-import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
+import com.github.krystalics.d10.scheduler.core.zk.ClusterInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
@@ -25,11 +25,11 @@ public class AllNodesChangeListener implements PathChildrenCacheListener {
      * @throws Exception
      */
     @Override
-    public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent){
+    public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) {
         switch (pathChildrenCacheEvent.getType()) {
             case CHILD_ADDED:
                 final String newNode = new String(pathChildrenCacheEvent.getData().getData());
-                log.info("new node is {}" , newNode);
+                log.info("new node is {}", newNode);
                 ClusterInfo.addToAllNodes(newNode);
                 break;
             case CHILD_UPDATED:

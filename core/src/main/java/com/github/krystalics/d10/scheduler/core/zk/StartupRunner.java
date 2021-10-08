@@ -1,6 +1,5 @@
 package com.github.krystalics.d10.scheduler.core.zk;
 
-import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.common.Constant;
 import com.github.krystalics.d10.scheduler.core.service.impl.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.core.service.impl.ZookeeperServiceImpl;

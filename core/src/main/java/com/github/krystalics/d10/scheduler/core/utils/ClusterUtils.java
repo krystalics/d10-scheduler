@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.utils;
 
-import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
+import com.github.krystalics.d10.scheduler.core.zk.ClusterInfo;
 
 /**
  * @author linjiabao001

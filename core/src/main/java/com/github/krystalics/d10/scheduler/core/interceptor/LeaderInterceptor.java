@@ -1,7 +1,8 @@
 package com.github.krystalics.d10.scheduler.core.interceptor;
 
-import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
+import com.github.krystalics.d10.scheduler.common.utils.DispatchUtils;
 import com.github.krystalics.d10.scheduler.core.utils.LeaderUtils;
+import com.github.krystalics.d10.scheduler.core.zk.ClusterInfo;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -29,7 +30,13 @@ public class LeaderInterceptor implements HandlerInterceptor {
         }
 
         //todo 节点是leader
-        if(LeaderUtils.isLeader()){
+        if (!LeaderUtils.isLeader()) {
+            final String result = DispatchUtils.dispatchWithResult4Page(ClusterInfo.getMaster(), request, "userToken");
+            if("lost".equals(result)){
+                //todo leader lost but this node has not been notify,so get the zk node value after sleep 500ms
+            }
+            return true;
+        }else {
             log.info("i'm the leader,to process something special");
         }
 

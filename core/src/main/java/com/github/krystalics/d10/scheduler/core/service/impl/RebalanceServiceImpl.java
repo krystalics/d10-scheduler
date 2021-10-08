@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.service.impl;
 
-import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
+import com.github.krystalics.d10.scheduler.core.zk.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.service.RebalanceService;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;

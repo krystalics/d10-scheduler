@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.zk.listener;
 
-import com.github.krystalics.d10.scheduler.core.common.ClusterInfo;
+import com.github.krystalics.d10.scheduler.core.zk.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.service.RebalanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;

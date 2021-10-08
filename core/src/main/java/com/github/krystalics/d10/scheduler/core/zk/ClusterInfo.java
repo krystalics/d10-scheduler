@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.common;
+package com.github.krystalics.d10.scheduler.core.zk;
 
 import java.util.List;
 import java.util.Map;
