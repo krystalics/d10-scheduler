@@ -1,6 +1,7 @@
 package com.github.krystalics.d10.scheduler.core.zk;
 
 import com.github.krystalics.d10.scheduler.core.common.Constant;
+import com.github.krystalics.d10.scheduler.core.schedule.DistributedScheduler;
 import com.github.krystalics.d10.scheduler.core.service.impl.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.core.service.impl.ZookeeperServiceImpl;
 import com.github.krystalics.d10.scheduler.core.utils.IPUtils;
@@ -68,6 +69,9 @@ public class StartupRunner implements CommandLineRunner {
     @Autowired
     private LeaderLatch leaderLatch;
 
+    @Autowired
+    private DistributedScheduler distributedScheduler;
+
     /**
      * 作为leader的话、会将自身的id或者 ip 写进 /election节点中
      *
@@ -99,6 +103,7 @@ public class StartupRunner implements CommandLineRunner {
 
 //            rebalanceService.rebalance();
         }
+        distributedScheduler.init();
 
 
     }

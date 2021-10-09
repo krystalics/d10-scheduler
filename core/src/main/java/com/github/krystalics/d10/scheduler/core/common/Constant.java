@@ -1,5 +1,7 @@
 package com.github.krystalics.d10.scheduler.core.common;
 
+import java.time.ZoneId;
+
 /**
  * @author linjiabao001
  * @date 2021/10/2
@@ -17,6 +19,7 @@ public class Constant {
      * 系统统一时区设置、不依赖于机器本身的时区设置
      */
     public final static String SYSTEM_TIME_ZONE = "Asia/Shanghai";
+    public final static ZoneId TIMEZONE_ASIA_SHANGHAI = ZoneId.of(SYSTEM_TIME_ZONE);
 
     public final static String DATE_TIME_FORMAT = "yyyyMMddHHmmss";
     public final static String HOUR_VERSION_NO_FORMAT = "yyyyMMddHH0000";
@@ -34,7 +37,6 @@ public class Constant {
     public final static String ZK_LIVE_NODES = "/live";
 
     public final static String ZK_ALL_NODES = "/all";
-
 
 
 }

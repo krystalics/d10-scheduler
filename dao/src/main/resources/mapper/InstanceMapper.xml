@@ -119,4 +119,14 @@
         <include refid="table"/>
         <include refid="where_sql"/>
     </select>
+
+    <select id="soloItem" resultType="com.github.krystalics.d10.scheduler.dao.entity.Instance">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        where version_id = #{versionId}
+        order by instance_id desc
+        limit 1;
+    </select>
 </mapper>

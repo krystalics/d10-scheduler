@@ -16,8 +16,8 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
-    "test":  "craco test",
+    "build": "NODE_ENV=production BUILD_PATH = '../web/src/main/resources/static/dist' craco build webpack",
+    "test": "craco test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -37,5 +37,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "webpack": "^4.44.2"
+  },
+  "homepage": "."
 }

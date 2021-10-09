@@ -59,6 +59,7 @@ public class Task implements Serializable {
      */
     private String jobConf;
 
+    private LocalDateTime nextInstanceTime;
 
     /**
      * 任务归属人邮箱前缀

@@ -3,6 +3,7 @@ package com.github.krystalics.d10.scheduler.core.utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -22,5 +23,11 @@ public class DateUtilsTest {
         final ZonedDateTime dateTime = ZonedDateTime.now();
         final String s = DateUtils.versionNo(dateTime, 1);
         Assertions.assertEquals("20211002160000", s);
+    }
+
+    @Test
+    public void test() {
+        LocalDateTime dateTime = LocalDateTime.now();
+        System.out.println(dateTime);
     }
 }

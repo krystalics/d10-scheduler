@@ -15,6 +15,7 @@
         schedule_type    as scheduleType,
         concurrency      as concurrency,
         crontab          as crontab,
+        next_instance_time      as nextInstanceTime,
         owner_mail_prefix       as ownerMail,
         creator_mail_prefix     as creatorMail,
         job_conf          as jobConf,
@@ -39,6 +40,10 @@
 
             <if test="state != null and state != ''">
                 and state = #{state}
+            </if>
+
+            <if test="nextInstanceTime != null and nextInstanceTime != ''">
+<![CDATA[       and next_instance_time <= #{nextInstanceTime} ]]>
             </if>
 
         </where>

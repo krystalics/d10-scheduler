@@ -5,6 +5,7 @@ import com.github.krystalics.d10.scheduler.dao.BaseMapper;
 import com.github.krystalics.d10.scheduler.dao.entity.Instance;
 import com.github.krystalics.d10.scheduler.dao.qm.InstanceQM;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -16,5 +17,10 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface InstanceMapper extends BaseMapper<Instance, InstanceQM> {
+    /**
+     * @param versionId
+     * @return
+     */
+    Instance findLastInstanceByVersionId(@Param("versionId") long versionId);
 
 }

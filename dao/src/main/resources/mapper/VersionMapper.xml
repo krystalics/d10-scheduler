@@ -82,8 +82,16 @@
                 retry_remain_times = #{retryRemainTimes},
             </if>
 
+            <if test="lastInstanceId != null and lastInstanceId != ''">
+                last_instance_id = #{lastInstanceId},
+            </if>
+
+            <if test="state != null and state != ''">
+                state = #{state}
+            </if>
+
         </set>
-        <include refid="where_sql"/>
+        where version_id = #{versionId};
     </update>
 
     <select id="getById" resultType="com.github.krystalics.d10.scheduler.dao.entity.Version">
@@ -92,5 +100,13 @@
         from
         <include refid="table"/>
         <include refid="where_sql"/>
+    </select>
+
+    <select id="findByTaskIdAndVersionNo" resultType="com.github.krystalics.d10.scheduler.dao.entity.Version">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        where task_id = #{taskId} and version_no = #{versionNo}
     </select>
 </mapper>

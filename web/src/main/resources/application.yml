@@ -17,3 +17,6 @@ logging:
   level:
     org:
       springframework: error
+
+server:
+  port: 8088

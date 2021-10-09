@@ -6,23 +6,29 @@ import com.github.krystalics.d10.scheduler.core.common.Constant;
 import com.github.krystalics.d10.scheduler.core.utils.CronUtils;
 import com.github.krystalics.d10.scheduler.core.utils.DateUtils;
 import com.github.krystalics.d10.scheduler.dao.entity.Instance;
+import com.github.krystalics.d10.scheduler.dao.entity.InstanceRely;
 import com.github.krystalics.d10.scheduler.dao.entity.Task;
+import com.github.krystalics.d10.scheduler.dao.entity.TaskRely;
 import com.github.krystalics.d10.scheduler.dao.entity.Version;
 import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
+import com.github.krystalics.d10.scheduler.dao.mapper.InstanceRelyMapper;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
+import com.github.krystalics.d10.scheduler.dao.mapper.TaskRelyMapper;
 import com.github.krystalics.d10.scheduler.dao.mapper.VersionMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
+import com.github.krystalics.d10.scheduler.dao.qm.TaskRelyQM;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
+
 
 /**
  * @author linjiabao001
@@ -33,6 +39,14 @@ import java.util.concurrent.CountDownLatch;
 @Slf4j
 public class DistributedScheduler {
 
+    /**
+     * 记录任务id今天生成的版本，避免后面疯狂查库
+     */
+    private static final ConcurrentHashMap<Long, CopyOnWriteArraySet<Version>> taskIdAndVersionsMap = new ConcurrentHashMap<>();
+
+    private static final ConcurrentHashMap<Long, Task> tasksMap = new ConcurrentHashMap<>();
+
+
     @Autowired
     private TaskMapper taskMapper;
 
@@ -42,46 +56,67 @@ public class DistributedScheduler {
     @Autowired
     private InstanceMapper instanceMapper;
 
+    @Autowired
+    private TaskRelyMapper taskRelyMapper;
+
+    @Autowired
+    private InstanceRelyMapper instanceRelyMapper;
+
     private CountDownLatch latch;
 
+    ZonedDateTime todayMin;
+    ZonedDateTime todayMax;
+
     public void init() throws InterruptedException {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(Constant.SYSTEM_TIME_ZONE));
-        log.info("scheduler start init the tasks, now is {}", now);
+        //todo 在redis或者mysql 单独的加锁表 加锁，防止两个节点同时进行init的过程
+        ZonedDateTime now = ZonedDateTime.now(Constant.TIMEZONE_ASIA_SHANGHAI);
+        todayMin = ZonedDateTime.of(LocalDateTime.MIN, Constant.TIMEZONE_ASIA_SHANGHAI);
+        todayMax = ZonedDateTime.of(LocalDateTime.MAX, Constant.TIMEZONE_ASIA_SHANGHAI);
+
+        log.info("scheduler start init the tasks, now is {}、and today min is {},max is {}", now, todayMin, todayMax);
         TaskQM taskQM = new TaskQM();
         taskQM.setState(2);
-
+        taskQM.setNextInstanceTime(todayMax.toLocalDateTime());
 
         List<Task> tasks = taskMapper.list(taskQM);
+
         latch = new CountDownLatch(tasks.size());
-
-        for (Task task : tasks) {
-//            tasksMap.put(task.getTaskId(), task);
-//            InitExecutors.submit(new InitWorker(task));
-        }
-
+        tasks.forEach((task) -> {
+            tasksMap.put(task.getTaskId(), task);
+            InitExecutors.submit(() -> initTask(task));
+        });
         latch.await();
         log.info("init versions and instance finished , cost " + ((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s");
 
+        latch = new CountDownLatch(tasks.size());
+        tasks.forEach((task) -> InitExecutors.submit(() -> initRely(task)));
+        latch.await();
+        log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s"));
+
+//        for (int i = 0; i < ConsumerExecutors.DELAYED_CONSUMERS_NUM; i++) {
+//            ConsumerExecutors.submit(new DelayedInstanceConsumer());
+//        }
+//        for (int i = 0; i < ConsumerExecutors.SCHEDULED_CONSUMERS_NUM; i++) {
+//            ConsumerExecutors.submit(new ScheduledConsumer());
+//        }
 
     }
 
     public void initTask(Task task) {
-        Date todayMaxTime = DateTime.now().millisOfDay().withMaximumValue().toDate();
-        Date date = DateTime.now().minusDays(1).millisOfDay().withMaximumValue().toDate();
+        ZonedDateTime date = todayMin;
 
 
         try {
             //小时级任务，需要生成24个版本
             if (FrequencyGranularity.HOUR.getValue() == task.getFrequency()) {
                 for (int i = 0; i < 24; i++) {
-                    date = initVersionAndInstance(date, todayMaxTime);
+                    date = initVersionAndInstance(task, date);
                 }
             } else {
-                initVersionAndInstance(date, todayMaxTime);
+                initVersionAndInstance(task, date);
             }
         } catch (Exception e) {
             log.error("init task error where task id = " + task.getTaskId() + " and task name = " + task.getTaskName(), e);
-            return;
         } finally {
             latch.countDown();
         }
@@ -89,37 +124,38 @@ public class DistributedScheduler {
 
     }
 
-    private Date initVersionAndInstance(Task task, ZonedDateTime date, ZonedDateTime todayMaxTime) {
+    private ZonedDateTime initVersionAndInstance(Task task, ZonedDateTime date) {
         date = CronUtils.nextExecutionDate(date, task.getCrontab());
-        if (date.isAfter(todayMaxTime)) {
+        if (date.isAfter(todayMax)) {
             return null;
         }
         String versionNo = DateUtils.versionNo(date, task.getFrequency());
-        Instance instance = schedulerCenter.insertVersionAndInstance(task, versionNo, date);
-        putIntoQueue(instance);
+        Instance instance = insertVersionAndInstance(task, versionNo, date);
+//        putIntoQueue(instance);
         return date;
     }
 
-    public Instance insertVersionAndInstance(Task task, String versionNo, Date startTimeTheory) {
-        Version version = versionMapper.findVersionByTaskIdAndVersionNo(task.getTaskId(), versionNo);
+    public Instance insertVersionAndInstance(Task task, String versionNo, ZonedDateTime startTimeTheory) {
+        Version version = versionMapper.findByTaskIdAndVersionNo(task.getTaskId(), versionNo);
         if (version == null) {
             version = generateVersion(task, versionNo);
-            versionMapper.insertVersion(version);
+            versionMapper.insert(version);
         }
-        int versionId = version.getVersionId();
+        long versionId = version.getVersionId();
 
         Instance instance = instanceMapper.findLastInstanceByVersionId(versionId);
+
         if (instance == null) {
             instance = generateInstance(task, versionId, startTimeTheory);
-            instanceMapper.insertInstance(instance);
+            instanceMapper.insert(instance);
         }
-        int instanceId = instance.getInstanceId();
+        long instanceId = instance.getInstanceId();
 
         version.setLastInstanceId(instanceId);
-        versionMapper.updateLastInstanceId(instanceId, versionId);
+        versionMapper.update(version);
 
-        versionsMap.put(versionId, version);
-        instancesMap.put(instanceId, instance);
+//        versionsMap.put(versionId, version);
+//        instancesMap.put(instanceId, instance);
 
         CopyOnWriteArraySet<Version> versions = taskIdAndVersionsMap.getOrDefault(task.getTaskId(), new CopyOnWriteArraySet<Version>());
         versions.add(version);
@@ -147,13 +183,68 @@ public class DistributedScheduler {
     /**
      * 先查看数据库中有没有该实例，用于服务重启时
      */
-    public Instance generateInstance(Task task, long versionId, Date startTimeTheory) {
+    public Instance generateInstance(Task task, long versionId, ZonedDateTime startTimeTheory) {
         Instance instance = new Instance();
         instance.setJobConf(task.getJobConf());
         instance.setState(1);
         instance.setTaskId(task.getTaskId());
         instance.setVersionId(versionId);
-        instance.setStartTimeTheory(startTimeTheory);
+        instance.setStartTimeTheory(startTimeTheory.toLocalDateTime());
         return instance;
     }
+
+    public void initRely(Task task) {
+        long taskId = task.getTaskId();
+
+        Set<Version> versions = taskIdAndVersionsMap.get(taskId);
+
+        initRelies(taskId, todayMin, versions);
+
+        log.info("version rely generated where task id is {} ", taskId);
+        latch.countDown();
+    }
+
+    public void initRelies(long taskId, ZonedDateTime date, Set<Version> versions) {
+        TaskRelyQM taskRelyQM = new TaskRelyQM();
+        taskRelyQM.setTaskId(taskId);
+        List<TaskRely> upRelies = taskRelyMapper.list(taskRelyQM);
+
+        for (Version version : versions) {
+            for (TaskRely upRely : upRelies) {
+                fillRely(version, upRely, date);
+            }
+        }
+    }
+
+    public void fillRely(Version version, TaskRely rely, ZonedDateTime date) {
+        long upTaskId = rely.getUpTaskId();
+
+        Task upTask = tasksMap.get(upTaskId);
+
+        //说明该上游下线了,或者任务周期大于1天 且执行时间不在当日内;
+        if (upTask == null) {
+            //从数据库中获取
+            TaskQM taskQM = new TaskQM();
+            taskQM.setTaskId(upTaskId);
+            upTask = taskMapper.list(taskQM).get(0);
+            if (upTask == null) {
+                log.info("the up upTask not exist, which task_id is {}", upTaskId);
+                return;
+            }
+        }
+
+        final List<ZonedDateTime> upTaskDates = CronUtils.rangeExecutionDate(date, upTask.getCrontab(), rely.getOffset(), rely.getCnt());
+        //构造上游的实例依赖
+        for (ZonedDateTime upTaskDate : upTaskDates) {
+            final String versionNo = DateUtils.versionNo(upTaskDate, upTask.getFrequency());
+            InstanceRely instanceRely = new InstanceRely();
+            instanceRely.setInstanceId(version.getLastInstanceId());
+            instanceRely.setUpTaskId(upTaskId);
+            instanceRely.setUpVersionNo(versionNo);
+
+            instanceRelyMapper.insert(instanceRely);
+        }
+    }
+
+
 }
