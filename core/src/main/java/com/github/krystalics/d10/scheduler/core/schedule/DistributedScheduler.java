@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -67,16 +68,22 @@ public class DistributedScheduler {
     ZonedDateTime todayMin;
     ZonedDateTime todayMax;
 
+    /**
+     * mysql表时间字段的值如果为null、那么在范围搜索的时候会直接返回 false
+     * 例如 next_instance_time<='2021-10-10 00:00:00' 一条记录都搜不到
+     *
+     * @throws InterruptedException
+     */
     public void init() throws InterruptedException {
         //todo 在redis或者mysql 单独的加锁表 加锁，防止两个节点同时进行init的过程
         ZonedDateTime now = ZonedDateTime.now(Constant.TIMEZONE_ASIA_SHANGHAI);
-        todayMin = ZonedDateTime.of(LocalDateTime.MIN, Constant.TIMEZONE_ASIA_SHANGHAI);
-        todayMax = ZonedDateTime.of(LocalDateTime.MAX, Constant.TIMEZONE_ASIA_SHANGHAI);
+        todayMin = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MIN), Constant.TIMEZONE_ASIA_SHANGHAI);
+        todayMax = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MAX), Constant.TIMEZONE_ASIA_SHANGHAI);
 
         log.info("scheduler start init the tasks, now is {}、and today min is {},max is {}", now, todayMin, todayMax);
         TaskQM taskQM = new TaskQM();
         taskQM.setState(2);
-        taskQM.setNextInstanceTime(todayMax.toLocalDateTime());
+        taskQM.setNextInstanceTime(todayMax);
 
         List<Task> tasks = taskMapper.list(taskQM);
 
@@ -104,8 +111,6 @@ public class DistributedScheduler {
 
     public void initTask(Task task) {
         ZonedDateTime date = todayMin;
-
-
         try {
             //小时级任务，需要生成24个版本
             if (FrequencyGranularity.HOUR.getValue() == task.getFrequency()) {
@@ -113,8 +118,12 @@ public class DistributedScheduler {
                     date = initVersionAndInstance(task, date);
                 }
             } else {
-                initVersionAndInstance(task, date);
+                date = initVersionAndInstance(task, date);
             }
+            //下一次实例化的时间
+            date = CronUtils.nextExecutionDate(date, task.getCrontab());
+            task.setNextInstanceTime(date);
+            taskMapper.update(task);
         } catch (Exception e) {
             log.error("init task error where task id = " + task.getTaskId() + " and task name = " + task.getTaskName(), e);
         } finally {
@@ -189,7 +198,7 @@ public class DistributedScheduler {
         instance.setState(1);
         instance.setTaskId(task.getTaskId());
         instance.setVersionId(versionId);
-        instance.setStartTimeTheory(startTimeTheory.toLocalDateTime());
+        instance.setStartTimeTheory(startTimeTheory);
         return instance;
     }
 

@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * <p>
@@ -59,7 +60,7 @@ public class Task implements Serializable {
      */
     private String jobConf;
 
-    private LocalDateTime nextInstanceTime;
+    private ZonedDateTime nextInstanceTime;
 
     /**
      * 任务归属人邮箱前缀

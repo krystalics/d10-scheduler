@@ -35,7 +35,7 @@
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="versionId">
         insert into
         <include refid="table"/>(
         version_id,
@@ -86,9 +86,6 @@
                 last_instance_id = #{lastInstanceId},
             </if>
 
-            <if test="state != null and state != ''">
-                state = #{state}
-            </if>
 
         </set>
         where version_id = #{versionId};

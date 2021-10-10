@@ -15,5 +15,4 @@ public class InstanceQM extends BaseQM {
     private Long instanceId;
     private Long taskId;
     private Long versionId;
-    private String versionNo;
 }

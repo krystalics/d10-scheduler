@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * <p>
@@ -40,7 +41,7 @@ public class Instance implements Serializable {
     /**
      * 实例将被调起的 物理时间点,形如"20140802 10:30",根据crontab填入
      */
-    private LocalDateTime startTimeTheory;
+    private ZonedDateTime startTimeTheory;
 
     /**
      * 命令配置，已替换版本号变量等
@@ -60,12 +61,12 @@ public class Instance implements Serializable {
     /**
      * 实例运行开始时间
      */
-    private LocalDateTime runStartTime;
+    private ZonedDateTime runStartTime;
 
     /**
      * 实例运行结束时间
      */
-    private LocalDateTime runEndTime;
+    private ZonedDateTime runEndTime;
 
     /**
      * 实例执行节点
@@ -77,10 +78,10 @@ public class Instance implements Serializable {
     /**
      * 记录生成时间，实际上也就是 实例化开始时间
      */
-    private LocalDateTime ctime;
+    private ZonedDateTime ctime;
 
     /**
      * 记录最后更改时间
      */
-    private LocalDateTime mtime;
+    private ZonedDateTime mtime;
 }

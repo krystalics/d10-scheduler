@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author linjiabao001
@@ -18,5 +19,5 @@ public class TaskQM extends BaseQM {
     private String taskName;
     private Integer type;
     private Integer state;
-    private LocalDateTime nextInstanceTime;
+    private ZonedDateTime nextInstanceTime;
 }

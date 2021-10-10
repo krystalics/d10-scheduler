@@ -41,8 +41,8 @@
             <if test="state != null and state != ''">
                 and state = #{state}
             </if>
-
-            <if test="nextInstanceTime != null and nextInstanceTime != ''">
+-- 使用java8的localdatetime 不用加 != '' 不然会报和字符串不兼容的错误
+            <if test="nextInstanceTime != null">
 <![CDATA[       and next_instance_time <= #{nextInstanceTime} ]]>
             </if>
 
@@ -50,7 +50,7 @@
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="taskId">
         insert into
         <include refid="table"/>(
         task_id,
@@ -113,6 +113,10 @@
         <set>
             <if test="state != null and state != ''">
                 state = #{state},
+            </if>
+
+            <if test="nextInstanceTime != null">
+                next_instance_time = #{nextInstanceTime}
             </if>
         </set>
         <include refid="where_sql"/>

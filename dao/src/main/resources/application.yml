@@ -1,0 +1,6 @@
+mybatis
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    com.github.krystalics.d10.scheduler.dao.mapper: trace # 改成你的mapper文件所在包路径

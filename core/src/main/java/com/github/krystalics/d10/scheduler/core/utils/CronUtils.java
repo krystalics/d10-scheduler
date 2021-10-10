@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.cronutils.model.CronType.QUARTZ;
+import static com.cronutils.model.CronType.SPRING;
 
 /**
  * @author linjiabao001
@@ -29,7 +30,7 @@ import static com.cronutils.model.CronType.QUARTZ;
  */
 public class CronUtils {
 
-    private static final CronDefinition CRON_DEFINITION = CronDefinitionBuilder.instanceDefinitionFor(QUARTZ);
+    private static final CronDefinition CRON_DEFINITION = CronDefinitionBuilder.instanceDefinitionFor(SPRING);
     private static final CronParser PARSER = new CronParser(CRON_DEFINITION);
 
 

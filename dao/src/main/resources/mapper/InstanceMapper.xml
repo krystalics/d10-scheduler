@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper">
     <sql id="table">
-        version_instance
+        instance
     </sql>
 
     <sql id="fields">
@@ -38,22 +38,16 @@
                 and version_id = #{versionId}
             </if>
 
-            <if test="versionNo != null and versionNo != ''">
-                and version_no = #{versionNo}
-            </if>
-
         </where>
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="instanceId">
         insert into
         <include refid="table"/>(
         instance_id       ,
         task_id           ,
         version_id        ,
-        version_no        ,
-        retry_remain_times,
         start_time_theory ,
         job_conf          ,
         state             ,
@@ -66,8 +60,6 @@
         #{instanceId},
         #{taskId},
         #{versionId},
-        #{versionNo},
-        #{retryRemainTimes},
         #{startTimeTheory},
         #{jobConf},
         #{state},
@@ -120,7 +112,7 @@
         <include refid="where_sql"/>
     </select>
 
-    <select id="soloItem" resultType="com.github.krystalics.d10.scheduler.dao.entity.Instance">
+    <select id="findLastInstanceByVersionId" resultType="com.github.krystalics.d10.scheduler.dao.entity.Instance">
         select
         <include refid="fields"/>
         from
