@@ -3,7 +3,7 @@ package com.github.krystalics.d10.scheduler.dao.entity;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author linjiabao001
@@ -19,6 +19,6 @@ public class Version implements Serializable {
     private Long taskId;
     private Long lastInstanceId;
     private Integer retryRemainTimes;
-    private LocalDateTime ctime;
-    private LocalDateTime mtime;
+    private ZonedDateTime ctime;
+    private ZonedDateTime mtime;
 }

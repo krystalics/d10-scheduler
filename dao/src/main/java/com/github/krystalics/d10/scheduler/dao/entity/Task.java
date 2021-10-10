@@ -92,10 +92,10 @@ public class Task implements Serializable {
      */
     private Integer priority;
 
-    private LocalDateTime ctime;
+    private ZonedDateTime ctime;
 
     /**
      * 记录最后更改时间
      */
-    private LocalDateTime mtime;
+    private ZonedDateTime mtime;
 }
