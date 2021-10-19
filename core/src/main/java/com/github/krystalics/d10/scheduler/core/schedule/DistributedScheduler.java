@@ -129,10 +129,16 @@ public class DistributedScheduler {
         } finally {
             latch.countDown();
         }
-//        log.info("init task where task id =" + task.getTaskId() + " and task name = " + task.getTaskName() + " success!!!");
+        log.info("init task where task id =" + task.getTaskId() + " and task name = " + task.getTaskName() + " success!!!");
 
     }
 
+    /**
+     *
+     * @param task 任务
+     * @param date 参考时间
+     * @return task具体执行的时间
+     */
     private ZonedDateTime initVersionAndInstance(Task task, ZonedDateTime date) {
         date = CronUtils.nextExecutionDate(date, task.getCrontab());
         if (date.isAfter(todayMax)) {
