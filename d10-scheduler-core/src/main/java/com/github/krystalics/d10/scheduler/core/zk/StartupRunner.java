@@ -1,6 +1,5 @@
 package com.github.krystalics.d10.scheduler.core.zk;
 
-import com.github.krystalics.d10.scheduler.core.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.common.Constant;
 import com.github.krystalics.d10.scheduler.core.schedule.DistributedScheduler;
 import com.github.krystalics.d10.scheduler.core.service.impl.RebalanceServiceImpl;
@@ -85,7 +84,7 @@ public class StartupRunner implements CommandLineRunner {
         log.info("init action begin! this node address is {}", address);
         initZkPaths();
         initCuratorCaches();
-        ClusterInfo.setSelf(address);
+        ClusterInfo.set(address);
         log.info("try to be a leader!");
 
         leaderLatch.addListener(electionListener);

@@ -1,6 +1,5 @@
 package com.github.krystalics.d10.scheduler.core.controller;
 
-import com.github.krystalics.d10.scheduler.core.ClusterInfo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

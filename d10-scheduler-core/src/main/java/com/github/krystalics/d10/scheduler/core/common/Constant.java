@@ -25,6 +25,14 @@ public class Constant {
     public final static String HOUR_VERSION_NO_FORMAT = "yyyyMMddHH0000";
     public final static String DAY_VERSION_NO_FORMAT = "yyyyMMdd000000";
 
+    //============================== cache-key ===================================
+
+    public final static String LIVE_NODES = "liveNodes";
+    public final static String ALL_NODES = "allNodes";
+    public final static String SELF_NODE = "self";
+    public final static String LEADER_NODE = "leader";
+    public final static String LOST_STATE = "lostState";
+
 
     //============================== zk ===================================
 

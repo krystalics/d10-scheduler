@@ -1,6 +1,5 @@
 package com.github.krystalics.d10.scheduler.core.zk.listener;
 
-import com.github.krystalics.d10.scheduler.core.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.common.Constant;
 import com.github.krystalics.d10.scheduler.core.service.impl.ZookeeperServiceImpl;
 import lombok.SneakyThrows;

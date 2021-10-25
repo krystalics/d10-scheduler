@@ -1,6 +1,5 @@
 package com.github.krystalics.d10.scheduler.core.service.impl;
 
-import com.github.krystalics.d10.scheduler.core.ClusterInfo;
 import com.github.krystalics.d10.scheduler.core.service.RebalanceService;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
@@ -39,7 +38,7 @@ public class RebalanceServiceImpl implements RebalanceService {
 
         for (String liveNode : liveNodes) {
             step += stepLong;
-            ClusterInfo.setNodeRange(liveNode, step);
+//            ClusterInfo.setNodeRange(liveNode, step);
         }
 
     }

@@ -1,6 +1,5 @@
 package com.github.krystalics.d10.scheduler.core.zk.listener;
 
-import com.github.krystalics.d10.scheduler.core.ClusterInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
