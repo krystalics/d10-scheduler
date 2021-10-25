@@ -123,12 +123,10 @@ public class StartupRunner implements CommandLineRunner {
     }
 
     /**
-     * curator cache中的 afterInitialized
-     * 可以让listener在节点初始化完后再加入 监听，
+     * curator cache中的 afterInitialized 可以让listener在节点初始化完后再加入 监听，
      *
      * 没加它之前：之前存在的node、都是会触发对应的 child_add事件
-     * 加了它就没了，之前存在的节点对它来说不影响。
-     * 看场景使用吧
+     * 这里加了afterInitialized，之前存在的节点对它来说不影响。避免触发对应的事件
      */
     public void initCuratorCaches() {
         log.info("create listeners for nodes changed!");
@@ -137,11 +135,11 @@ public class StartupRunner implements CommandLineRunner {
         leaderChangeCache.listenable().addListener(leaderChangeListener);
 
         CuratorCache allNodesCache = CuratorCache.build(client, Constant.ZK_ALL_NODES);
-        CuratorCacheListener allNodesCacheListener = CuratorCacheListener.builder().forPathChildrenCache(Constant.ZK_ALL_NODES, client, allNodesChangeListener).build();
+        CuratorCacheListener allNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(Constant.ZK_ALL_NODES, client, allNodesChangeListener).build();
         allNodesCache.listenable().addListener(allNodesCacheListener);
 
         CuratorCache liveNodesCache = CuratorCache.build(client, Constant.ZK_LIVE_NODES);
-        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().forPathChildrenCache(Constant.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
+        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(Constant.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
         liveNodesCache.listenable().addListener(liveNodesCacheListener);
 
         leaderChangeCache.start();

@@ -13,9 +13,17 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @description
  */
 
-public class Cluster {
+public class SimpleLocalCache {
 
     private static final Map<String, Object> CACHE = new ConcurrentHashMap<>();
+
+    public static void put(String key, Object value) {
+        CACHE.put(key, value);
+    }
+
+    public static Object get(String key) {
+        return CACHE.get(key);
+    }
 
     public static void addLiveNode(JobInstance instance) {
         addNode(Constant.LIVE_NODES, instance);
