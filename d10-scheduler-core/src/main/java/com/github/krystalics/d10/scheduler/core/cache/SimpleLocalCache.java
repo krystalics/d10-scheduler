@@ -70,6 +70,9 @@ public class SimpleLocalCache {
         return (JobInstance) CACHE.getOrDefault(Constant.LEADER_NODE, new JobInstance());
     }
 
+    public static void setInstanceLeader(boolean isLeader){
+
+    }
 
     public static void setLost(boolean lost) {
         CACHE.put(Constant.LOST_STATE, lost);

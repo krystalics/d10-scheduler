@@ -34,9 +34,6 @@ public class StartupRunner implements CommandLineRunner {
     @Value("${server.port}")
     private int port;
 
-    @Value("${schedule.ha.policy}")
-    private String haPolicy;
-
     @Autowired
     private CuratorFramework client;
 
@@ -89,23 +86,9 @@ public class StartupRunner implements CommandLineRunner {
 
         leaderLatch.addListener(electionListener);
         leaderLatch.start();
-
-        if (Constant.SCHEDULE_HA_POLICY_MASTER_SLAVE.equals(haPolicy)) {
-            /**
-             * 阻塞至成为新的leader
-             */
-            System.out.println("master");
-            leaderLatch.await();
-            System.out.println("new leader");
-
-        } else {
-            System.out.println("multi");
-
-//            rebalanceService.rebalance();
-        }
+        // 阻塞至成为新的leader
+        leaderLatch.await();
         distributedScheduler.init();
-
-
     }
 
     public void initZkPaths() throws Exception {
@@ -124,7 +107,7 @@ public class StartupRunner implements CommandLineRunner {
 
     /**
      * curator cache中的 afterInitialized 可以让listener在节点初始化完后再加入 监听，
-     *
+     * <p>
      * 没加它之前：之前存在的node、都是会触发对应的 child_add事件
      * 这里加了afterInitialized，之前存在的节点对它来说不影响。避免触发对应的事件
      */

@@ -9,13 +9,6 @@ import java.time.ZoneId;
  */
 public class Constant {
     /**
-     * 系统高可用的策略选择
-     */
-    public final static String SCHEDULE_HA_POLICY_MASTER_SLAVE = "master-slave";
-    public final static String SCHEDULE_HA_POLICY_MULTI_LIVE = "multi-live";
-
-
-    /**
      * 系统统一时区设置、不依赖于机器本身的时区设置
      */
     public final static String SYSTEM_TIME_ZONE = "Asia/Shanghai";

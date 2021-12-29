@@ -98,14 +98,8 @@ public class DistributedScheduler {
         latch = new CountDownLatch(tasks.size());
         tasks.forEach((task) -> InitExecutors.submit(() -> initRely(task)));
         latch.await();
-        log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s"));
 
-//        for (int i = 0; i < ConsumerExecutors.DELAYED_CONSUMERS_NUM; i++) {
-//            ConsumerExecutors.submit(new DelayedInstanceConsumer());
-//        }
-//        for (int i = 0; i < ConsumerExecutors.SCHEDULED_CONSUMERS_NUM; i++) {
-//            ConsumerExecutors.submit(new ScheduledConsumer());
-//        }
+        log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s"));
 
     }
 

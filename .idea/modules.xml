@@ -2,13 +2,17 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/d10-scheduler-common/common.iml" filepath="$PROJECT_DIR$/d10-scheduler-common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/d10-scheduler-core/core.iml" filepath="$PROJECT_DIR$/d10-scheduler-core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/d10-scheduler.iml" filepath="$PROJECT_DIR$/.idea/d10-scheduler.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/d10-scheduler-common.iml" filepath="$PROJECT_DIR$/common/d10-scheduler-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/d10-scheduler-core.iml" filepath="$PROJECT_DIR$/core/d10-scheduler-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/dao/d10-scheduler-dao.iml" filepath="$PROJECT_DIR$/dao/d10-scheduler-dao.iml" />
       <module fileurl="file://$PROJECT_DIR$/d10-scheduler-registry-center/d10-scheduler-registry-center.iml" filepath="$PROJECT_DIR$/d10-scheduler-registry-center/d10-scheduler-registry-center.iml" />
       <module fileurl="file://$PROJECT_DIR$/web/d10-scheduler-web.iml" filepath="$PROJECT_DIR$/web/d10-scheduler-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/d10-scheduler-dao/dao.iml" filepath="$PROJECT_DIR$/d10-scheduler-dao/dao.iml" />
       <module fileurl="file://$PROJECT_DIR$/d10-scheduler-frontend/frontend.iml" filepath="$PROJECT_DIR$/d10-scheduler-frontend/frontend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/d10-scheduler-web/web.iml" filepath="$PROJECT_DIR$/d10-scheduler-web/web.iml" />
     </modules>
   </component>
 </project>

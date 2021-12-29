@@ -1,6 +1,8 @@
 package com.github.krystalics.d10.scheduler.core.zk.listener;
 
+import com.github.krystalics.d10.scheduler.core.cache.SimpleLocalCache;
 import com.github.krystalics.d10.scheduler.core.common.Constant;
+import com.github.krystalics.d10.scheduler.core.common.JobInstance;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
@@ -25,6 +27,11 @@ public class ElectionListener implements LeaderLatchListener {
         log.info("i'm the leader");
         try {
             ClusterInfo.setMaster(ClusterInfo.selfAddress());
+            JobInstance jobInstance = new JobInstance();
+            jobInstance.setLeader(true);
+            jobInstance.setAddress("");
+            jobInstance.setT
+            SimpleLocalCache.setLeader();
             client.setData().forPath(Constant.ZK_LEADER, ClusterInfo.selfAddress().getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             e.printStackTrace();

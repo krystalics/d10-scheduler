@@ -29,11 +29,3 @@ logging:
 
 server:
   port: 8082
-
-#  高可用策略 有两种 master-slave 主从 | multi-live 多活
-schedule:
-  ha:
-    policy: multi-live
-
-token:
-  keyMap: { scheduler: 92e6e4ba2336a893718910810df46d7f, executorManager: 15cc5d85980ff20c679f1f2a22a6aa10, executor: ced95c1c8afb5de4a14fbbbbecd2bcef }

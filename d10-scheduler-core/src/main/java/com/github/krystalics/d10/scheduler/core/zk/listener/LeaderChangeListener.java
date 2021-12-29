@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @Slf4j
-public class LeaderChangeListener implements CuratorCacheListener {
+public class  LeaderChangeListener implements CuratorCacheListener {
 
     /**
      * 当项目启动、check到要监听到节点已经存在、会触发 NODE_CREATED 动作。
