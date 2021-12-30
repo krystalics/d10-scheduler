@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.common;
 
-import com.github.krystalics.d10.scheduler.common.common.Pair;
+import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import lombok.Data;
 
 /**

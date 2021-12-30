@@ -1,7 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.utils;
 
-import com.github.krystalics.d10.scheduler.core.common.Constant;
-import com.github.krystalics.d10.scheduler.common.common.VersionGranularity;
+import com.github.krystalics.d10.scheduler.common.constant.VersionGranularity;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

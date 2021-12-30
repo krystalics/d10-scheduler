@@ -1,7 +1,7 @@
 package com.github.krystalics.d10.scheduler.common.utils;
 
-import com.github.krystalics.d10.scheduler.common.common.Constants;
-import com.github.krystalics.d10.scheduler.common.common.Pair;
+import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
+import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -51,7 +51,7 @@ public class DispatchUtils {
         LOG.info("dispatch request url:{}, method:{}, token:{}, params:{}", requestUrl, method, userToken, requestParam);
         HttpUrl.Builder urlBuilder = HttpUrl.parse(requestUrl).newBuilder();
         if (StringUtils.isNotEmpty(userToken)) {
-            requestBuilder.addHeader(Constants.SCHEDULER_USER_TOKEN, userToken);
+            requestBuilder.addHeader(CommonConstants.SCHEDULER_USER_TOKEN, userToken);
         }
         /**
          * GET请求
@@ -145,7 +145,7 @@ public class DispatchUtils {
         LOG.info("dispatch request url:{}, method:{}, token:{}, params:{}", requestUrl, method, userToken, requestParam);
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(requestUrl)).newBuilder();
         if (StringUtils.isNotEmpty(userToken)) {
-            requestBuilder.addHeader(Constants.SCHEDULER_USER_TOKEN, userToken);
+            requestBuilder.addHeader(CommonConstants.SCHEDULER_USER_TOKEN, userToken);
         }
         /**
          * GET请求

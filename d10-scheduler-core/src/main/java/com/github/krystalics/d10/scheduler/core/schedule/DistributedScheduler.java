@@ -1,8 +1,7 @@
 package com.github.krystalics.d10.scheduler.core.schedule;
 
 
-import com.github.krystalics.d10.scheduler.common.common.FrequencyGranularity;
-import com.github.krystalics.d10.scheduler.core.common.Constant;
+import com.github.krystalics.d10.scheduler.common.constant.FrequencyGranularity;
 import com.github.krystalics.d10.scheduler.core.utils.CronUtils;
 import com.github.krystalics.d10.scheduler.core.utils.DateUtils;
 import com.github.krystalics.d10.scheduler.dao.entity.Instance;

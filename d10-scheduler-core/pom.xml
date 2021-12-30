@@ -19,17 +19,15 @@
             <version>9.1.5</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.curator/curator-recipes -->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>5.2.0</version>
-        </dependency>
-
-
         <dependency>
             <groupId>com.github.krystalics</groupId>
             <artifactId>d10-scheduler-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.krystalics</groupId>
+            <artifactId>d10-scheduler-registry-center</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

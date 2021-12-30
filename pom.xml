@@ -22,6 +22,7 @@
         <module>d10-scheduler-dao</module>
         <module>d10-scheduler-common</module>
         <module>d10-scheduler-executor</module>
+        <module>d10-scheduler-registry-center</module>
     </modules>
 
     <dependencies>

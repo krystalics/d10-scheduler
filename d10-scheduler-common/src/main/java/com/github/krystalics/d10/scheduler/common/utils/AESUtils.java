@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.common.utils;
 
-import com.github.krystalics.d10.scheduler.common.CommonConstants;
+import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;

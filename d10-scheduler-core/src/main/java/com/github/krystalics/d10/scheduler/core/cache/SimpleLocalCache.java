@@ -1,6 +1,5 @@
 package com.github.krystalics.d10.scheduler.core.cache;
 
-import com.github.krystalics.d10.scheduler.core.common.Constant;
 import com.github.krystalics.d10.scheduler.core.common.JobInstance;
 
 import java.util.Map;
