@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>d10-scheduler-registry-center</artifactId>
+    <artifactId>d10-scheduler-executor</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

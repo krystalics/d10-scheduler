@@ -15,7 +15,6 @@
         <module name="web" />
         <module name="d10-scheduler-web" />
         <module name="d10-scheduler-common" />
-        <module name="d10-scheduler-registry-center" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
