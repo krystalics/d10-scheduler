@@ -92,6 +92,13 @@ offset锚定之后、cnt的计算很简单、就不细说了。目前线上运�
 运行成功的版本添加一个trigger、会尝试触发它的下游版本进入运行状态。而这时下游节点本身会开展check行为、去判断它的所有上游是否已经完成。期间注意多个上游同时完成、同时触发的锁问题之外 没啥值得注意的点。</br>
 ![img.png](imgs/dag-10.png)
 
+##### 设计的优缺点
+对比DolphinScheduler和Airflow的跨周期依赖的设计、这种方案的配置将跨周期的依赖节点当作普通的依赖，并没有进行特化。把跨周期的依赖 当作单独的任务去对待，不断的check上游是否完成</br>
+![img.png](imgs/dag-11.png)</br>
+总结、这种方案的优缺点如下：
+- 优点：这种设计能够很通用的适应各种语言和架构，任务的依赖配置非常的灵活，面对各种夸周期的依赖。诸如 天任务依赖周任务，周任务依赖月任务等等复杂的场景都能解决。
+- 缺点：理解成本比较高，用户配置起来比较吃力。
+
 #### 参考文章：
 https://medium.com/@rchang/a-beginners-guide-to-data-engineering-the-series-finale-2cc92ff14b0 </br>
 https://medium.com/@rchang/a-beginners-guide-to-data-engineering-part-ii-47c4e7cbda71 </br>
