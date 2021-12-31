@@ -1,7 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.console.interceptor;
 
 import com.github.krystalics.d10.scheduler.common.utils.DispatchUtils;
-import com.github.krystalics.d10.scheduler.core.utils.LeaderUtils;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;

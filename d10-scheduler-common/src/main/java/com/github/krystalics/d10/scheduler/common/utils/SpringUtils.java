@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.utils;
+package com.github.krystalics.d10.scheduler.common.utils;
 
 import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.lang.TypeReference;

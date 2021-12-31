@@ -1,19 +1,17 @@
-package com.github.krystalics.d10.scheduler.core.utils;
+package com.github.krystalics.d10.scheduler.common.utils;
 
 import com.cronutils.model.Cron;
+import com.cronutils.model.CronType;
 import com.cronutils.model.definition.CronDefinition;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
-import com.github.krystalics.d10.scheduler.core.exception.IllegalCntException;
+import com.github.krystalics.d10.scheduler.common.exception.IllegalCntException;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static com.cronutils.model.CronType.QUARTZ;
-import static com.cronutils.model.CronType.SPRING;
 
 /**
  * @author linjiabao001
@@ -22,15 +20,13 @@ import static com.cronutils.model.CronType.SPRING;
  * CRON4J:java版本的UNIX、表达式与之相同
  * QUARTZ:包含 秒 分 时 天 周 月 年等完整的时间周期概念
  * SPRING:也包含完整的周期概念，与quartz的书写方式可能略有差异
- * <p>
- * 本系统的crontab表达式选择的是：QUARTZ
- * 注意在表示周的时候 1 = 周日sunday
- * <p>
+ * <p>本系统的crontab表达式选择的是：QUARTZ
+ * 注意在表示周的时候 1 = 周日sunday<p>
  * todo jdk 时间概念 zonedDatedTime 和 Joda 两个的融合
  */
 public class CronUtils {
 
-    private static final CronDefinition CRON_DEFINITION = CronDefinitionBuilder.instanceDefinitionFor(SPRING);
+    private static final CronDefinition CRON_DEFINITION = CronDefinitionBuilder.instanceDefinitionFor(CronType.SPRING);
     private static final CronParser PARSER = new CronParser(CRON_DEFINITION);
 
 

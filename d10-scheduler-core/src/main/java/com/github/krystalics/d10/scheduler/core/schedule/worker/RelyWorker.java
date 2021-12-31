@@ -1,7 +1,7 @@
 //package com.github.krystalics.d10.scheduler.core.schedule.worker;
 //
 //
-//import com.github.krystalics.d10.scheduler.core.utils.SpringUtils;
+//import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 //import com.github.krystalics.d10.scheduler.dao.entity.Task;
 //import com.github.krystalics.d10.scheduler.dao.entity.Version;
 //import org.joda.time.DateTime;

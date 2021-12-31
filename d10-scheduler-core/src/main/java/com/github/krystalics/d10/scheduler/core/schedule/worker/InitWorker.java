@@ -4,9 +4,9 @@
 //import com.github.krystalics.d10.scheduler.core.common.Constant;
 //import com.github.krystalics.d10.scheduler.common.common.FrequencyGranularity;
 //import com.github.krystalics.d10.scheduler.common.common.VersionState;
-//import com.github.krystalics.d10.scheduler.core.utils.CronUtils;
-//import com.github.krystalics.d10.scheduler.core.utils.DateUtils;
-//import com.github.krystalics.d10.scheduler.core.utils.SpringUtils;
+//import com.github.krystalics.d10.scheduler.common.utils.CronUtils;
+//import com.github.krystalics.d10.scheduler.common.utils.DateUtils;
+//import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 //import com.github.krystalics.d10.scheduler.dao.entity.Instance;
 //import com.github.krystalics.d10.scheduler.dao.entity.Task;
 //import org.slf4j.Logger;

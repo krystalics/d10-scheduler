@@ -8,6 +8,7 @@ import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.field.value.SpecialChar;
 import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
+import com.github.krystalics.d10.scheduler.common.utils.CronUtils;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;

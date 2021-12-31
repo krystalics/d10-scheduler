@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.utils;
+package com.github.krystalics.d10.scheduler.common.utils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

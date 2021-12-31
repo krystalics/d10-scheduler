@@ -1,5 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.utils;
 
+import com.github.krystalics.d10.scheduler.common.utils.DateUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

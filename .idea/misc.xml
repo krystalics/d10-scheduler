@@ -6,6 +6,11 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/web/pom.xml" />
         <option value="$PROJECT_DIR$/d10-scheduler-registry-center/pom.xml" />
+        <option value="$PROJECT_DIR$/d10-scheduler-executor/pom.xml" />
+        <option value="$PROJECT_DIR$/d10-scheduler-common/pom.xml" />
+        <option value="$PROJECT_DIR$/d10-scheduler-core/pom.xml" />
+        <option value="$PROJECT_DIR$/d10-scheduler-dao/pom.xml" />
+        <option value="$PROJECT_DIR$/d10-scheduler-web/pom.xml" />
       </list>
     </option>
   </component>
