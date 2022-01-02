@@ -5,11 +5,11 @@ import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.schedule.DistributedScheduler;
 import com.github.krystalics.d10.scheduler.registry.service.impl.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.registry.service.impl.ZookeeperServiceImpl;
-
 import com.github.krystalics.d10.scheduler.registry.zk.listener.AllNodesChangeListener;
 import com.github.krystalics.d10.scheduler.registry.zk.listener.ElectionListener;
 import com.github.krystalics.d10.scheduler.registry.zk.listener.LeaderChangeListener;
 import com.github.krystalics.d10.scheduler.registry.zk.listener.LiveNodesChangeListener;
+import com.github.krystalics.d10.scheduler.registry.zk.listener.ShardListener;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -24,9 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author krysta
@@ -54,6 +51,9 @@ public class StartupRunner implements CommandLineRunner {
     private LiveNodesChangeListener liveNodesChangeListener;
 
     @Autowired
+    private ShardListener shardListener;
+
+    @Autowired
     private ZookeeperServiceImpl zookeeperService;
 
     @Autowired
@@ -75,8 +75,10 @@ public class StartupRunner implements CommandLineRunner {
 
     /**
      * 作为leader的话、会将自身的id或者 ip 写进 /election节点中
-     * 阻塞至成为新的leader后会进行 实例化的工作
+     * 阻塞至成为新的leader后会进行 shard 重新分片的工作
+     * 再然后进行实例化的工作
      * 不过不成为leader也不应该影响服务的正常启动，所以会额外放在一个线程去执行leader的选举
+     *
      * @param args
      * @throws Exception
      */
@@ -95,9 +97,11 @@ public class StartupRunner implements CommandLineRunner {
                 leaderLatch.start();
 
                 leaderLatch.await();
-                distributedScheduler.init();
+                rebalanceService.rebalance(address);
+
+//                distributedScheduler.init();
             }
-        },"election").start();
+        }, "election").start();
     }
 
     public void initZkPaths() throws Exception {
@@ -105,10 +109,6 @@ public class StartupRunner implements CommandLineRunner {
         zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LEADER, "leader ip", CreateMode.PERSISTENT);
         zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES, "cluster live ips", CreateMode.PERSISTENT);
         zookeeperService.createNodeIfNotExist(CommonConstants.ZK_ALL_NODES, "cluster all ips", CreateMode.PERSISTENT);
-
-        final List<String> liveNodes = client.getChildren().forPath(CommonConstants.ZK_LIVE_NODES);
-//        ClusterInfo.addToLiveNodes(liveNodes);
-
         zookeeperService.createNodeIfNotExist(CommonConstants.ZK_ALL_NODES + "/" + address, address, CreateMode.PERSISTENT);
         //在live中为临时节点
         zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
@@ -126,6 +126,9 @@ public class StartupRunner implements CommandLineRunner {
         CuratorCache leaderChangeCache = CuratorCache.build(client, CommonConstants.ZK_LEADER);
         leaderChangeCache.listenable().addListener(leaderChangeListener);
 
+        CuratorCache shardCache = CuratorCache.build(client, CommonConstants.ZK_SHARD_NODE);
+        shardCache.listenable().addListener(shardListener);
+
         CuratorCache allNodesCache = CuratorCache.build(client, CommonConstants.ZK_ALL_NODES);
         CuratorCacheListener allNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(CommonConstants.ZK_ALL_NODES, client, allNodesChangeListener).build();
         allNodesCache.listenable().addListener(allNodesCacheListener);
@@ -135,6 +138,7 @@ public class StartupRunner implements CommandLineRunner {
         liveNodesCache.listenable().addListener(liveNodesCacheListener);
 
         leaderChangeCache.start();
+        shardCache.start();
         allNodesCache.start();
         liveNodesCache.start();
     }

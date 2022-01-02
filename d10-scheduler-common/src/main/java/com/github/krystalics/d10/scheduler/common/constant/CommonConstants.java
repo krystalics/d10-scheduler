@@ -43,4 +43,6 @@ public class CommonConstants {
 
     public final static String ZK_ALL_NODES = "/all";
 
+    public final static String ZK_SHARD_NODE = "/shard";
+
 }

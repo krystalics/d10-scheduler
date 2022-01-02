@@ -6,5 +6,5 @@ package com.github.krystalics.d10.scheduler.registry.service;
  * @description
  */
 public interface RebalanceService {
-    void rebalance() throws Exception;
+    void rebalance(String address) throws Exception;
 }

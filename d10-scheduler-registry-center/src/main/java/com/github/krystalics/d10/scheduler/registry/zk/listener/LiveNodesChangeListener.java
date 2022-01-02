@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,6 +20,9 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
 
     @Autowired
     private RebalanceService rebalanceService;
+
+    @Autowired
+    public LeaderLatch leaderLatch;
 
     /**
      * 临时节点发生一些异常情况、就直接移除
@@ -59,10 +63,20 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
     public void add(PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
         final String newNode = new String(pathChildrenCacheEvent.getData().getData());
         log.info("new node is {}", newNode);
+        if(leaderLatch.hasLeadership()){
+            log.info("i'm leader , new node has been added to the system, start rebalanced!");
+            rebalanceService.rebalance(newNode);
+        }
     }
 
-    public void delete(PathChildrenCacheEvent pathChildrenCacheEvent) {
+    public void delete(PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
         final String node = new String(pathChildrenCacheEvent.getData().getData());
         log.info("node has been deleted {}", node);
+        if(leaderLatch.hasLeadership()){
+            log.info("i'm leader , node has been deleted from the system, start rebalanced!");
+            rebalanceService.rebalance(node);
+        }
+
+
     }
 }

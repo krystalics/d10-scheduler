@@ -41,4 +41,8 @@ public class ZookeeperServiceImpl  {
                 .forPath(path, data.getBytes(StandardCharsets.UTF_8));
     }
 
+    public void deleteNode(String path) throws Exception {
+        client.delete().forPath(path);
+    }
+
 }
