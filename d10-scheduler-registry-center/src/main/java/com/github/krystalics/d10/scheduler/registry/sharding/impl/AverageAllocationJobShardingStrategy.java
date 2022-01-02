@@ -18,7 +18,7 @@
 package com.github.krystalics.d10.scheduler.registry.sharding.impl;
 
 
-import com.github.krystalics.d10.scheduler.core.common.JobInstance;
+import com.github.krystalics.d10.scheduler.registry.JobInstance;
 import com.github.krystalics.d10.scheduler.registry.sharding.ShardingStrategy;
 
 import java.util.ArrayList;

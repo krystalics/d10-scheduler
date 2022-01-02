@@ -1,6 +1,7 @@
 package com.github.krystalics.d10.scheduler.registry.sharding;
 
-import com.github.krystalics.d10.scheduler.core.common.JobInstance;
+
+import com.github.krystalics.d10.scheduler.registry.JobInstance;
 
 import java.util.List;
 import java.util.Map;
