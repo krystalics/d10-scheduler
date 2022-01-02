@@ -1,6 +1,7 @@
 package com.github.krystalics.d10.scheduler.core.schedule;
 
 
+import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.constant.FrequencyGranularity;
 import com.github.krystalics.d10.scheduler.common.utils.CronUtils;
 import com.github.krystalics.d10.scheduler.common.utils.DateUtils;
@@ -75,9 +76,9 @@ public class DistributedScheduler {
      */
     public void init() throws InterruptedException {
         //todo 在redis或者mysql 单独的加锁表 加锁，防止两个节点同时进行init的过程
-        ZonedDateTime now = ZonedDateTime.now(Constant.TIMEZONE_ASIA_SHANGHAI);
-        todayMin = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MIN), Constant.TIMEZONE_ASIA_SHANGHAI);
-        todayMax = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MAX), Constant.TIMEZONE_ASIA_SHANGHAI);
+        ZonedDateTime now = ZonedDateTime.now(CommonConstants.TIMEZONE_ASIA_SHANGHAI);
+        todayMin = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MIN), CommonConstants.TIMEZONE_ASIA_SHANGHAI);
+        todayMax = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MAX), CommonConstants.TIMEZONE_ASIA_SHANGHAI);
 
         log.info("scheduler start init the tasks, now is {}、and today min is {},max is {}", now, todayMin, todayMax);
         TaskQM taskQM = new TaskQM();

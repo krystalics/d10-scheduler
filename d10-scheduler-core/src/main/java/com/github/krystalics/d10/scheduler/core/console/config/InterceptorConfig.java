@@ -1,7 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.console.config;
 
 import com.github.krystalics.d10.scheduler.core.console.interceptor.BaseLoginInterceptor;
-import com.github.krystalics.d10.scheduler.core.console.interceptor.LeaderInterceptor;
 import com.github.krystalics.d10.scheduler.core.console.interceptor.TokenInterceptor;
 import com.google.common.collect.Lists;
 
@@ -20,10 +19,6 @@ import java.util.List;
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
 
-    @Bean
-    public LeaderInterceptor leaderInterceptor() {
-        return new LeaderInterceptor();
-    }
 
 	@Bean
 	public BaseLoginInterceptor baseLoginInterceptor() {
@@ -52,9 +47,9 @@ public class InterceptorConfig implements WebMvcConfigurer {
 		excludePatchPatterns.add("/api/**");
 		excludePatchPatterns.add("/static/**");
 
-		registry.addInterceptor(leaderInterceptor())
-                .addPathPatterns("/**")
-		.excludePathPatterns(excludePatchPatterns);
+//		registry.addInterceptor(leaderInterceptor())
+//                .addPathPatterns("/**")
+//		.excludePathPatterns(excludePatchPatterns);
 
 		//对于所有api的请求都需要token验证
 //		registry.addInterceptor(tokenInterceptor).addPathPatterns("/api/**");

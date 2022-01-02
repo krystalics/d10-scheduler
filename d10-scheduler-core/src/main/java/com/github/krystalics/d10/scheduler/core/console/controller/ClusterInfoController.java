@@ -14,6 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClusterInfoController {
     @GetMapping("/info")
     public String clusterInfo() {
-        return ClusterInfo.getClusterInfo().toString();
+        return "";
     }
 }

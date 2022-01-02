@@ -2,11 +2,12 @@ package com.github.krystalics.d10.scheduler.registry.zk.listener;
 
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
-
+import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.charset.StandardCharsets;
@@ -22,11 +23,15 @@ public class ElectionListener implements LeaderLatchListener {
     @Autowired
     private CuratorFramework client;
 
+    @Value("${server.port:8080}")
+    private int port;
+
     @Override
     public void isLeader() {
-        log.info("i'm the leader");
         try {
-//            client.setData().forPath(CommonConstants.ZK_LEADER, ClusterInfo.selfAddress().getBytes(StandardCharsets.UTF_8));
+            String address = IPUtils.getHost() + ":" + port;
+            log.info("i'm the leader,and my address is {}", address);
+            client.setData().forPath(CommonConstants.ZK_LEADER, address.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             e.printStackTrace();
         }

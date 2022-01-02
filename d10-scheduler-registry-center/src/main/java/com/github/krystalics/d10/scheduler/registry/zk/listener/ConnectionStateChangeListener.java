@@ -21,9 +21,6 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class ConnectionStateChangeListener implements ConnectionStateListener {
 
-    @Autowired
-    private ZookeeperServiceImpl zookeeperService;
-
     /**
      * 当节点与zk的连接状态发生变化时、在这里处理
      * leaderLatch中 已经封装了ConnectionStateListener、但只有leader角色才会有这待遇。

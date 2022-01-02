@@ -10,6 +10,7 @@ import com.github.krystalics.d10.scheduler.registry.zk.listener.AllNodesChangeLi
 import com.github.krystalics.d10.scheduler.registry.zk.listener.ElectionListener;
 import com.github.krystalics.d10.scheduler.registry.zk.listener.LeaderChangeListener;
 import com.github.krystalics.d10.scheduler.registry.zk.listener.LiveNodesChangeListener;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author krysta
@@ -72,24 +75,29 @@ public class StartupRunner implements CommandLineRunner {
 
     /**
      * 作为leader的话、会将自身的id或者 ip 写进 /election节点中
-     *
+     * 阻塞至成为新的leader后会进行 实例化的工作
+     * 不过不成为leader也不应该影响服务的正常启动，所以会额外放在一个线程去执行leader的选举
      * @param args
      * @throws Exception
      */
     @Override
     public void run(String... args) throws Exception {
-        address = IPUtils.getHost() + ":" + port;
-        log.info("init action begin! this node address is {}", address);
-        initZkPaths();
-        initCuratorCaches();
-//        ClusterInfo.set(address);
-        log.info("try to be a leader!");
+        new Thread(new Runnable() {
+            @SneakyThrows
+            @Override
+            public void run() {
+                address = IPUtils.getHost() + ":" + port;
+                log.info("init action begin! this node address is {}", address);
+                StartupRunner.this.initZkPaths();
+                StartupRunner.this.initCuratorCaches();
+                log.info("try to be a leader!");
+                leaderLatch.addListener(electionListener);
+                leaderLatch.start();
 
-        leaderLatch.addListener(electionListener);
-        leaderLatch.start();
-        // 阻塞至成为新的leader
-        leaderLatch.await();
-        distributedScheduler.init();
+                leaderLatch.await();
+                distributedScheduler.init();
+            }
+        },"election").start();
     }
 
     public void initZkPaths() throws Exception {
