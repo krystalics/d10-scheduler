@@ -256,4 +256,10 @@ public class DistributedScheduler {
     }
 
 
+    /**
+     * 暂停调度
+     */
+    public void stop(){
+        log.info("stop the scheduler");
+    }
 }

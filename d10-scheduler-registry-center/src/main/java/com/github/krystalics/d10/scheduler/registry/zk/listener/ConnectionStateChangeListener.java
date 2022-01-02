@@ -1,15 +1,10 @@
 package com.github.krystalics.d10.scheduler.registry.zk.listener;
 
-import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
-
-import com.github.krystalics.d10.scheduler.registry.service.impl.ZookeeperServiceImpl;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.zookeeper.CreateMode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -45,7 +40,7 @@ public class ConnectionStateChangeListener implements ConnectionStateListener {
     public void stateChanged(CuratorFramework curatorFramework, ConnectionState connectionState) {
         switch (connectionState) {
             case LOST:
-//                ClusterInfo.setLost();
+//              todo  distributedScheduler.stop();
                 break;
             case SUSPENDED:
                 //当进行 Leader 选举和 lock 锁等操作时，需要先挂起客户端的连接。注意这里的会话挂起并不等于关闭会话，也不会触发诸如删除临时节点等操作
