@@ -143,14 +143,7 @@ public class StartupRunner implements CommandLineRunner {
         liveNodesCache.start();
     }
 
-    public void createNode(String path, String data, CreateMode mode) throws Exception {
-        if (client.checkExists().forPath(path) != null) {
-            return;
-        }
-        client.create().creatingParentsIfNeeded()
-                .withMode(mode)
-                .forPath(path, data.getBytes(StandardCharsets.UTF_8));
-    }
+
 
 
 }
