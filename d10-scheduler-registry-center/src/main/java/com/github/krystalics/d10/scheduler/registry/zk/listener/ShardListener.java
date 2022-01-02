@@ -25,7 +25,7 @@ public class ShardListener implements CuratorCacheListener {
     public void event(CuratorCacheListener.Type type, ChildData before, ChildData after) {
         switch (type) {
             case NODE_CREATED:
-                log.info("the shard node is created, new node is " + new String(after.getData()));
+                log.info("the shard node is created, target node is " + new String(after.getData()));
                 break;
             case NODE_CHANGED:
                 break;

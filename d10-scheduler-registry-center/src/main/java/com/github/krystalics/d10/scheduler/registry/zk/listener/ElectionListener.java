@@ -3,6 +3,7 @@ package com.github.krystalics.d10.scheduler.registry.zk.listener;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
+import com.github.krystalics.d10.scheduler.registry.service.impl.ZookeeperServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
@@ -21,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class ElectionListener implements LeaderLatchListener {
     @Autowired
-    private CuratorFramework client;
+    private ZookeeperServiceImpl zookeeperService;
 
     @Value("${server.port:8080}")
     private int port;
@@ -31,7 +32,7 @@ public class ElectionListener implements LeaderLatchListener {
         try {
             String address = IPUtils.getHost() + ":" + port;
             log.info("i'm the leader,and my address is {}", address);
-            client.setData().forPath(CommonConstants.ZK_LEADER, address.getBytes(StandardCharsets.UTF_8));
+            zookeeperService.setData(CommonConstants.ZK_LEADER, address);
         } catch (Exception e) {
             e.printStackTrace();
         }

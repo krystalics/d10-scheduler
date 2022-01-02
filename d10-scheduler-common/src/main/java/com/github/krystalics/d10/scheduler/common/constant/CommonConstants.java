@@ -10,7 +10,7 @@ import java.time.ZoneId;
 public class CommonConstants {
     public static final String SCHEDULER_USER_TOKEN = "schedulerUserToken";
 
-    public static final String DEFAULT_CHARSET="UTF-8";
+    public static final String DEFAULT_CHARSET = "UTF-8";
 
     /**
      * 系统统一时区设置、不依赖于机器本身的时区设置
@@ -44,5 +44,7 @@ public class CommonConstants {
     public final static String ZK_ALL_NODES = "/all";
 
     public final static String ZK_SHARD_NODE = "/shard";
+
+    public final static int REBALANCED_TRY_TIMES = 3;
 
 }

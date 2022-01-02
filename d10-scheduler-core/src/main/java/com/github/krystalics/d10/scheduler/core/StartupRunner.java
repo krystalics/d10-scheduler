@@ -36,36 +36,13 @@ public class StartupRunner implements CommandLineRunner {
     private int port;
 
     @Autowired
-    private CuratorFramework client;
-
-    @Autowired
     private ElectionListener electionListener;
-
-    @Autowired
-    private LeaderChangeListener leaderChangeListener;
-
-    @Autowired
-    private AllNodesChangeListener allNodesChangeListener;
-
-    @Autowired
-    private LiveNodesChangeListener liveNodesChangeListener;
-
-    @Autowired
-    private ShardListener shardListener;
 
     @Autowired
     private ZookeeperServiceImpl zookeeperService;
 
     @Autowired
     private RebalanceServiceImpl rebalanceService;
-
-    @Bean
-    public LeaderLatch leaderLatch() {
-        String address = IPUtils.getHost() + ":" + port;
-        return new LeaderLatch(client, CommonConstants.ZK_ELECTION, address, LeaderLatch.CloseMode.NOTIFY_LEADER);
-    }
-
-    String address = "";
 
     @Autowired
     private LeaderLatch leaderLatch;
@@ -88,10 +65,10 @@ public class StartupRunner implements CommandLineRunner {
             @SneakyThrows
             @Override
             public void run() {
-                address = IPUtils.getHost() + ":" + port;
+                String address = IPUtils.getHost() + ":" + port;
                 log.info("init action begin! this node address is {}", address);
-                StartupRunner.this.initZkPaths();
-                StartupRunner.this.initCuratorCaches();
+                zookeeperService.initZkPaths(address);
+                zookeeperService.initCuratorCaches();
                 log.info("try to be a leader!");
                 leaderLatch.addListener(electionListener);
                 leaderLatch.start();
@@ -103,46 +80,6 @@ public class StartupRunner implements CommandLineRunner {
             }
         }, "election").start();
     }
-
-    public void initZkPaths() throws Exception {
-        log.info("create zk init paths if need!");
-        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LEADER, "leader ip", CreateMode.PERSISTENT);
-        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES, "cluster live ips", CreateMode.PERSISTENT);
-        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_ALL_NODES, "cluster all ips", CreateMode.PERSISTENT);
-        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_ALL_NODES + "/" + address, address, CreateMode.PERSISTENT);
-        //在live中为临时节点
-        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
-    }
-
-    /**
-     * curator cache中的 afterInitialized 可以让listener在节点初始化完后再加入 监听，
-     * <p>
-     * 没加它之前：之前存在的node、都是会触发对应的 child_add事件
-     * 这里加了afterInitialized，之前存在的节点对它来说不影响。避免触发对应的事件
-     */
-    public void initCuratorCaches() {
-        log.info("create listeners for nodes changed!");
-
-        CuratorCache leaderChangeCache = CuratorCache.build(client, CommonConstants.ZK_LEADER);
-        leaderChangeCache.listenable().addListener(leaderChangeListener);
-
-        CuratorCache shardCache = CuratorCache.build(client, CommonConstants.ZK_SHARD_NODE);
-        shardCache.listenable().addListener(shardListener);
-
-        CuratorCache allNodesCache = CuratorCache.build(client, CommonConstants.ZK_ALL_NODES);
-        CuratorCacheListener allNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(CommonConstants.ZK_ALL_NODES, client, allNodesChangeListener).build();
-        allNodesCache.listenable().addListener(allNodesCacheListener);
-
-        CuratorCache liveNodesCache = CuratorCache.build(client, CommonConstants.ZK_LIVE_NODES);
-        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(CommonConstants.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
-        liveNodesCache.listenable().addListener(liveNodesCacheListener);
-
-        leaderChangeCache.start();
-        shardCache.start();
-        allNodesCache.start();
-        liveNodesCache.start();
-    }
-
 
 
 
