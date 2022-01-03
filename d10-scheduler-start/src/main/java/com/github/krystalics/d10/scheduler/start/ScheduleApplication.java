@@ -77,8 +77,8 @@ public class ScheduleApplication {
                     leaderLatch.await();
                     rebalanceService.rebalance(address);
 
-//                distributedScheduler.init();
-                    D10Scheduler.getInstance().start();
+//                  initiation.init();
+                    D10SchedulerHelper.getInstance().start();
                 }
             }, "election").start();
         }

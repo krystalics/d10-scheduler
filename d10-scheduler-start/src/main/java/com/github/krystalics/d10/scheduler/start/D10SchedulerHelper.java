@@ -14,11 +14,11 @@ import java.util.concurrent.TimeUnit;
  * todo 调度器分片的结果这里要可见
  */
 
-public class D10Scheduler {
-    private static Logger log = LoggerFactory.getLogger(D10Scheduler.class);
-    private static D10Scheduler instance = new D10Scheduler();
+public class D10SchedulerHelper {
+    private static Logger log = LoggerFactory.getLogger(D10SchedulerHelper.class);
+    private static D10SchedulerHelper instance = new D10SchedulerHelper();
 
-    public static D10Scheduler getInstance() {
+    public static D10SchedulerHelper getInstance() {
         return instance;
     }
 

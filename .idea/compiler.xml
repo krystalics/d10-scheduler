@@ -8,32 +8,32 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="d10-scheduler-executor" />
-        <module name="d10-scheduler-core" />
-        <module name="d10-scheduler-web" />
-        <module name="d10-scheduler-registry-center" />
+        <module name="d10-scheduler-init" />
+        <module name="d10-scheduler-admin" />
+        <module name="d10-scheduler-start" />
         <module name="d10-scheduler-common" />
         <module name="d10-scheduler-dao" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="d10-scheduler" target="1.8" />
+      <module name="d10-scheduler-admin" target="1.8" />
       <module name="d10-scheduler-common" target="8" />
-      <module name="d10-scheduler-core" target="1.8" />
       <module name="d10-scheduler-dao" target="8" />
       <module name="d10-scheduler-executor" target="8" />
-      <module name="d10-scheduler-registry-center" target="8" />
-      <module name="d10-scheduler-web" target="1.8" />
+      <module name="d10-scheduler-init" target="1.8" />
+      <module name="d10-scheduler-start" target="8" />
       <module name="distributed" target="8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="d10-scheduler-admin" options="-parameters" />
       <module name="d10-scheduler-common" options="-parameters" />
-      <module name="d10-scheduler-core" options="-parameters" />
       <module name="d10-scheduler-dao" options="-parameters" />
       <module name="d10-scheduler-executor" options="-parameters" />
-      <module name="d10-scheduler-registry-center" options="-parameters" />
-      <module name="d10-scheduler-web" options="-parameters" />
+      <module name="d10-scheduler-init" options="-parameters" />
+      <module name="d10-scheduler-start" options="-parameters" />
       <module name="distributed" options="-parameters" />
     </option>
   </component>

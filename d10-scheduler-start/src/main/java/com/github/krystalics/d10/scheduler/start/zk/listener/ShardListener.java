@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.start.zk.listener;
 
-import com.github.krystalics.d10.scheduler.start.D10Scheduler;
+import com.github.krystalics.d10.scheduler.start.D10SchedulerHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
@@ -27,7 +27,7 @@ public class ShardListener implements CuratorCacheListener {
         switch (type) {
             case NODE_CREATED:
                 log.info("the shard node is created、to stop the scheduler, target node is " + new String(after.getData()));
-                D10Scheduler.getInstance().stop();
+                D10SchedulerHelper.getInstance().stop();
                 break;
             case NODE_CHANGED:
                 break;

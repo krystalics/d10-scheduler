@@ -11,6 +11,9 @@
         <option value="$PROJECT_DIR$/d10-scheduler-core/pom.xml" />
         <option value="$PROJECT_DIR$/d10-scheduler-dao/pom.xml" />
         <option value="$PROJECT_DIR$/d10-scheduler-web/pom.xml" />
+        <option value="$PROJECT_DIR$/d10-scheduler-start/pom.xml" />
+        <option value="$PROJECT_DIR$/d10-scheduler-init/pom.xml" />
+        <option value="$PROJECT_DIR$/d10-scheduler-admin/pom.xml" />
       </list>
     </option>
   </component>

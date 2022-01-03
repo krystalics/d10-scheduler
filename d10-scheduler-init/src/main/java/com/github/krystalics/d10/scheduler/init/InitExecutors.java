@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.init.pool;
+package com.github.krystalics.d10.scheduler.init;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
