@@ -3,11 +3,11 @@ package com.github.krystalics.d10.scheduler.admin.dao;
 
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
-import com.github.krystalics.d10.scheduler.admin.SpringBootBaseTest;
+import com.github.krystalics.d10.scheduler.admin.BaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class TaskMapperTest extends SpringBootBaseTest {
+public class TaskMapperTest extends BaseTest {
     @Autowired
     private TaskMapper taskMapper;
 

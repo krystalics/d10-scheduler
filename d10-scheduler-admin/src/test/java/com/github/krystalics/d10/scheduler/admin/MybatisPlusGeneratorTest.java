@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
  * @description
  */
 
-public class MybatisPlusGeneratorTest extends SpringBootBaseTest {
+public class MybatisPlusGeneratorTest extends BaseTest {
     @Test
     public void generate() {
 //        FastAutoGenerator.create("jdbc:mysql://127.0.0.1:3306/scheduler?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC", "root", "root")

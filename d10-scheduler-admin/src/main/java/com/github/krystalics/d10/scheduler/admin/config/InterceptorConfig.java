@@ -2,7 +2,6 @@ package com.github.krystalics.d10.scheduler.admin.config;
 
 import com.github.krystalics.d10.scheduler.admin.interceptor.BaseLoginInterceptor;
 import com.github.krystalics.d10.scheduler.admin.interceptor.TokenInterceptor;
-import com.google.common.collect.Lists;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
 	@Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-    	List<String> excludePatchPatterns = Lists.newArrayList();
+    	List<String> excludePatchPatterns = new ArrayList<>();
 		/**
 		 * 所有请求中除了以下几种、都直接转发
 		 */

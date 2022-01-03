@@ -47,10 +47,6 @@ public class RebalanceServiceImpl implements RebalanceService {
                     zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.EPHEMERAL);
                     log.info("2.assign the task to schedulers");
                     shard();
-                    // 创建 /shard节点的之后sleep3s、方便其他节点接收到节点创建的信号，防止流程太快，其他节点接收不到node_change的信号 ，节点就被删除了
-                    // todo 可以做一个ack的check机制、现在先sleep吧
-                    Thread.sleep(3000);
-
                     log.info("3.delete the /shard node");
                     zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
                     lock.unlock();
@@ -73,6 +69,14 @@ public class RebalanceServiceImpl implements RebalanceService {
 
     }
 
+    /**
+     * 使用shard策略将任务分片，然后将分片结果写入 /live 节点中
+     * 不直接写入/shard 节点是因为，有时执行的太快，等其他节点启动时，shard已经结束，节点被删了
+     * 方便其他节点接收到节点创建的信号，防止流程太快，其他节点接收不到node_change的信号 ，节点就被删除了
+     * 所以将其结果写入 /live 中
+     *
+     * @throws Exception
+     */
     public void shard() throws Exception {
         final List<String> liveNodes = zookeeperService.liveNodes();
         log.info("rebalanced ,all live nodes are {}", liveNodes);
@@ -88,7 +92,7 @@ public class RebalanceServiceImpl implements RebalanceService {
 
         ShardingStrategy shardingStrategy = new ScopeStrategy();
         final List<JobInstance> sharding = shardingStrategy.sharding(jobInstances, taskSize);
-        zookeeperService.setData(CommonConstants.ZK_SHARD_NODE, JSONUtils.toJSONStringWithoutCircleDetect(sharding));
+        zookeeperService.setData(CommonConstants.ZK_LIVE_NODES, JSONUtils.toJSONStringWithoutCircleDetect(sharding));
         log.info("sharding result is {}", sharding);
     }
 

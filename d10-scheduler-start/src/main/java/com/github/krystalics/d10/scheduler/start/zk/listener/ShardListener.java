@@ -20,8 +20,7 @@ import java.util.List;
 @Slf4j
 public class ShardListener implements CuratorCacheListener {
 
-    @Autowired
-    private JobInstance jobInstance;
+
 
     /**
      * shard节点会由leader在 /live 节点数量发生变化的时候进行创建，其他节点需要在shard期间暂停工作
@@ -40,16 +39,7 @@ public class ShardListener implements CuratorCacheListener {
                 D10SchedulerHelper.getInstance().stop();
                 break;
             case NODE_CHANGED:
-                final String afterData = new String(after.getData());
-                log.info("sharding result is {}", afterData);
-                final List<JobInstance> jobInstances = JSON.parseArray(afterData, JobInstance.class);
-                for (JobInstance instance : jobInstances) {
-                    if (instance.getAddress().equals(jobInstance.getAddress())) {
-                        jobInstance.setTaskIds(instance.getTaskIds());
-                        log.info("get new scope,{}", jobInstance);
-                        break;
-                    }
-                }
+                //
                 break;
             case NODE_DELETED:
                 log.info("the shard node is deleted、to start the scheduler");

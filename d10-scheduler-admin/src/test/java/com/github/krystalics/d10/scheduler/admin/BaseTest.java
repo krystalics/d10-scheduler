@@ -8,5 +8,5 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @description
  */
 @SpringBootTest
-public class SpringBootBaseTest {
+public class BaseTest {
 }

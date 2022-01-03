@@ -5,6 +5,7 @@ import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.start.zk.listener.AllNodesChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.LeaderChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.LiveNodesChangeListener;
+import com.github.krystalics.d10.scheduler.start.zk.listener.LiveShardResultListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ShardListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -43,6 +44,9 @@ public class ZookeeperServiceImpl  {
 
     @Autowired
     private LiveNodesChangeListener liveNodesChangeListener;
+
+    @Autowired
+    private LiveShardResultListener liveShardResultListener;
 
     @Value("${server.port}")
     private int port;
@@ -104,6 +108,7 @@ public class ZookeeperServiceImpl  {
         CuratorCache liveNodesCache = CuratorCache.build(client, CommonConstants.ZK_LIVE_NODES);
         CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(CommonConstants.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
         liveNodesCache.listenable().addListener(liveNodesCacheListener);
+        liveNodesCache.listenable().addListener(liveShardResultListener);
 
         leaderChangeCache.start();
         shardCache.start();
