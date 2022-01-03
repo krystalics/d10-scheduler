@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper">
+
+    <select id="schedulerReadVersionInstance" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
+        select
+            i.task_id          as taskId,
+            i.version_id       as versionId,
+            instance_id        as instanceId,
+            version_no         as versionNo,
+            retry_remain_times as retryRemainTimes,
+            start_time_theory  as startTimeTheory,
+            i.job_conf         as jobConf,
+            i.state            as state,
+            job_log_address    as jobLogAddress,
+            run_start_time     as runStartTime,
+            run_end_time       as runEndTime,
+            node               as node,
+            auto_start         as autoStart,
+            i.ctime            as ctime,
+            i.mtime            as mtime
+
+        from task as t
+                 join version as v
+                      on t.task_id = v.task_id
+                 join instance i
+                      on v.last_instance_id = i.instance_id
+
+        where t.schedule_type = 0 and i.task_id between #{left} and #{right}
+<![CDATA[ and i.state<5 and t.state = 2 and start_time_theory <= NOW() ]]>
+    </select>
+</mapper>

@@ -17,12 +17,12 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>d10-scheduler-core</module>
-        <module>d10-scheduler-web</module>
+        <module>d10-scheduler-init</module>
+        <module>d10-scheduler-admin</module>
         <module>d10-scheduler-dao</module>
         <module>d10-scheduler-common</module>
         <module>d10-scheduler-executor</module>
-        <module>d10-scheduler-registry-center</module>
+        <module>d10-scheduler-start</module>
     </modules>
 
     <dependencies>
