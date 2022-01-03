@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.start.service;
+package com.github.krystalics.d10.scheduler.start.sharding;
 
 /**
  * @author linjiabao001

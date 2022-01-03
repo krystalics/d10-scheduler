@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.start.service.impl;
+package com.github.krystalics.d10.scheduler.start.zk;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;

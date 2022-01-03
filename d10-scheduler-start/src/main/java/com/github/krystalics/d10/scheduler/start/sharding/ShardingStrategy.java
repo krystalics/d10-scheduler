@@ -1,7 +1,8 @@
 package com.github.krystalics.d10.scheduler.start.sharding;
 
 
-import com.github.krystalics.d10.scheduler.start.JobInstance;
+
+import com.github.krystalics.d10.scheduler.common.constant.Pair;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,6 @@ public interface ShardingStrategy {
      * @param shardingTotalCount 任务总数，需要进行分片的count
      * @return
      */
-    Map<JobInstance, List<Integer>> sharding(List<JobInstance> jobInstances, int shardingTotalCount);
+    List<JobInstance> sharding(List<JobInstance> jobInstances, int shardingTotalCount);
 
 }

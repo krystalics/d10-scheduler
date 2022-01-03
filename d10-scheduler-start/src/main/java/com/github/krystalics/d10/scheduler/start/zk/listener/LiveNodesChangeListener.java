@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.start.zk.listener;
 
-import com.github.krystalics.d10.scheduler.start.service.RebalanceService;
+import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;

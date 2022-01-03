@@ -1,8 +1,10 @@
 package com.github.krystalics.d10.scheduler.start;
 
+import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
+import com.github.krystalics.d10.scheduler.start.sharding.JobInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +30,7 @@ public class D10SchedulerHelper {
     private volatile boolean scheduleThreadToStop = false;
 
     private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
+    private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
 
     /**
      * 1。将本调度器分片范围的可运行任务取出
@@ -49,14 +52,14 @@ public class D10SchedulerHelper {
                     }
                 }
                 log.info(">>>>>>>>> init d10-scheduler admin scheduler success.");
-
                 while (!scheduleThreadToStop) {
-
+                    final Pair<Long, Long> taskIds = jobInstance.getTaskIds();
+                    log.info("this scheduler's scope is {}", taskIds.toString());
                     // Scan Job
                     long start = System.currentTimeMillis();
 
                     try {
-                        List<VersionInstance> scheduleList = schedulerMapper.schedulerReadVersionInstance(1, 10000);
+                        List<VersionInstance> scheduleList = schedulerMapper.schedulerReadVersionInstance(taskIds.getL(), taskIds.getR());
                         if (scheduleList != null && scheduleList.size() > 0) {
                             log.info("get {} version instances to schedule", scheduleList.size());
                             for (VersionInstance versionInstance : scheduleList) {

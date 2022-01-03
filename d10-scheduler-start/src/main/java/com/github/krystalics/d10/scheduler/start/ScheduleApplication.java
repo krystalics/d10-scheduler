@@ -1,9 +1,11 @@
 package com.github.krystalics.d10.scheduler.start;
 
+import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.init.Initiation;
-import com.github.krystalics.d10.scheduler.start.service.impl.RebalanceServiceImpl;
-import com.github.krystalics.d10.scheduler.start.service.impl.ZookeeperServiceImpl;
+import com.github.krystalics.d10.scheduler.start.sharding.JobInstance;
+import com.github.krystalics.d10.scheduler.start.sharding.RebalanceServiceImpl;
+import com.github.krystalics.d10.scheduler.start.zk.ZookeeperServiceImpl;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ElectionListener;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
@@ -82,7 +85,16 @@ public class ScheduleApplication {
             }, "election").start();
         }
 
+        @Bean
+        public JobInstance jobInstance() {
+            String address = IPUtils.getHost() + ":" + port;
+            final JobInstance instance = new JobInstance();
+            instance.setAddress(address);
+            instance.setTaskIds(Pair.of(0L, 0L));
+            return instance;
+        }
 
     }
+
 
 }
