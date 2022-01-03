@@ -1,15 +1,10 @@
 package com.github.krystalics.d10.scheduler.start.zk.listener;
 
-import com.alibaba.fastjson.JSON;
-import com.github.krystalics.d10.scheduler.start.D10SchedulerHelper;
-import com.github.krystalics.d10.scheduler.start.sharding.JobInstance;
+import com.github.krystalics.d10.scheduler.start.thread.D10SchedulerHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * @author linjiabao001
