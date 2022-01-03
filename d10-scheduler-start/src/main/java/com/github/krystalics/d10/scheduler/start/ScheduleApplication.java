@@ -78,7 +78,6 @@ public class ScheduleApplication {
                     rebalanceService.rebalance(address);
 
 //                  initiation.init();
-                    D10SchedulerHelper.getInstance().start();
                 }
             }, "election").start();
         }

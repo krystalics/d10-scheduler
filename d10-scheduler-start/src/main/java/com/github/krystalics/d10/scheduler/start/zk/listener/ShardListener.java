@@ -26,12 +26,14 @@ public class ShardListener implements CuratorCacheListener {
     public void event(CuratorCacheListener.Type type, ChildData before, ChildData after) {
         switch (type) {
             case NODE_CREATED:
-                log.info("the shard node is created、to stop the scheduler, target node is " + new String(after.getData()));
+                log.info("the shard node is created、to stop the scheduler");
                 D10SchedulerHelper.getInstance().stop();
                 break;
             case NODE_CHANGED:
                 break;
             case NODE_DELETED:
+                log.info("the shard node is deleted、to start the scheduler");
+                D10SchedulerHelper.getInstance().start();
                 break;
             default:
                 throw new RuntimeException("unknown node event type " + type.name());

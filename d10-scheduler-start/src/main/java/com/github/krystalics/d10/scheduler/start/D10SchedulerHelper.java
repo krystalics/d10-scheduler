@@ -23,7 +23,7 @@ public class D10SchedulerHelper {
     }
 
     //轮询的间隔，1min
-    public static final long POLLING_INTER = 6000;
+    public static final long POLLING_INTER = 60000;
     private Thread scheduleThread;
     private volatile boolean scheduleThreadToStop = false;
 
@@ -35,7 +35,7 @@ public class D10SchedulerHelper {
      * 3。获得资源位的可以进入分发队列、没有的则跳过
      */
     public void start() {
-
+        scheduleThreadToStop = false;
         // schedule thread
         scheduleThread = new Thread(new Runnable() {
             @Override
@@ -60,7 +60,7 @@ public class D10SchedulerHelper {
                         if (scheduleList != null && scheduleList.size() > 0) {
                             log.info("get {} version instances to schedule", scheduleList.size());
                             for (VersionInstance versionInstance : scheduleList) {
-                                log.info(versionInstance.toString());
+
                             }
 
                         } else {
@@ -94,28 +94,30 @@ public class D10SchedulerHelper {
             }
         });
         scheduleThread.setDaemon(true);
-        scheduleThread.setName("d10-scheduler, admin JobScheduleHelper#scheduleThread");
+        scheduleThread.setName("d10-scheduler");
         scheduleThread.start();
     }
 
     public void stop() {
-        scheduleThreadToStop = true;
-        try {
-            TimeUnit.SECONDS.sleep(3);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
-        if (scheduleThread.getState() != Thread.State.TERMINATED) {
-            // interrupt and wait
-            scheduleThread.interrupt();
+        if (scheduleThread != null) {
+            scheduleThreadToStop = true;
             try {
-                scheduleThread.join();
+                TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
                 log.error(e.getMessage(), e);
             }
-        }
+            if (scheduleThread.getState() != Thread.State.TERMINATED) {
+                // interrupt and wait
+                scheduleThread.interrupt();
+                try {
+                    scheduleThread.join();
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
 
-        log.warn(">>>>>>>>>>> d10-scheduler, JobScheduleHelper stop");
+            log.warn(">>>>>>>>>>> d10-scheduler, JobScheduleHelper stop");
+        }
     }
 
 
