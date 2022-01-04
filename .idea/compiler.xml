@@ -9,16 +9,18 @@
         <outputRelativeToContentRoot value="true" />
         <module name="d10-scheduler-executor" />
         <module name="d10-scheduler-init" />
+        <module name="d10-scheduler-core" />
         <module name="d10-scheduler-admin" />
         <module name="d10-scheduler-start" />
-        <module name="d10-scheduler-common" />
         <module name="d10-scheduler-dao" />
+        <module name="d10-scheduler-common" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="d10-scheduler" target="1.8" />
       <module name="d10-scheduler-admin" target="1.8" />
       <module name="d10-scheduler-common" target="8" />
+      <module name="d10-scheduler-core" target="1.8" />
       <module name="d10-scheduler-dao" target="8" />
       <module name="d10-scheduler-executor" target="8" />
       <module name="d10-scheduler-init" target="1.8" />
@@ -30,6 +32,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="d10-scheduler-admin" options="-parameters" />
       <module name="d10-scheduler-common" options="-parameters" />
+      <module name="d10-scheduler-core" options="-parameters" />
       <module name="d10-scheduler-dao" options="-parameters" />
       <module name="d10-scheduler-executor" options="-parameters" />
       <module name="d10-scheduler-init" options="-parameters" />

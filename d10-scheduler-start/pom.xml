@@ -27,7 +27,7 @@
 
         <dependency>
             <groupId>com.github.krystalics</groupId>
-            <artifactId>d10-scheduler-init</artifactId>
+            <artifactId>d10-scheduler-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
