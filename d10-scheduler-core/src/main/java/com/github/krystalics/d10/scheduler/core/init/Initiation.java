@@ -19,8 +19,11 @@ import com.github.krystalics.d10.scheduler.dao.mapper.VersionMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskRelyQM;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -129,7 +132,6 @@ public class Initiation {
     }
 
     /**
-     *
      * @param task 任务
      * @param date 参考时间
      * @return task具体执行的时间
@@ -140,11 +142,11 @@ public class Initiation {
             return null;
         }
         String versionNo = DateUtils.versionNo(date, task.getFrequency());
-        Instance instance = insertVersionAndInstance(task, versionNo, date);
-//        putIntoQueue(instance);
+        insertVersionAndInstance(task, versionNo, date);
         return date;
     }
 
+    @Transactional
     public Instance insertVersionAndInstance(Task task, String versionNo, ZonedDateTime startTimeTheory) {
         Version version = versionMapper.findByTaskIdAndVersionNo(task.getTaskId(), versionNo);
         if (version == null) {
@@ -156,16 +158,13 @@ public class Initiation {
         Instance instance = instanceMapper.findLastInstanceByVersionId(versionId);
 
         if (instance == null) {
-            instance = generateInstance(task, versionId, startTimeTheory);
+            instance = generateInstance(task, versionId, versionNo, startTimeTheory);
             instanceMapper.insert(instance);
         }
         long instanceId = instance.getInstanceId();
 
         version.setLastInstanceId(instanceId);
         versionMapper.update(version);
-
-//        versionsMap.put(versionId, version);
-//        instancesMap.put(instanceId, instance);
 
         CopyOnWriteArraySet<Version> versions = taskIdAndVersionsMap.getOrDefault(task.getTaskId(), new CopyOnWriteArraySet<Version>());
         versions.add(version);
@@ -193,9 +192,9 @@ public class Initiation {
     /**
      * 先查看数据库中有没有该实例，用于服务重启时
      */
-    public Instance generateInstance(Task task, long versionId, ZonedDateTime startTimeTheory) {
+    public Instance generateInstance(Task task, long versionId, String versionNo, ZonedDateTime startTimeTheory) {
         Instance instance = new Instance();
-        instance.setJobConf(replaceParam(task.getJobConf()));
+        instance.setJobConf(replaceParam(task.getJobConf(), versionNo));
         instance.setState(1);
         instance.setTaskId(task.getTaskId());
         instance.setVersionId(versionId);
@@ -203,10 +202,15 @@ public class Initiation {
         return instance;
     }
 
-    //todo 替换参数; 正则匹配所有的 ${time:}的情况，然后一个个参数替换
-    public String replaceParam(String jobConf){
-//        ParamExpressionUtils.handleTimeExpression();
-        return "";
+    /**
+     * 将时间参数按照参考时间【版本号 versionNo】替换成真实的时间
+     * @param jobConf
+     * @param versionNo
+     * @return
+     */
+    public String replaceParam(String jobConf, String versionNo) {
+        DateTime versionDateTime = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(versionNo);
+        return ParamExpressionUtils.handleTimeExpression(jobConf, versionDateTime.toString("yyyy-MM-dd HH:mm:ss"));
     }
 
     public void initRely(Task task) {

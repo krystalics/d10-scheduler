@@ -7,11 +7,11 @@ package com.github.krystalics.d10.scheduler.common.constant;
  */
 public enum ScheduleType {
     /**
-     * 1表示为时间触发
-     * 2表示为依赖触发
+     * 0表示为时间触发
+     * 1表示为依赖触发
      */
-    TIME(1),
-    TRIGGER(2);
+    TIME(0),
+    TRIGGER(1);
 
     private final int value;
 
