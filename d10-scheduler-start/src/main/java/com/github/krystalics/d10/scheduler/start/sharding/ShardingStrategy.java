@@ -2,10 +2,9 @@ package com.github.krystalics.d10.scheduler.start.sharding;
 
 
 
-import com.github.krystalics.d10.scheduler.common.constant.Pair;
+import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author linjiabao001

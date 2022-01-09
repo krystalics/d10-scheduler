@@ -2,6 +2,7 @@ package com.github.krystalics.d10.scheduler.start.sharding;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
+import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.start.sharding.impl.ScopeStrategy;

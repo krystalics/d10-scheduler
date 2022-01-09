@@ -18,7 +18,7 @@ public interface SchedulerMapper {
      *
      * @param left  该调度器负责的分片范围下界
      * @param right 该调度器负责的分片范围上界
-     * @return 调度器需要调度的任务
+     * @return 调度器需要调度的任务的instanceId
      */
-    List<VersionInstance> schedulerReadVersionInstance(@Param("left") long left, @Param("right") long right);
+    List<Long> schedulerReadVersionInstance(@Param("left") long left, @Param("right") long right);
 }

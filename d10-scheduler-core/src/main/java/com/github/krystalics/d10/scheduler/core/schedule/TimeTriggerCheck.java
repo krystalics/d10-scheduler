@@ -1,10 +1,12 @@
-package com.github.krystalics.d10.scheduler.start.thread;
+package com.github.krystalics.d10.scheduler.core.schedule;
 
+import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
+import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
-import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
+import com.github.krystalics.d10.scheduler.core.pool.ScheduleExecutors;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
-import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,15 +14,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * xxl-job 在后续的版本中脱离了quartz体系，所以这里直接借鉴它的做法。创建项目自己的轮训体系
- * todo 调度器分片的结果这里要可见
+ * @author linjiabao001
+ * @date 2022/1/9
+ * @description 时间触发的任务检测
  */
+public class TimeTriggerCheck implements ScheduledCheck {
+    private static Logger log = LoggerFactory.getLogger(TimeTriggerCheck.class);
+    private static TimeTriggerCheck instance = new TimeTriggerCheck();
 
-public class D10SchedulerHelper {
-    private static Logger log = LoggerFactory.getLogger(D10SchedulerHelper.class);
-    private static D10SchedulerHelper instance = new D10SchedulerHelper();
-
-    public static D10SchedulerHelper getInstance() {
+    public static TimeTriggerCheck getInstance() {
         return instance;
     }
 
@@ -34,9 +36,9 @@ public class D10SchedulerHelper {
 
     /**
      * 1。将本调度器分片范围的可运行任务取出
-     * 2。进行资源位的竞争、为多租户设计留下口子
-     * 3。获得资源位的可以进入分发队列、没有的则跳过
+     * 2。设置为pending状态
      */
+    @Override
     public void start() {
         scheduleThreadToStop = false;
         // schedule thread
@@ -59,12 +61,16 @@ public class D10SchedulerHelper {
                     long start = System.currentTimeMillis();
 
                     try {
-                        List<VersionInstance> scheduleList = schedulerMapper.schedulerReadVersionInstance(taskIds.getL(), taskIds.getR());
+                        List<Long> scheduleList = schedulerMapper.schedulerReadVersionInstance(taskIds.getL(), taskIds.getR());
                         if (scheduleList != null && scheduleList.size() > 0) {
                             log.info("get {} version instances to schedule", scheduleList.size());
-                            for (VersionInstance versionInstance : scheduleList) {
+                            final List<List<Long>> partitions = Lists.partition(scheduleList, (scheduleList.size() / CommonConstants.INSTANCE_PER_PARTITION) + 1);
 
-                            }
+                            partitions.forEach(list->{
+                                ScheduleExecutors.submitTimeCheck(()->{
+                                    //todo update the state to waiting resource
+                                });
+                            });
 
                         } else {
                             log.warn("nothing to schedule");
@@ -101,6 +107,7 @@ public class D10SchedulerHelper {
         scheduleThread.start();
     }
 
+    @Override
     public void stop() {
         if (scheduleThread != null) {
             scheduleThreadToStop = true;
@@ -122,6 +129,5 @@ public class D10SchedulerHelper {
             log.warn(">>>>>>>>>>> d10-scheduler, JobScheduleHelper stop");
         }
     }
-
 
 }

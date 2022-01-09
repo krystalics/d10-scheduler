@@ -1,8 +1,6 @@
-package com.github.krystalics.d10.scheduler.start.sharding;
+package com.github.krystalics.d10.scheduler.common.constant;
 
-import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
 /**
  * @author linjiabao001

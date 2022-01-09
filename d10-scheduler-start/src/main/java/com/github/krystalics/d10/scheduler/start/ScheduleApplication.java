@@ -3,7 +3,7 @@ package com.github.krystalics.d10.scheduler.start;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.init.Initiation;
-import com.github.krystalics.d10.scheduler.start.sharding.JobInstance;
+import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.start.sharding.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.start.zk.ZookeeperServiceImpl;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ElectionListener;

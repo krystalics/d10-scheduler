@@ -1,7 +1,7 @@
 package com.github.krystalics.d10.scheduler.start.zk.listener;
 
 import com.alibaba.fastjson.JSON;
-import com.github.krystalics.d10.scheduler.start.sharding.JobInstance;
+import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
