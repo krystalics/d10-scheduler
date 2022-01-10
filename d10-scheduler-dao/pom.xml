@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.1.1</version>
+            <version>2.1.4</version>
             <scope>compile</scope>
         </dependency>
 
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.25</version>
+            <version>8.0.27</version>
             <!-- 默认是8.x的版本，可以自己加<version>指定版本 -->
             <scope>runtime</scope>
         </dependency>
