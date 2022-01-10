@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.start.zk.listener;
 
-import com.github.krystalics.d10.scheduler.start.thread.D10SchedulerHelper;
+import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 public class ShardListener implements CuratorCacheListener {
 
 
-
     /**
      * shard节点会由leader在 /live 节点数量发生变化的时候进行创建，其他节点需要在shard期间暂停工作
      *
@@ -30,15 +29,15 @@ public class ShardListener implements CuratorCacheListener {
             case NODE_CREATED:
                 final String beforeNode = new String(after.getData());
 
-                log.info("the shard node is created、to stop the scheduler {}",beforeNode);
-                D10SchedulerHelper.getInstance().stop();
+                log.info("the shard node is created、to stop the scheduler {}", beforeNode);
+                D10Scheduler.getInstance().stop();
                 break;
             case NODE_CHANGED:
                 //
                 break;
             case NODE_DELETED:
                 log.info("the shard node is deleted、to start the scheduler");
-                D10SchedulerHelper.getInstance().start();
+                D10Scheduler.getInstance().start();
                 break;
             default:
                 throw new RuntimeException("unknown node event type " + type.name());

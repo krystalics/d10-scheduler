@@ -1,7 +1,8 @@
-package com.github.krystalics.d10.scheduler.start.thread;
+package com.github.krystalics.d10.scheduler.core.schedule;
 
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
+import com.github.krystalics.d10.scheduler.core.schedule.check.ScheduledCheck;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
@@ -15,21 +16,22 @@ import java.util.concurrent.TimeUnit;
  * xxl-job 在后续的版本中脱离了quartz体系，所以这里直接借鉴它的做法。创建项目自己的轮训体系
  * todo 调度器分片的结果这里要可见
  */
-
-public class D10SchedulerHelper {
+class D10SchedulerHelper {
     private static Logger log = LoggerFactory.getLogger(D10SchedulerHelper.class);
-    private static D10SchedulerHelper instance = new D10SchedulerHelper();
 
-    public static D10SchedulerHelper getInstance() {
-        return instance;
+    public D10SchedulerHelper(ScheduledCheck scheduledCheck, long polling, String scheduledName) {
+        this.scheduledCheck = scheduledCheck;
+        this.POLLING_INTER = polling;
+        this.scheduledName = scheduledName;
     }
 
     //轮询的间隔，1min
-    public static final long POLLING_INTER = 60000;
+    public long POLLING_INTER = 60000;
     private Thread scheduleThread;
     private volatile boolean scheduleThreadToStop = false;
+    private final ScheduledCheck scheduledCheck;
+    private final String scheduledName;
 
-    private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
     private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
 
     /**
@@ -51,7 +53,7 @@ public class D10SchedulerHelper {
                         log.error(e.getMessage(), e);
                     }
                 }
-                log.info(">>>>>>>>> init d10-scheduler admin scheduler success.");
+                log.info(">>>>>>>>>d10-scheduler {} start.", scheduledName);
                 while (!scheduleThreadToStop) {
                     final Pair<Long, Long> taskIds = jobInstance.getTaskIds();
                     log.info("this scheduler's scope is {}", taskIds.toString());
@@ -59,17 +61,7 @@ public class D10SchedulerHelper {
                     long start = System.currentTimeMillis();
 
                     try {
-                        List<VersionInstance> scheduleList = schedulerMapper.schedulerReadVersionInstance(taskIds.getL(), taskIds.getR());
-                        if (scheduleList != null && scheduleList.size() > 0) {
-                            log.info("get {} version instances to schedule", scheduleList.size());
-                            for (VersionInstance versionInstance : scheduleList) {
-
-                            }
-
-                        } else {
-                            log.warn("nothing to schedule");
-                        }
-
+                        scheduledCheck.start();
                     } catch (Exception e) {
                         if (!scheduleThreadToStop) {
                             log.error(">>>>>>>>>>> d10-scheduler, JobScheduleHelper#scheduleThread error:{}", e);
@@ -97,7 +89,7 @@ public class D10SchedulerHelper {
             }
         });
         scheduleThread.setDaemon(true);
-        scheduleThread.setName("d10-scheduler");
+        scheduleThread.setName(scheduledName);
         scheduleThread.start();
     }
 
@@ -105,7 +97,8 @@ public class D10SchedulerHelper {
         if (scheduleThread != null) {
             scheduleThreadToStop = true;
             try {
-                TimeUnit.SECONDS.sleep(3);
+                scheduledCheck.stop();
+                TimeUnit.SECONDS.sleep(10);
             } catch (InterruptedException e) {
                 log.error(e.getMessage(), e);
             }

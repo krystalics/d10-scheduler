@@ -4,6 +4,7 @@ import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.init.Initiation;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
+import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.start.sharding.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.start.zk.ZookeeperServiceImpl;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ElectionListener;
@@ -80,6 +81,7 @@ public class ScheduleApplication {
                     leaderLatch.await();
                     rebalanceService.rebalance(address);
 
+                    D10Scheduler.getInstance().start();
 //                  initiation.init();
                 }
             }, "election").start();

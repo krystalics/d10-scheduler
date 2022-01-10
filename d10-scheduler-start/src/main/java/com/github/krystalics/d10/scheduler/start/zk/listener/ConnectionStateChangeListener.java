@@ -2,6 +2,7 @@ package com.github.krystalics.d10.scheduler.start.zk.listener;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
+import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.start.zk.ZookeeperServiceImpl;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,8 @@ public class ConnectionStateChangeListener implements ConnectionStateListener {
         switch (connectionState) {
             case LOST:
             case SUSPENDED:
-//              todo  distributedScheduler.stop();
+                log.error("node lost the connection with zookeeper!");
+                D10Scheduler.getInstance().stop();
                 break;
             case CONNECTED:
                 log.info("already connect to zk");
