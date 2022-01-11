@@ -85,6 +85,15 @@ public class ScheduleApplication {
 //                  initiation.init();
                 }
             }, "election").start();
+
+            /**
+             * register hooks, which are called before the process exits
+             */
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//            if (Stopper.isRunning()) {
+//                close("shutdownHook");
+//            }
+            }));
         }
 
         @Bean
