@@ -48,6 +48,8 @@ public class RebalanceServiceImpl implements RebalanceService {
                     zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.EPHEMERAL);
                     log.info("2.assign the task to schedulers");
                     shard();
+                    log.info("wait to receive all live node response!");
+                    //todo
                     log.info("3.delete the /shard node");
                     zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
                     lock.unlock();
@@ -67,6 +69,11 @@ public class RebalanceServiceImpl implements RebalanceService {
             }
         }
 
+
+    }
+
+    private void shardAck() throws Exception {
+        final List<String> liveNodes = zookeeperService.liveNodes();
 
     }
 

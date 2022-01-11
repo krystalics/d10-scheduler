@@ -3,23 +3,20 @@ package com.github.krystalics.d10.scheduler.core.schedule;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.core.schedule.check.ScheduledCheck;
-import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
-import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
  * xxl-job 在后续的版本中脱离了quartz体系，所以这里直接借鉴它的做法。创建项目自己的轮训体系
  * todo 调度器分片的结果这里要可见
  */
-class D10SchedulerHelper {
-    private static Logger log = LoggerFactory.getLogger(D10SchedulerHelper.class);
+class SchedulerCheckHelper implements ScheduledCheck{
+    private static Logger log = LoggerFactory.getLogger(SchedulerCheckHelper.class);
 
-    public D10SchedulerHelper(ScheduledCheck scheduledCheck, long polling, String scheduledName) {
+    public SchedulerCheckHelper(ScheduledCheck scheduledCheck, long polling, String scheduledName) {
         this.scheduledCheck = scheduledCheck;
         this.POLLING_INTER = polling;
         this.scheduledName = scheduledName;
@@ -39,6 +36,7 @@ class D10SchedulerHelper {
      * 2。进行资源位的竞争、为多租户设计留下口子
      * 3。获得资源位的可以进入分发队列、没有的则跳过
      */
+    @Override
     public void start() {
         scheduleThreadToStop = false;
         // schedule thread
@@ -90,9 +88,11 @@ class D10SchedulerHelper {
         });
         scheduleThread.setDaemon(true);
         scheduleThread.setName(scheduledName);
+        log.info(scheduledName+" thread start");
         scheduleThread.start();
     }
 
+    @Override
     public void stop() {
         if (scheduleThread != null) {
             scheduleThreadToStop = true;

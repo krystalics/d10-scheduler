@@ -81,7 +81,6 @@ public class ScheduleApplication {
                     leaderLatch.await();
                     rebalanceService.rebalance(address);
 
-                    D10Scheduler.getInstance().start();
 //                  initiation.init();
                 }
             }, "election").start();
@@ -90,10 +89,8 @@ public class ScheduleApplication {
              * register hooks, which are called before the process exits
              */
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//            if (Stopper.isRunning()) {
-//                close("shutdownHook");
-//            }
-            }));
+                D10Scheduler.getInstance().stop();
+            },"shutdown-hook"));
         }
 
         @Bean

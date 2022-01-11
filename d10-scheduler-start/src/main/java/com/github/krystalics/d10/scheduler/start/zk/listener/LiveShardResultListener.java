@@ -13,7 +13,8 @@ import java.util.List;
 /**
  * @author linjiabao001
  * @date 2022/1/3
- * @description shard后的结果存放为 /live 节点的数据
+ * @description shard后的结果存放为 /live 节点的数据。并且各个节点进行了shard变更后会有一个简单的ack机制
+ * 告诉leader节点它们知道了
  */
 @Component
 @Slf4j
