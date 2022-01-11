@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class ZookeeperServiceImpl  {
+public class ZookeeperServiceImpl {
 
     @Autowired
     private CuratorFramework client;
@@ -60,6 +60,7 @@ public class ZookeeperServiceImpl  {
     /**
      * zookeeper 不适合类似于mysql的查询，这个只作为 项目启动时
      * rebalance的凭证，因为这时候 clusterInfo中的信息还不是完整的
+     *
      * @return
      * @throws Exception
      */
@@ -67,7 +68,7 @@ public class ZookeeperServiceImpl  {
         return client.getChildren().forPath(CommonConstants.ZK_LIVE_NODES);
     }
 
-    public void setData(String path,String data) throws Exception {
+    public void setData(String path, String data) throws Exception {
         client.setData().forPath(path, data.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -84,6 +85,9 @@ public class ZookeeperServiceImpl  {
         client.delete().forPath(path);
     }
 
+    public List<String> getChildren(String path) throws Exception {
+        return client.getChildren().forPath(path);
+    }
 
 
     /**

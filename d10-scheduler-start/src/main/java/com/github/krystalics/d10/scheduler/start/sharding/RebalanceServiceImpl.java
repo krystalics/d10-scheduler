@@ -1,8 +1,8 @@
 package com.github.krystalics.d10.scheduler.start.sharding;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
-import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
+import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.start.sharding.impl.ScopeStrategy;
@@ -49,15 +49,17 @@ public class RebalanceServiceImpl implements RebalanceService {
                     log.info("2.assign the task to schedulers");
                     shard();
                     log.info("wait to receive all live node response!");
-                    //todo
+                    shardCheckAck();
                     log.info("3.delete the /shard node");
                     zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
                     lock.unlock();
                     break;
                 } else {
                     log.warn("the former one has get the lock, node = {}", address);
+                    Thread.sleep(1000);
                     break;
                 }
+
             } catch (Exception e) {
                 //如果rebalance的时候发生异常，进行unlock、并重新尝试，几次之后会通知管理员进行查看
                 log.error("rebalancing error,{}", e.toString());
@@ -72,8 +74,21 @@ public class RebalanceServiceImpl implements RebalanceService {
 
     }
 
-    private void shardAck() throws Exception {
-        final List<String> liveNodes = zookeeperService.liveNodes();
+    /**
+     * 将现有的live节点与shard节点下的子节点进行对比
+     * todo KeeperErrorCode = NoChildrenForEphemerals for /shard/127.0.0.1:8083
+     * @throws Exception
+     */
+    private void shardCheckAck() throws Exception {
+        while (true) {
+            final List<String> liveNodes = zookeeperService.liveNodes();
+            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_NODE);
+            log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
+            if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
+                return;
+            }
+            Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
+        }
 
     }
 

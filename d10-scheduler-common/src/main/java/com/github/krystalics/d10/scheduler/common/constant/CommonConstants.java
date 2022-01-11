@@ -52,4 +52,6 @@ public class CommonConstants {
      */
     public final static int INSTANCE_PER_PARTITION = 2000;
 
+    public final static int SHARD_ACK_WAITING = 1000;
+
 }
