@@ -38,6 +38,10 @@ public class RebalanceServiceImpl implements RebalanceService {
      */
     private final Lock lock = new ReentrantLock();
 
+    /**
+     * todo 连续多次的shard 需要重新继续
+     * @param address
+     */
     @Override
     public void rebalance(String address) {
         for (int i = 0; i < CommonConstants.REBALANCED_TRY_TIMES; i++) {
