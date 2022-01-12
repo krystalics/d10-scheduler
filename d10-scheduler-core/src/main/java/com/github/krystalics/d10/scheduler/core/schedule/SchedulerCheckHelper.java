@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * xxl-job 在后续的版本中脱离了quartz体系，所以这里直接借鉴它的做法。创建项目自己的轮训体系
  * todo 调度器分片的结果这里要可见
  */
-class SchedulerCheckHelper implements ScheduledCheck{
+class SchedulerCheckHelper implements ScheduledCheck {
     private static Logger log = LoggerFactory.getLogger(SchedulerCheckHelper.class);
 
     public SchedulerCheckHelper(ScheduledCheck scheduledCheck, long polling, String scheduledName) {
@@ -88,7 +88,7 @@ class SchedulerCheckHelper implements ScheduledCheck{
         });
         scheduleThread.setDaemon(true);
         scheduleThread.setName(scheduledName);
-        log.info(scheduledName+" thread start");
+        log.info(scheduledName + " thread start");
         scheduleThread.start();
     }
 
@@ -116,5 +116,12 @@ class SchedulerCheckHelper implements ScheduledCheck{
         }
     }
 
+    @Override
+    public boolean checkStop() {
+        if (scheduleThread == null) {
+            return true;
+        }
+        return scheduleThread.getState() == Thread.State.TERMINATED;
+    }
 
 }

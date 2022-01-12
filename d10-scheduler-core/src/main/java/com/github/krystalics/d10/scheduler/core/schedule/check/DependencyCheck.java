@@ -22,4 +22,9 @@ public class DependencyCheck implements ScheduledCheck {
         log.error("dependency check stop");
 
     }
+
+    @Override
+    public boolean checkStop() {
+        return true;
+    }
 }

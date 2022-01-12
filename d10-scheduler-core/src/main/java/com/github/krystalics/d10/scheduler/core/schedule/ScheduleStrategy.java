@@ -15,4 +15,10 @@ public interface ScheduleStrategy {
      * 停止check
      */
     void stop();
+
+    /**
+     * 查看是否已经停止了工作
+     * @return true为是
+     */
+    boolean checkStop();
 }

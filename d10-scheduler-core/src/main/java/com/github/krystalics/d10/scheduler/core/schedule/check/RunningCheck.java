@@ -22,4 +22,9 @@ public class RunningCheck implements ScheduledCheck{
         log.error("running check stop");
 
     }
+
+    @Override
+    public boolean checkStop() {
+        return true;
+    }
 }

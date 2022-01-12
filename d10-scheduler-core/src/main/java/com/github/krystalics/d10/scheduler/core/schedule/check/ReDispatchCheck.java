@@ -22,4 +22,9 @@ public class ReDispatchCheck implements ScheduledCheck{
         log.error("redispatch check stop");
 
     }
+
+    @Override
+    public boolean checkStop() {
+        return true;
+    }
 }

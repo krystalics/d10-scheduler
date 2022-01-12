@@ -55,4 +55,8 @@ public class TimeTriggerCheck implements ScheduledCheck {
         log.error("time check stop");
     }
 
+    @Override
+    public boolean checkStop() {
+        return true;
+    }
 }

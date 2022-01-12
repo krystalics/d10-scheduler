@@ -8,4 +8,5 @@ import com.github.krystalics.d10.scheduler.core.schedule.ScheduleStrategy;
  * @description 用于任务调度的检测体系
  */
 public interface ScheduledCheck extends ScheduleStrategy {
+
 }

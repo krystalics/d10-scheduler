@@ -34,4 +34,12 @@ public class D10Scheduler {
         }
     }
 
+    public boolean checkStop() {
+        for (ScheduleStrategy scheduleStrategy : SCHEDULE_LIST) {
+            if (!scheduleStrategy.checkStop()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

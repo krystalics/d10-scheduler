@@ -22,4 +22,9 @@ public class ResourceCheck implements ScheduledCheck {
         log.error("resource check stop");
 
     }
+
+    @Override
+    public boolean checkStop() {
+        return true;
+    }
 }
