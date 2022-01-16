@@ -9,7 +9,7 @@ public interface ScheduleStrategy {
     /**
      * 开始check
      */
-    void start();
+    void start() throws InterruptedException;
 
     /**
      * 停止check

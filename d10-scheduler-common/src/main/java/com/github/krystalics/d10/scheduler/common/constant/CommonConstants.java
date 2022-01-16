@@ -48,9 +48,9 @@ public class CommonConstants {
     public final static int REBALANCED_TRY_TIMES = 3;
 
     /**
-     * 2000条一个分段，进入线程池分开执行
+     * 1000条一个分段，进入线程池分开执行
      */
-    public final static int INSTANCE_PER_PARTITION = 2000;
+    public final static int INSTANCE_PER_PARTITION = 1000;
 
     public final static int SHARD_ACK_WAITING = 1000;
 

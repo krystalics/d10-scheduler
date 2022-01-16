@@ -28,6 +28,9 @@ public class VersionInstance {
     private ZonedDateTime runEndTime;
     private String node;
     private Integer autoStart;
+    private String queueName;
+    private Double cpuAvg;
+    private Double memoryAvg;
     private ZonedDateTime ctime;
     private ZonedDateTime mtime;
 }

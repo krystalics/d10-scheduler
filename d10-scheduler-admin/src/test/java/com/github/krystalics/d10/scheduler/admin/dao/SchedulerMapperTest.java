@@ -20,7 +20,7 @@ public class SchedulerMapperTest extends BaseTest {
 
     @Test
     public void read() {
-        final List<VersionInstance> versionInstances = schedulerMapper.schedulerReadVersionInstance(0, 10000);
+        final List<VersionInstance> versionInstances = schedulerMapper.readCouldTimeTriggered(0, 10000);
         System.out.println(versionInstances.size());
     }
 }
