@@ -1,5 +1,6 @@
-package com.github.krystalics.d10.scheduler.core.schedule;
+package com.github.krystalics.d10.scheduler.core.schedule.strategy;
 
+import com.github.krystalics.d10.scheduler.core.schedule.check.SchedulerCheckHelper;
 import com.github.krystalics.d10.scheduler.core.schedule.check.DependencyCheck;
 import com.github.krystalics.d10.scheduler.core.schedule.check.ReDispatchCheck;
 import com.github.krystalics.d10.scheduler.core.schedule.check.ResourceCheck;

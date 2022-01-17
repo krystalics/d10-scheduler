@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.schedule.check;
 
-import com.github.krystalics.d10.scheduler.core.schedule.ScheduleStrategy;
+import com.github.krystalics.d10.scheduler.core.schedule.strategy.ScheduleStrategy;
 
 /**
  * @author linjiabao001

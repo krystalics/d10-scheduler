@@ -132,7 +132,7 @@ public class TimeTriggerCheck implements ScheduledCheck {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Throwable.class)
     void resource(VersionInstance versionInstance){
 
     }

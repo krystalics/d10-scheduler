@@ -1,5 +1,9 @@
 package com.github.krystalics.d10.scheduler.core.schedule;
 
+import com.github.krystalics.d10.scheduler.core.schedule.strategy.ScheduleFactory;
+import com.github.krystalics.d10.scheduler.core.schedule.strategy.ScheduleStrategy;
+import com.github.krystalics.d10.scheduler.core.schedule.strategy.Strategy;
+
 import java.util.List;
 
 /**
@@ -22,7 +26,7 @@ public class D10Scheduler {
      */
     private final static List<ScheduleStrategy> SCHEDULE_LIST = ScheduleFactory.getScheduleList(Strategy.CHECK);
 
-    public void start() {
+    public void start() throws InterruptedException {
         for (ScheduleStrategy scheduleStrategy : SCHEDULE_LIST) {
             scheduleStrategy.start();
         }

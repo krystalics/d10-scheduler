@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.schedule;
+package com.github.krystalics.d10.scheduler.core.schedule.strategy;
 
 /**
  * @author linjiabao001

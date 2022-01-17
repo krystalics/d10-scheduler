@@ -1,8 +1,7 @@
-package com.github.krystalics.d10.scheduler.core.schedule;
+package com.github.krystalics.d10.scheduler.core.schedule.check;
 
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
-import com.github.krystalics.d10.scheduler.core.schedule.check.ScheduledCheck;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  * xxl-job 在后续的版本中脱离了quartz体系，所以这里直接借鉴它的做法。创建项目自己的轮训体系
  * todo 调度器分片的结果这里要可见
  */
-class SchedulerCheckHelper implements ScheduledCheck {
+public class SchedulerCheckHelper implements ScheduledCheck {
     private static Logger log = LoggerFactory.getLogger(SchedulerCheckHelper.class);
 
     public SchedulerCheckHelper(ScheduledCheck scheduledCheck, long polling, String scheduledName) {
