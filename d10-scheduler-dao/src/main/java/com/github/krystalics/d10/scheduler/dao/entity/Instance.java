@@ -76,6 +76,23 @@ public class Instance implements Serializable {
     private Integer autoStart;
 
     /**
+     * 运行在哪个queue上
+     */
+    private String queueName;
+
+    /**
+     * 实例生成的操作人:默认是scheduler
+     * 重跑时会记录操作的用户
+     */
+    private String operator;
+
+    /**
+     * 实例生成的操作原因:默认是scheduler 自动例行
+     * 重跑时会记录用户的操作原因
+     */
+    private String operateReason;
+
+    /**
      * 记录生成时间，实际上也就是 实例化开始时间
      */
     private ZonedDateTime ctime;

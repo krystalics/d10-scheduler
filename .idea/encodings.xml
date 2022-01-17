@@ -7,6 +7,8 @@
     <file url="file://$PROJECT_DIR$/d10-scheduler-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/d10-scheduler-dao/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/d10-scheduler-executor/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/d10-scheduler-resource-manager/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/d10-scheduler-resource-manager/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/d10-scheduler-start/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/d10-scheduler-start/src/main/resources" charset="UTF-8" />
   </component>

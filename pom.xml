@@ -23,6 +23,7 @@
         <module>d10-scheduler-common</module>
         <module>d10-scheduler-executor</module>
         <module>d10-scheduler-start</module>
+        <module>d10-scheduler-resource-manager</module>
     </modules>
 
     <dependencyManagement>

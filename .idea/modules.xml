@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/d10-scheduler-dao/d10-scheduler-dao.iml" filepath="$PROJECT_DIR$/d10-scheduler-dao/d10-scheduler-dao.iml" />
       <module fileurl="file://$PROJECT_DIR$/d10-scheduler-executor/d10-scheduler-executor.iml" filepath="$PROJECT_DIR$/d10-scheduler-executor/d10-scheduler-executor.iml" />
       <module fileurl="file://$PROJECT_DIR$/d10-scheduler-init/d10-scheduler-init.iml" filepath="$PROJECT_DIR$/d10-scheduler-init/d10-scheduler-init.iml" />
+      <module fileurl="file://$PROJECT_DIR$/d10-scheduler-resource-manager/d10-scheduler-resource-manager.iml" filepath="$PROJECT_DIR$/d10-scheduler-resource-manager/d10-scheduler-resource-manager.iml" />
       <module fileurl="file://$PROJECT_DIR$/d10-scheduler-start/d10-scheduler-start.iml" filepath="$PROJECT_DIR$/d10-scheduler-start/d10-scheduler-start.iml" />
       <module fileurl="file://$PROJECT_DIR$/d10-scheduler-frontend/frontend.iml" filepath="$PROJECT_DIR$/d10-scheduler-frontend/frontend.iml" />
     </modules>

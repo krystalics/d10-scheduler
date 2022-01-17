@@ -92,6 +92,23 @@ public class Task implements Serializable {
      */
     private Integer priority;
 
+    /**
+     * 任务业务优先级、作为一个mark
+     */
+    private Integer bizPriority;
+
+    /**
+     * 任务平均消耗的客户端cpu、默认0.5core
+     * 可根据不同的任务类型进行设置，做的个性化一点就是根据每个任务的实际运行情况进行配置
+     */
+    private Double cpuAvg;
+
+    /**
+     * 任务平均消耗的客户端内存，默认1g
+     */
+    private Double memoryAvg;
+
+
     private ZonedDateTime ctime;
 
     /**

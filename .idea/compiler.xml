@@ -10,6 +10,7 @@
         <module name="d10-scheduler-executor" />
         <module name="d10-scheduler-init" />
         <module name="d10-scheduler-core" />
+        <module name="d10-scheduler-resource-manager" />
         <module name="d10-scheduler-admin" />
         <module name="d10-scheduler-start" />
         <module name="d10-scheduler-dao" />
@@ -24,6 +25,7 @@
       <module name="d10-scheduler-dao" target="8" />
       <module name="d10-scheduler-executor" target="8" />
       <module name="d10-scheduler-init" target="1.8" />
+      <module name="d10-scheduler-resource-manager" target="8" />
       <module name="d10-scheduler-start" target="8" />
       <module name="distributed" target="8" />
     </bytecodeTargetLevel>
@@ -36,6 +38,7 @@
       <module name="d10-scheduler-dao" options="-parameters" />
       <module name="d10-scheduler-executor" options="-parameters" />
       <module name="d10-scheduler-init" options="-parameters" />
+      <module name="d10-scheduler-resource-manager" options="-parameters" />
       <module name="d10-scheduler-start" options="-parameters" />
       <module name="distributed" options="-parameters" />
     </option>
