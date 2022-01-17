@@ -82,20 +82,44 @@
         </foreach>
     </update>
 
-    <select id="checkUpInstanceIsSuccess">
+    <select id="checkUpInstancesAreSuccess">
         select count(1)
         from instance_rely ir
-             join version v
-                  on ir.up_task_id = v.task_id and ir.up_version_no = v.version_no
-             join instance i
-                  on v.last_instance_id = i.instance_id
-        where ir.instance_id = #{instanceId} and i.state != 5;
+                 join version v
+                      on ir.up_task_id = v.task_id and ir.up_version_no = v.version_no
+                 join instance i
+                      on v.last_instance_id = i.instance_id
+        where ir.instance_id = #{instanceId}
+          and i.state != 5;
     </select>
 
-    <select id="checkQueueHasResource">
+    <select id="routingSchedulingInstances" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
+        select instance_id       as instanceId,
+               i.state           as state,
+               t.queue_name      as queueName,
+               t.cpu_avg         as cpuAvg,
+               t.memory_avg      as memoryAvg,
+               start_time_theory as startTimeTheory
 
+        from task as t
+                 join version as v
+                      on t.task_id = v.task_id
+                 join instance i
+                      on v.last_instance_id = i.instance_id
+
+        where i.task_id between #{left} and #{right}
+        <![CDATA[
+          and i.state < 5
+          and t.state = 2
+          and start_time_theory <= NOW()
+        ]]>
     </select>
 
+    <update id="updateState">
+        UPDATE instance
+        SET state = #{state}
+        WHERE instance_id = #{instanceId}
+    </update>
 
 
 </mapper>

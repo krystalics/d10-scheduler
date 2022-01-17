@@ -13,8 +13,12 @@ import java.util.stream.Stream;
 public class StreamTest {
     public static void main(String[] args) {
         Stream.of("Will I eat the apple?".split(" "))
-                .parallel()
-                .map(w -> w + " ")
+                .map(w -> {
+                    if(w.equals("Will")){
+                        throw new RuntimeException("");
+                    }
+                    return w + " ";
+                })
                 .peek(System.out::print)
                 .map(String::toUpperCase)
                 .peek(System.out::print)

@@ -24,7 +24,8 @@ public interface SchedulerMapper {
 
     /**
      * 获取可以调度的任务实例: state=3 进行dispatch
-     *                     state=7 redispatch
+     * state=7 redispatch
+     *
      * @param left  该调度器负责的分片范围下界
      * @param right 该调度器负责的分片范围上界
      * @param state 需要获取的instance状态
@@ -37,6 +38,7 @@ public interface SchedulerMapper {
      * state=1 进行依赖检查
      * state=2 进行资源检查
      * state=6 进行重试次数的检查
+     *
      * @param left  该调度器负责的分片范围下界
      * @param right 该调度器负责的分片范围上界
      * @param state 需要获取的instance状态
@@ -46,18 +48,31 @@ public interface SchedulerMapper {
 
     /**
      * 批量更新版本实例的状态
+     *
      * @param instances 实例列表
      */
     void batchUpdateState(List<VersionInstance> instances);
 
     /**
-     * 将状态更新为等待资源
+     * 将状态更新
+     *
      * @param instanceId 实例Id
      */
-    void updateStateToWait(@Param("instanceId") long instanceId);
+    void updateState(@Param("state") int state, @Param("instanceId") long instanceId);
+
     /**
      * 检查该实例的所有上游是否都成功了
+     *
      * @return 0表示都成功了、其他数字表示未成功的个数
      */
-    int checkUpInstanceIsSuccess(@Param("instanceId")long instanceId);
+    int checkUpInstancesAreSuccess(@Param("instanceId") long instanceId);
+
+    /**
+     * 获取例行调度的所有任务
+     *
+     * @param left  该调度器负责的分片范围下界
+     * @param right 该调度器负责的分片范围上界
+     * @return 所有的instance实例
+     */
+    List<VersionInstance> routingSchedulingInstances(@Param("left") long left, @Param("right") long right);
 }

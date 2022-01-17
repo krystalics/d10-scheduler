@@ -5,7 +5,7 @@ import com.github.krystalics.d10.scheduler.core.schedule.check.DependencyCheck;
 import com.github.krystalics.d10.scheduler.core.schedule.check.ReDispatchCheck;
 import com.github.krystalics.d10.scheduler.core.schedule.check.ResourceCheck;
 import com.github.krystalics.d10.scheduler.core.schedule.check.RunningCheck;
-import com.github.krystalics.d10.scheduler.core.schedule.check.TimeTriggerCheck;
+import com.github.krystalics.d10.scheduler.core.schedule.check.RoutingSchedulingCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public class ScheduleFactory {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduleFactory.class);
 
-    private final static SchedulerCheckHelper timeCheck = new SchedulerCheckHelper(new TimeTriggerCheck(), 60000, "time-check");
+    private final static SchedulerCheckHelper timeCheck = new SchedulerCheckHelper(new RoutingSchedulingCheck(), 60000, "time-check");
     private final static SchedulerCheckHelper dependencyCheck = new SchedulerCheckHelper(new DependencyCheck(), 60000, "dependency-check");
     private final static SchedulerCheckHelper resourceCheck = new SchedulerCheckHelper(new ResourceCheck(), 60000, "resource-check");
     private final static SchedulerCheckHelper runningCheck = new SchedulerCheckHelper(new RunningCheck(), 30000, "running-check");

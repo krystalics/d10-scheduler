@@ -23,4 +23,11 @@ public class SchedulerMapperTest extends BaseTest {
         final List<VersionInstance> versionInstances = schedulerMapper.readCouldTimeTriggered(0, 10000);
         System.out.println(versionInstances.size());
     }
+
+    @Test
+    public void route(){
+        final List<VersionInstance> versionInstances = schedulerMapper.routingSchedulingInstances(0, 10000);
+        System.out.println(versionInstances.size());
+//        versionInstances.forEach(System.out::println);
+    }
 }

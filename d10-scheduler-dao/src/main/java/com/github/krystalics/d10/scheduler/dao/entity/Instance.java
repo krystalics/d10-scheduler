@@ -90,7 +90,7 @@ public class Instance implements Serializable {
      * 实例生成的操作原因:默认是scheduler 自动例行
      * 重跑时会记录用户的操作原因
      */
-    private String operateReason;
+    private String operationReason;
 
     /**
      * 记录生成时间，实际上也就是 实例化开始时间

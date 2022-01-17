@@ -3,7 +3,6 @@ package com.github.krystalics.d10.scheduler.dao.entity;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -108,6 +107,7 @@ public class Task implements Serializable {
      */
     private Double memoryAvg;
 
+    private String queueName;
 
     private ZonedDateTime ctime;
 

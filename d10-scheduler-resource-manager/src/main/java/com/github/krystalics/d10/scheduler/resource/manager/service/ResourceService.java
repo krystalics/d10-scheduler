@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ResourceService {
 
+
+
     @Transactional(rollbackFor = Throwable.class)
     public String resourceAndInstanceStateUpdate() {
         //todo 1.check这个instance的队列使用的资源有没有达到min
