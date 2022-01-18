@@ -25,6 +25,10 @@ public class LockService {
         return lock.tryLock(timeout, TimeUnit.SECONDS);
     }
 
+    /**
+     * keypoint 该锁是客户端可重入的、如果想要把同一客户端的锁屏蔽，还需要具体方法上加上synchronized
+     * @param lockPath
+     */
     public void lock(String lockPath){
         Lock lock = zookeeperLockRegistry.obtain(lockPath);
         lock.lock();

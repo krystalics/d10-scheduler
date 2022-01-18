@@ -4,6 +4,7 @@ import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
 import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
 import com.github.krystalics.d10.scheduler.common.zk.LockService;
 import com.github.krystalics.d10.scheduler.resource.manager.service.ResourceService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
  * @Description FIFO策略
  */
 @Component
+@Slf4j
 public class FIFOScheduler implements ResourceScheduler {
 
     @Autowired
@@ -39,10 +41,15 @@ public class FIFOScheduler implements ResourceScheduler {
      * @return
      */
     @Override
-    public String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble) throws Exception {
-        lockService.lock(ResourceConstants.LOCK_PREFIX + queueName);
-        resourceService.resourceAndInstanceStateUpdate(instanceId, queueName, cpuApply, memoryApply, scramble);
-        lockService.unlock(ResourceConstants.LOCK_PREFIX + queueName);
+    public synchronized String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble) throws Exception {
+        try {
+            lockService.lock(ResourceConstants.LOCK_PREFIX + queueName);
+            resourceService.resourceAndInstanceStateUpdate(instanceId, queueName, cpuApply, memoryApply, scramble);
+        } catch (Exception e) {
+            log.error("resource allocator exception ", e);
+        } finally {
+            lockService.unlock(ResourceConstants.LOCK_PREFIX + queueName);
+        }
 
         return "";
     }
