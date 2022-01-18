@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.zk.listener;
+package com.github.krystalics.d10.scheduler.start.zk.listener;
 
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import lombok.SneakyThrows;

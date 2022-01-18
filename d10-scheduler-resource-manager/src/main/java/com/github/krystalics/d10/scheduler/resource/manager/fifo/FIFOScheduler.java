@@ -1,12 +1,11 @@
 package com.github.krystalics.d10.scheduler.resource.manager.fifo;
 
-import com.github.krystalics.d10.scheduler.core.zk.ZookeeperServiceImpl;
 import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
 import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
+import com.github.krystalics.d10.scheduler.common.zk.LockService;
 import com.github.krystalics.d10.scheduler.resource.manager.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 /**
  * @Author linjiabao001
@@ -20,7 +19,7 @@ public class FIFOScheduler implements ResourceScheduler {
     private ResourceService resourceService;
 
     @Autowired
-    private ZookeeperServiceImpl zookeeperService;
+    private LockService lockService;
 
     @Override
     public String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply) throws Exception {
@@ -41,9 +40,9 @@ public class FIFOScheduler implements ResourceScheduler {
      */
     @Override
     public String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble) throws Exception {
-        zookeeperService.lock(ResourceConstants.LOCK_PREFIX + queueName);
+        lockService.lock(ResourceConstants.LOCK_PREFIX + queueName);
         resourceService.resourceAndInstanceStateUpdate(instanceId, queueName, cpuApply, memoryApply, scramble);
-        zookeeperService.unlock(ResourceConstants.LOCK_PREFIX + queueName);
+        lockService.unlock(ResourceConstants.LOCK_PREFIX + queueName);
 
         return "";
     }

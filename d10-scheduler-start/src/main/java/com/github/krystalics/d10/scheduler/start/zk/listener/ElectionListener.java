@@ -1,9 +1,9 @@
-package com.github.krystalics.d10.scheduler.core.zk.listener;
+package com.github.krystalics.d10.scheduler.start.zk.listener;
 
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
-import com.github.krystalics.d10.scheduler.core.zk.ZookeeperServiceImpl;
+import com.github.krystalics.d10.scheduler.start.zk.ZookeeperHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class ElectionListener implements LeaderLatchListener {
     @Autowired
-    private ZookeeperServiceImpl zookeeperService;
+    private ZookeeperHelper zookeeperService;
 
     @Value("${server.port:8080}")
     private int port;

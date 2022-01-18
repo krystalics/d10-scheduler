@@ -5,8 +5,8 @@ import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
+import com.github.krystalics.d10.scheduler.start.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.start.sharding.impl.ScopeStrategy;
-import com.github.krystalics.d10.scheduler.core.zk.ZookeeperServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class RebalanceServiceImpl implements RebalanceService {
     private TaskMapper taskMapper;
 
     @Autowired
-    private ZookeeperServiceImpl zookeeperService;
+    private ZookeeperHelper zookeeperService;
 
     /**
      * 当新leader替换老leader上位，就会在startRunner和live node delete重复执行 rebalance

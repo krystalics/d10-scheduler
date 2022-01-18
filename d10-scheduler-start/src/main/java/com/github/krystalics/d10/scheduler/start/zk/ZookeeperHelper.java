@@ -1,29 +1,21 @@
-package com.github.krystalics.d10.scheduler.core.zk;
+package com.github.krystalics.d10.scheduler.start.zk;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
-import com.github.krystalics.d10.scheduler.core.zk.listener.AllNodesChangeListener;
-import com.github.krystalics.d10.scheduler.core.zk.listener.LeaderChangeListener;
-import com.github.krystalics.d10.scheduler.core.zk.listener.LiveNodesChangeListener;
-import com.github.krystalics.d10.scheduler.core.zk.listener.LiveShardResultListener;
-import com.github.krystalics.d10.scheduler.core.zk.listener.ShardListener;
+import com.github.krystalics.d10.scheduler.start.zk.listener.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.zookeeper.lock.ZookeeperLockRegistry;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 /**
  * @author linjiabao001
@@ -32,7 +24,7 @@ import java.util.concurrent.locks.Lock;
  */
 @Service
 @Slf4j
-public class ZookeeperServiceImpl {
+public class ZookeeperHelper {
 
     @Autowired
     private CuratorFramework client;
@@ -51,9 +43,6 @@ public class ZookeeperServiceImpl {
 
     @Autowired
     private LiveShardResultListener liveShardResultListener;
-
-    @Autowired
-    private ZookeeperLockRegistry zookeeperLockRegistry;
 
     @Value("${server.port}")
     private int port;
@@ -135,24 +124,5 @@ public class ZookeeperServiceImpl {
         createNodeIfNotExist(CommonConstants.ZK_ALL_NODES + "/" + address, address, CreateMode.PERSISTENT);
         //在live中为临时节点
         createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
-    }
-
-    /**
-     * @param lockPath 锁路径
-     * @param timeout  超时时间
-     */
-    public boolean tryLock(String lockPath, long timeout) throws Exception {
-        Lock lock = zookeeperLockRegistry.obtain(lockPath);
-        return lock.tryLock(timeout, TimeUnit.SECONDS);
-    }
-
-    public void lock(String lockPath){
-        Lock lock = zookeeperLockRegistry.obtain(lockPath);
-        lock.lock();
-    }
-
-    public void unlock(String lockPath){
-        Lock lock = zookeeperLockRegistry.obtain(lockPath);
-        lock.unlock();
     }
 }

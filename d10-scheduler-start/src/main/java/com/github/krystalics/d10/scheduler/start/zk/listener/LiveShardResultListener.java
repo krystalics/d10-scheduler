@@ -1,11 +1,11 @@
-package com.github.krystalics.d10.scheduler.core.zk.listener;
+package com.github.krystalics.d10.scheduler.start.zk.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
-import com.github.krystalics.d10.scheduler.core.zk.ZookeeperServiceImpl;
+import com.github.krystalics.d10.scheduler.start.zk.ZookeeperHelper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.ChildData;
@@ -29,7 +29,7 @@ import java.util.List;
 public class LiveShardResultListener implements CuratorCacheListener {
 
     @Autowired
-    private ZookeeperServiceImpl zookeeperService;
+    private ZookeeperHelper zookeeperService;
 
     @Autowired
     private JobInstance jobInstance;

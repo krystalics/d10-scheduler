@@ -82,6 +82,10 @@
         WHERE instance_id = #{instanceId}
     </update>
 
+    <select id="checkQueueResource">
+--      todo 获取queue的接口、以及queue的entity等等
+    </select>
+
 
 
 </mapper>

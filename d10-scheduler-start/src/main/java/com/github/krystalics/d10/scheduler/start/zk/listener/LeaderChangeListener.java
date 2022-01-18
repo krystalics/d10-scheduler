@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.zk.listener;
+package com.github.krystalics.d10.scheduler.start.zk.listener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.ChildData;

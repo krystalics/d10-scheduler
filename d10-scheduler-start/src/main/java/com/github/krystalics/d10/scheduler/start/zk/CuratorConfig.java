@@ -1,6 +1,6 @@
-package com.github.krystalics.d10.scheduler.core.zk;
+package com.github.krystalics.d10.scheduler.start.zk;
 
-import com.github.krystalics.d10.scheduler.core.zk.listener.ConnectionStateChangeListener;
+import com.github.krystalics.d10.scheduler.start.zk.listener.ConnectionStateChangeListener;
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.zookeeper.lock.ZookeeperLockRegistry;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -98,5 +99,10 @@ public class CuratorConfig {
             throw new IllegalStateException("zk acls error");
         }
         return acls;
+    }
+
+    @Bean
+    public ZookeeperLockRegistry zookeeperLockRegistry(CuratorFramework client) {
+        return new ZookeeperLockRegistry(client, "test");
     }
 }
