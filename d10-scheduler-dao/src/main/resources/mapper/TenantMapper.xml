@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.TenantMapper">
+    <sql id="table">
+        tenant
+    </sql>
+
+    <sql id="fields">
+        id          as id,
+        tenant_code as tenantCode,
+        description as description,
+        queue_id    as queueId,
+        ctime       as ctime,
+        mtime       as mtime
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            1 = 1
+            <if test="tenantCode != null and tenantCode != ''">
+                and tenant_code = #{tenantCode}
+            </if>
+
+        </where>
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        <include refid="table"/>(
+        tenant_code,
+        description,
+        queue_id)
+        value(
+        #{tenantCode},
+        #{description},
+        #{queueId})
+    </insert>
+
+    <select id="list" resultType="com.github.krystalics.d10.scheduler.dao.entity.Tenant">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        <include refid="where_sql"/>
+        <if test="orderByOperation != null">
+            <foreach collection="orderByOperation.itemOperators" item="opr" separator="," open="order by ">
+                ${opr.column} ${opr.operator}
+            </foreach>
+        </if>
+        <if test="page != null">
+            limit #{page.offset},#{page.limit}
+        </if>
+    </select>
+
+    <select id="count" resultType="int">
+        select count(*) from
+        <include refid="table"/>
+        <include refid="where_sql"/>
+    </select>
+
+
+    <update id="update">
+        update
+        <include refid="table"/>
+        <set>
+            <if test="tenantCode != null and tenantCode != ''">
+                tenant_code = #{tenantCode}
+            </if>
+        </set>
+        <include refid="where_sql"/>
+    </update>
+
+    <select id="getById" resultType="com.github.krystalics.d10.scheduler.dao.entity.Tenant">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        where id=#{id}
+    </select>
+</mapper>

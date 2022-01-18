@@ -3,7 +3,7 @@ package com.github.krystalics.d10.scheduler.start.zk.listener;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
-import com.github.krystalics.d10.scheduler.start.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.springframework.beans.factory.annotation.Autowired;

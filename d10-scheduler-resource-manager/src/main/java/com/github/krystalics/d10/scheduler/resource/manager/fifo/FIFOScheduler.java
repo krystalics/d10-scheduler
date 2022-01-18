@@ -2,7 +2,7 @@ package com.github.krystalics.d10.scheduler.resource.manager.fifo;
 
 import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
 import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
-import com.github.krystalics.d10.scheduler.common.zk.LockService;
+import com.github.krystalics.d10.scheduler.resource.manager.service.LockService;
 import com.github.krystalics.d10.scheduler.resource.manager.service.ResourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

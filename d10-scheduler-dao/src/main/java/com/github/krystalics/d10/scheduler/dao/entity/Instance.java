@@ -4,8 +4,8 @@ package com.github.krystalics.d10.scheduler.dao.entity;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -95,10 +95,10 @@ public class Instance implements Serializable {
     /**
      * 记录生成时间，实际上也就是 实例化开始时间
      */
-    private ZonedDateTime ctime;
+    private Date ctime;
 
     /**
      * 记录最后更改时间
      */
-    private ZonedDateTime mtime;
+    private Date mtime;
 }

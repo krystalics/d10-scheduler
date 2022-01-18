@@ -1,6 +1,5 @@
 package com.github.krystalics.d10.scheduler.resource.manager.service;
 
-import com.github.krystalics.d10.scheduler.common.zk.LockService;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

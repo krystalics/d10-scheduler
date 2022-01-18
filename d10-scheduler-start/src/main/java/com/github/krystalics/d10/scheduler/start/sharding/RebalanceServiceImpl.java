@@ -5,7 +5,7 @@ import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
-import com.github.krystalics.d10.scheduler.start.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.start.sharding.impl.ScopeStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;

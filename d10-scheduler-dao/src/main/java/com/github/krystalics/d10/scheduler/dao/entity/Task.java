@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -109,10 +110,10 @@ public class Task implements Serializable {
 
     private String queueName;
 
-    private ZonedDateTime ctime;
+    private Date ctime;
 
     /**
      * 记录最后更改时间
      */
-    private ZonedDateTime mtime;
+    private Date mtime;
 }

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.QueueMapper">
+    <sql id="table">
+        queue
+    </sql>
+
+    <sql id="fields">
+        id              as id,
+        queue_name      as queueName,
+        queue_in_yarn   as queueInYarn,
+        cpu_in_use      as cpuInUse,
+        cpu_max         as cpuMax,
+        cpu_min         as cpuMin,
+        cpu_capacity    as cpuCapacity,
+        memory_in_use   as memoryInUse,
+        memory_max      as memoryMax,
+        memory_min      as memoryMin,
+        memory_capacity as memoryCapacity,
+        priority        as priority,
+        ctime           as ctime,
+        mtime           as mtime
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            1 = 1
+            <if test="queueName != null and queueName != ''">
+                and queue_name = #{queueName}
+            </if>
+
+        </where>
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        <include refid="table"/>(
+        id             ,
+        queue_name     ,
+        queue_in_yarn  ,
+        cpu_in_use     ,
+        cpu_max        ,
+        cpu_min        ,
+        cpu_capacity   ,
+        memory_in_use  ,
+        memory_max     ,
+        memory_min     ,
+        memory_capacity,
+        priority       )
+        value(
+        #{id},
+        #{queueName},
+        #{queueInYarn},
+        #{cpuInUse},
+        #{cpuMax},
+        #{cpuMin},
+        #{cpuCapacity},
+        #{memoryInUse},
+        #{memoryMax},
+        #{memoryMin},
+        #{memoryCapacity},
+        #{priority})
+    </insert>
+
+    <select id="list" resultType="com.github.krystalics.d10.scheduler.dao.entity.Queue">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        <include refid="where_sql"/>
+        <if test="orderByOperation != null">
+            <foreach collection="orderByOperation.itemOperators" item="opr" separator="," open="order by ">
+                ${opr.column} ${opr.operator}
+            </foreach>
+        </if>
+        <if test="page != null">
+            limit #{page.offset},#{page.limit}
+        </if>
+    </select>
+
+    <select id="count" resultType="int">
+        select count(*) from
+        <include refid="table"/>
+        <include refid="where_sql"/>
+    </select>
+
+
+    <update id="update">
+        update
+        <include refid="table"/>
+        <set>
+            <if test="queueName != null and queueName != ''">
+                queue_name = #{queueName}
+            </if>
+        </set>
+        <include refid="where_sql"/>
+    </update>
+
+    <select id="getById" resultType="com.github.krystalics.d10.scheduler.dao.entity.Queue">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        where id=#{id}
+    </select>
+</mapper>

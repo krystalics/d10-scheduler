@@ -4,7 +4,7 @@ package com.github.krystalics.d10.scheduler.dao.entity;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -27,5 +27,5 @@ public class InstanceRely implements Serializable {
 
     private String upVersionNo;
 
-    private LocalDateTime ctime;
+    private Date ctime;
 }

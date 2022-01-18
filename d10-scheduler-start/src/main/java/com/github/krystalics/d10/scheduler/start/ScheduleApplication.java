@@ -6,7 +6,8 @@ import com.github.krystalics.d10.scheduler.core.init.Initiation;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.start.sharding.RebalanceServiceImpl;
-import com.github.krystalics.d10.scheduler.start.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.start.zk.StartHelper;
+import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ElectionListener;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,9 @@ public class ScheduleApplication {
         private ZookeeperHelper zookeeperService;
 
         @Autowired
+        private StartHelper startHelper;
+
+        @Autowired
         private RebalanceServiceImpl rebalanceService;
 
         @Autowired
@@ -72,8 +76,8 @@ public class ScheduleApplication {
                 public void run() {
                     String address = IPUtils.getHost() + ":" + port;
                     log.info("init action begin! this node address is {}", address);
-                    zookeeperService.initZkPaths(address);
-                    zookeeperService.initCuratorCaches();
+                    startHelper.initZkPaths(address);
+                    startHelper.initCuratorCaches();
                     log.info("try to be a leader!");
                     leaderLatch.addListener(electionListener);
                     leaderLatch.start();

@@ -7,18 +7,17 @@ import java.util.Date;
 
 /**
  * @author linjiabao001
- * @date 2021/10/5
+ * @date 2022/1/18
  * @description
  */
 @Data
-public class Version implements Serializable {
+public class Tenant implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long versionId;
-    private String versionNo;
-    private Long taskId;
-    private Long lastInstanceId;
-    private Integer retryRemainTimes;
+    private Long id;
+    private String tenantCode;
+    private String description;
+    private Long queueId;
     private Date ctime;
     private Date mtime;
 }
