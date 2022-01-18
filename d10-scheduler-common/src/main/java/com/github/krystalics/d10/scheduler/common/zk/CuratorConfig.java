@@ -1,8 +1,6 @@
 package com.github.krystalics.d10.scheduler.common.zk;
 
 import com.google.common.collect.Lists;
-import net.javacrumbs.shedlock.core.LockProvider;
-import net.javacrumbs.shedlock.provider.zookeeper.curator.ZookeeperCuratorLockProvider;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
@@ -14,7 +12,6 @@ import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.zookeeper.lock.ZookeeperLockRegistry;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -96,10 +93,5 @@ public class CuratorConfig {
             throw new IllegalStateException("zk acls error");
         }
         return acls;
-    }
-
-    @Bean
-    public LockProvider lockProvider(CuratorFramework client) {
-        return new ZookeeperCuratorLockProvider(client);
     }
 }

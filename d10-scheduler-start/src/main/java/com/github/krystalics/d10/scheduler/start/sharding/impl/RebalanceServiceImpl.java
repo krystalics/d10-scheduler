@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.start.sharding;
+package com.github.krystalics.d10.scheduler.start.sharding.impl;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
@@ -6,6 +6,8 @@ import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
+import com.github.krystalics.d10.scheduler.start.sharding.ShardingStrategy;
 import com.github.krystalics.d10.scheduler.start.sharding.impl.ScopeStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
@@ -56,6 +58,7 @@ public class RebalanceServiceImpl implements RebalanceService {
                     shardCheckAck();
                     log.info("3.delete the /shard node");
                     zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
+                    zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_RESULT_NODE);
                     lock.unlock();
                     break;
                 } else {
@@ -86,7 +89,7 @@ public class RebalanceServiceImpl implements RebalanceService {
     private void shardCheckAck() throws Exception {
         while (true) {
             final List<String> liveNodes = zookeeperService.liveNodes();
-            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_NODE);
+            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_RESULT_NODE);
             log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
             if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
                 return;

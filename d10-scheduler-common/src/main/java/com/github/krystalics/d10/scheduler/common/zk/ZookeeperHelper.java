@@ -2,7 +2,6 @@ package com.github.krystalics.d10.scheduler.common.zk;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.shedlock.core.LockProvider;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +21,6 @@ public class ZookeeperHelper {
 
     @Autowired
     private CuratorFramework client;
-
-    @Autowired
-    private LockProvider lockProvider;
-
     /**
      * zookeeper 不适合类似于mysql的查询，这个只作为 项目启动时
      * rebalance的凭证，因为这时候 clusterInfo中的信息还不是完整的
@@ -52,6 +47,10 @@ public class ZookeeperHelper {
 
     public void deleteNode(String path) throws Exception {
         client.delete().forPath(path);
+    }
+
+    public void deleteChildrenAndParent(String path) throws Exception {
+        client.delete().deletingChildrenIfNeeded().forPath(path);
     }
 
     public List<String> getChildren(String path) throws Exception {

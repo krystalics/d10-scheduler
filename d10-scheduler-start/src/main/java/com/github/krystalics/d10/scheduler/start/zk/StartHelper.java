@@ -7,7 +7,7 @@ import com.github.krystalics.d10.scheduler.start.zk.listener.AllNodesChangeListe
 import com.github.krystalics.d10.scheduler.start.zk.listener.ConnectionStateChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.LeaderChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.LiveNodesChangeListener;
-import com.github.krystalics.d10.scheduler.start.zk.listener.LiveShardResultListener;
+import com.github.krystalics.d10.scheduler.start.zk.listener.ShardResultListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ShardListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -44,7 +44,7 @@ public class StartHelper {
     private LiveNodesChangeListener liveNodesChangeListener;
 
     @Autowired
-    private LiveShardResultListener liveShardResultListener;
+    private ShardResultListener shardResultListener;
 
     @Autowired
     private ConnectionStateChangeListener connectionStateChangeListener;
@@ -86,7 +86,8 @@ public class StartHelper {
         CuratorCache liveNodesCache = CuratorCache.build(client, CommonConstants.ZK_LIVE_NODES);
         CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(CommonConstants.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
         liveNodesCache.listenable().addListener(liveNodesCacheListener);
-        liveNodesCache.listenable().addListener(liveShardResultListener);
+        //由于shard的结果是写进/live节点，所以就绑定在这个cache下
+        liveNodesCache.listenable().addListener(shardResultListener);
 
         client.start();
         leaderChangeCache.start();

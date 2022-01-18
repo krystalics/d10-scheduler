@@ -45,6 +45,8 @@ public class CommonConstants {
 
     public final static String ZK_SHARD_NODE = "/shard";
 
+    public final static String ZK_SHARD_RESULT_NODE = "/shard-result";
+
     public final static int REBALANCED_TRY_TIMES = 3;
 
     /**
