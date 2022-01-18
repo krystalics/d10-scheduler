@@ -12,13 +12,13 @@ import java.util.stream.Stream;
  */
 public class StreamTest {
     public static void main(String[] args) {
-        Stream.of("Will I eat the apple?".split(" "))
+        long count = Stream.of("Will I eat the apple?".split(" "))
                 .map(w -> {
-                    try{
-                        if(w.equals("Will")){
+                    try {
+                        if (w.equals("Will")) {
                             throw new RuntimeException("Will error");
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         System.out.println(e);
                         e.printStackTrace();
                     }
@@ -29,7 +29,9 @@ public class StreamTest {
                 .map(String::toUpperCase)
                 .peek(System.out::print)
                 .map(String::toLowerCase)
-                .forEach(System.out::print);
+                .count();
+
+        System.out.println(count);
 
     }
 }

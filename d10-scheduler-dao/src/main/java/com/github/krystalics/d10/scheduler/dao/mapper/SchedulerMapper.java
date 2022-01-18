@@ -54,11 +54,9 @@ public interface SchedulerMapper {
     void batchUpdateState(List<VersionInstance> instances);
 
     /**
-     * 将状态更新
-     *
-     * @param instanceId 实例Id
+     * 更新实例
      */
-    void updateState(@Param("state") int state, @Param("instanceId") long instanceId);
+    void updateInstance(VersionInstance instance);
 
     /**
      * 检查该实例的所有上游是否都成功了

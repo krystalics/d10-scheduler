@@ -1,17 +1,15 @@
 package com.github.krystalics.d10.scheduler.core.schedule.check;
 
-import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
-import com.github.krystalics.d10.scheduler.core.pool.ScheduleExecutors;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
-import com.google.common.collect.Lists;
+import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
+import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -26,6 +24,7 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
 
     private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
     private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
+    private static ResourceScheduler resourceScheduler = SpringUtils.getBean(ResourceScheduler.class);
 
     private CountDownLatch latch;
 
@@ -46,19 +45,21 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
 
             final long count = scheduleList.parallelStream()
                     .filter(this::dependencyCheck)
-                    .filter(this::resourceCheck)
+                    .filter(this::resourceApply)
+                    .filter(this::dispatch)
                     .count();
 
+            log.info("{} instance has been dispatch to executor in this routing.", count);
 
         } else {
             log.warn("nothing to schedule");
         }
 
-
     }
 
     /**
-     * 通过这一道闸门，才能往下走
+     * 对INIT状态进行依赖检查，检查所有的上游版本实例是否成功、其他状态直接跳过。
+     * 这个方法过后，后续的处理中不存在 INIT 状态的instance
      */
     private boolean dependencyCheck(VersionInstance instance) {
         try {
@@ -67,32 +68,62 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
                 if (count == 0) {
                     instance.setState(VersionState.WAITING.getState());
                     log.info("{} 's all up instances are already success! update its state to wait", instance.getInstanceId());
-                    schedulerMapper.updateState(VersionState.WAITING.getState(), instance.getInstanceId());
+                    schedulerMapper.updateInstance(instance);
                     return true;
                 }
+                return false;
             }
         } catch (Exception e) {
             log.error("something error happened in dependency check when instance = {},caused by {}", instance, e);
+            return false;
         }
 
 
-        return false;
+        return true;
     }
 
-    private boolean resourceCheck(VersionInstance instance) {
+    /**
+     * 对WAITING状态进行资源分配、其他状态直接跳过。
+     * 这个方法过后，后续的处理中不存在 WAITING 状态的instance
+     */
+    private boolean resourceApply(VersionInstance instance) {
         try {
             if (instance.getState().equals(VersionState.WAITING.getState())) {
-                //todo 获取资源并且 更新状态为 pending
-
+                String queueName = resourceScheduler.resourceAllocator(instance.getInstanceId(), instance.getQueueName(), instance.getCpuAvg(), instance.getMemoryAvg());
+                if (ResourceConstants.EMPTY_QUEUE.equals(queueName)) {
+                    return false;
+                }
+                log.info("resource apply success! task queue = {},and finally the instance queue ={}", instance.getQueueName(), queueName);
+                instance.setQueueName(queueName);
+                instance.setState(VersionState.PENDING.getState());
+                schedulerMapper.updateInstance(instance);
                 return true;
             }
         } catch (Exception e) {
             log.error("something error happened in resource check when instance = {},caused by {}", instance, e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean dispatch(VersionInstance instance) {
+        try {
+            if (instance.getState().equals(VersionState.PENDING.getState())) {
+                //todo 分发任务到executor
+
+                log.info("dispatch success! instanceId = {}", instance.getInstanceId());
+                instance.setState(VersionState.RUNNING.getState());
+                schedulerMapper.updateInstance(instance);
+                return true;
+            }
+
+        } catch (Exception e) {
+            log.error("something error happened in dispatch when instance = {},caused by {}", instance, e);
         }
 
         return false;
     }
-
 
     @Override
     public void stop() {

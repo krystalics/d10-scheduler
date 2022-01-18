@@ -20,54 +20,6 @@
         ]]>
     </select>
 
-    <select id="readCouldScheduledTasks" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
-        select i.task_id          as taskId,
-               i.version_id       as versionId,
-               instance_id        as instanceId,
-               version_no         as versionNo,
-               retry_remain_times as retryRemainTimes,
-               start_time_theory  as startTimeTheory,
-               i.job_conf         as jobConf,
-               i.state            as state,
-               job_log_address    as jobLogAddress,
-               run_start_time     as runStartTime,
-               run_end_time       as runEndTime,
-               node               as node,
-               auto_start         as autoStart,
-               i.ctime            as ctime,
-               i.mtime            as mtime
-
-        from task as t
-                 join version as v
-                      on t.task_id = v.task_id
-                 join instance i
-                      on v.last_instance_id = i.instance_id
-
-        where i.task_id between #{left} and #{right}
-<![CDATA[ and i.state = #{state}
-          and t.state = 2
-        ]]>
-    </select>
-
-    <select id="readNeedPreparedTasks" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
-        select
-        instance_id as instanceId,
-        i.state as state,
-        t.queue_name as queueName,
-        t.cpu_avg as cpuAvg,
-        t.memory_avg as memoryAvg
-        from task as t
-        join version as v
-        on t.task_id = v.task_id
-        join instance i
-        on v.last_instance_id = i.instance_id
-
-        where i.task_id between #{left} and #{right}
-        <if test="state = 1">
-            and t.schedule_type = 1
-        </if>
-        <![CDATA[ and i.state = #{state} and t.state = 2]]>
-    </select>
 
     <update id="batchUpdateState" parameterType="java.util.List">
         UPDATE instance
@@ -115,11 +67,21 @@
         ]]>
     </select>
 
-    <update id="updateState">
+    <update id="updateInstance">
         UPDATE instance
         SET state = #{state}
+        <if test="queueName != null and queueName != ''">
+             ,queue_name = #{queueName}
+        </if>
+        <if test="runStartTime != null and runStartTime != ''">
+            ,run_start_time = #{runStartTime}
+        </if>
+        <if test="node != null and node != ''">
+            ,node = #{node}
+        </if>
         WHERE instance_id = #{instanceId}
     </update>
+
 
 
 </mapper>
