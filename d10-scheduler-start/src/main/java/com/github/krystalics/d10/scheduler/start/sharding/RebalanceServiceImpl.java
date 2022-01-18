@@ -6,7 +6,7 @@ import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.start.sharding.impl.ScopeStrategy;
-import com.github.krystalics.d10.scheduler.start.zk.ZookeeperServiceImpl;
+import com.github.krystalics.d10.scheduler.core.zk.ZookeeperServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;

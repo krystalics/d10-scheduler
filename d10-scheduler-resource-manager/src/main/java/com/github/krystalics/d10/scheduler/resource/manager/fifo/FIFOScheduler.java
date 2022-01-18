@@ -1,6 +1,8 @@
 package com.github.krystalics.d10.scheduler.resource.manager.fifo;
 
+import com.github.krystalics.d10.scheduler.core.zk.ZookeeperServiceImpl;
 import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
+import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
 import com.github.krystalics.d10.scheduler.resource.manager.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,14 +19,19 @@ public class FIFOScheduler implements ResourceScheduler {
     @Autowired
     private ResourceService resourceService;
 
+    @Autowired
+    private ZookeeperServiceImpl zookeeperService;
+
     @Override
-    public String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply) {
+    public String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply) throws Exception {
         return resourceAllocator(instanceId, queueName, cpuApply, memoryApply, true);
     }
 
 
     /**
-     * 需要对 queueName进行分布式锁，或者
+     * 1./lock-queue/{queueName} 进行分布式锁
+     * 2.
+     *
      * @param instanceId  申请资源的任务
      * @param queueName   预设想要申请资源的队列
      * @param cpuApply    需要的cpu
@@ -33,9 +40,11 @@ public class FIFOScheduler implements ResourceScheduler {
      * @return
      */
     @Override
-    public String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble) {
-        //todo lock获取queue锁、悲观锁并发粒度小
-        resourceService.resourceAndInstanceStateUpdate();
+    public String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble) throws Exception {
+        zookeeperService.lock(ResourceConstants.LOCK_PREFIX + queueName);
+        resourceService.resourceAndInstanceStateUpdate(instanceId, queueName, cpuApply, memoryApply, scramble);
+        zookeeperService.unlock(ResourceConstants.LOCK_PREFIX + queueName);
+
         return "";
     }
 

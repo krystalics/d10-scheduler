@@ -1,9 +1,9 @@
-package com.github.krystalics.d10.scheduler.start.zk.listener;
+package com.github.krystalics.d10.scheduler.core.zk.listener;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
-import com.github.krystalics.d10.scheduler.start.zk.ZookeeperServiceImpl;
+import com.github.krystalics.d10.scheduler.core.zk.ZookeeperServiceImpl;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;

@@ -9,4 +9,5 @@ public class ResourceConstants {
     public static final double CPU_AVG = 0.5;
     public static final double MEM_AVG = 1.0;
     public static final String EMPTY_QUEUE = "";
+    public static final String LOCK_PREFIX = "/lock-queue/";
 }

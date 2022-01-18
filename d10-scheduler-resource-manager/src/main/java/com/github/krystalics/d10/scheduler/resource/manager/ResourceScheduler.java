@@ -5,7 +5,7 @@ public interface ResourceScheduler {
      * 资源分配的接口、默认开启资源争抢模式 scramble=true
      * 参数说明 -> resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble)
      */
-    String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply);
+    String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply) throws Exception;
 
 
     /**
@@ -16,7 +16,7 @@ public interface ResourceScheduler {
      * @param scramble    true开启争抢模式，false则不争抢
      * @return 资源来源的真正队列、因为争抢模式，可能出资源的不是原来预定的队列。如果返回""说明没有获得资源
      */
-    String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble);
+    String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble) throws Exception;
 
 
 }

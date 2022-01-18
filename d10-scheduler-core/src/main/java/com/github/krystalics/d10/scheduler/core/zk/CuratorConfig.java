@@ -1,6 +1,6 @@
-package com.github.krystalics.d10.scheduler.start.zk;
+package com.github.krystalics.d10.scheduler.core.zk;
 
-import com.github.krystalics.d10.scheduler.start.zk.listener.ConnectionStateChangeListener;
+import com.github.krystalics.d10.scheduler.core.zk.listener.ConnectionStateChangeListener;
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
