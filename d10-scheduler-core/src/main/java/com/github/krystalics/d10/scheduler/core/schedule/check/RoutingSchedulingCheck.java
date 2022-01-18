@@ -45,8 +45,8 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
             log.info("get {} version instances to schedule", scheduleList.size());
 
             final long count = scheduleList.parallelStream()
-                    .map(this::dependencyCheck)
-                    .map(this::resourceCheck)
+                    .filter(this::dependencyCheck)
+                    .filter(this::resourceCheck)
                     .count();
 
 
@@ -57,23 +57,40 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
 
     }
 
-    private VersionInstance dependencyCheck(VersionInstance instance) {
-        if (instance.getState().equals(VersionState.INIT.getState())) {
-            final int count = schedulerMapper.checkUpInstancesAreSuccess(instance.getInstanceId());
-            if (count == 0) {
-                instance.setState(VersionState.WAITING.getState());
-                log.info("{} 's all up instances are already success! update its state to wait", instance.getInstanceId());
-                schedulerMapper.updateState(VersionState.WAITING.getState(), instance.getInstanceId());
+    /**
+     * 通过这一道闸门，才能往下走
+     */
+    private boolean dependencyCheck(VersionInstance instance) {
+        try {
+            if (instance.getState().equals(VersionState.INIT.getState())) {
+                final int count = schedulerMapper.checkUpInstancesAreSuccess(instance.getInstanceId());
+                if (count == 0) {
+                    instance.setState(VersionState.WAITING.getState());
+                    log.info("{} 's all up instances are already success! update its state to wait", instance.getInstanceId());
+                    schedulerMapper.updateState(VersionState.WAITING.getState(), instance.getInstanceId());
+                    return true;
+                }
             }
+        } catch (Exception e) {
+            log.error("something error happened in dependency check when instance = {},caused by {}", instance, e);
         }
-        return instance;
+
+
+        return false;
     }
 
-    private VersionInstance resourceCheck(VersionInstance instance) {
-        if (instance.getState().equals(VersionState.WAITING.getState())) {
-            //todo 获取资源并且 更新状态为 pending
+    private boolean resourceCheck(VersionInstance instance) {
+        try {
+            if (instance.getState().equals(VersionState.WAITING.getState())) {
+                //todo 获取资源并且 更新状态为 pending
+
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("something error happened in resource check when instance = {},caused by {}", instance, e);
         }
-        return instance;
+
+        return false;
     }
 
 

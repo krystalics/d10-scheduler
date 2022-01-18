@@ -14,9 +14,15 @@ public class StreamTest {
     public static void main(String[] args) {
         Stream.of("Will I eat the apple?".split(" "))
                 .map(w -> {
-                    if(w.equals("Will")){
-                        throw new RuntimeException("");
+                    try{
+                        if(w.equals("Will")){
+                            throw new RuntimeException("Will error");
+                        }
+                    }catch (Exception e){
+                        System.out.println(e);
+                        e.printStackTrace();
                     }
+
                     return w + " ";
                 })
                 .peek(System.out::print)
