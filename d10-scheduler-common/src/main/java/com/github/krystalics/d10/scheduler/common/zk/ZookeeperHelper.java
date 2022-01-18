@@ -2,6 +2,7 @@ package com.github.krystalics.d10.scheduler.common.zk;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.core.LockProvider;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class ZookeeperHelper {
 
     @Autowired
     private CuratorFramework client;
+
+    @Autowired
+    private LockProvider lockProvider;
 
     /**
      * zookeeper 不适合类似于mysql的查询，这个只作为 项目启动时

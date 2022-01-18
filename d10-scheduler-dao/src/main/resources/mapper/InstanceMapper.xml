@@ -94,15 +94,26 @@
 
 
     <update id="update">
-        update
+        UPDATE
         <include refid="table"/>
         <set>
             <if test="state != null and state != ''">
                 state = #{state},
             </if>
+            <if test="queueName != null and queueName != ''">
+                queue_name = #{queueName},
+            </if>
+            <if test="runStartTime != null and runStartTime != ''">
+                run_start_time = #{runStartTime},
+            </if>
+            <if test="node != null and node != ''">
+                node = #{node},
+            </if>
         </set>
-        <include refid="where_sql"/>
+        WHERE instance_id = #{instanceId}
     </update>
+
+
 
     <select id="getById" resultType="com.github.krystalics.d10.scheduler.dao.entity.Instance">
         select

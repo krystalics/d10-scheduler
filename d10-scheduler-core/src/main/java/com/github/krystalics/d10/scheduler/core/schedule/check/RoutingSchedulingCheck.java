@@ -95,9 +95,6 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
                     return false;
                 }
                 log.info("resource apply success! task queue = {},and finally the instance queue ={}", instance.getQueueName(), queueName);
-                instance.setQueueName(queueName);
-                instance.setState(VersionState.PENDING.getState());
-                schedulerMapper.updateInstance(instance);
                 return true;
             }
         } catch (Exception e) {

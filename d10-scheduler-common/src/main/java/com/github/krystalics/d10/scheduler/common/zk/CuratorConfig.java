@@ -1,6 +1,8 @@
 package com.github.krystalics.d10.scheduler.common.zk;
 
 import com.google.common.collect.Lists;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.zookeeper.curator.ZookeeperCuratorLockProvider;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
@@ -49,6 +51,7 @@ public class CuratorConfig {
     /**
      * 这里的curatorFramework 没有start()
      * 在start包内的 starthelper中与其他一些listener一起启动的
+     *
      * @return curatorFramework的bean
      */
     @Bean
@@ -96,7 +99,7 @@ public class CuratorConfig {
     }
 
     @Bean
-    public ZookeeperLockRegistry zookeeperLockRegistry(CuratorFramework client) {
-        return new ZookeeperLockRegistry(client, "test");
+    public LockProvider lockProvider(CuratorFramework client) {
+        return new ZookeeperCuratorLockProvider(client);
     }
 }

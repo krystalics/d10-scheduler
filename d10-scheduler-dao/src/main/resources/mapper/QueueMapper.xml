@@ -92,8 +92,41 @@
         <include refid="table"/>
         <set>
             <if test="queueName != null and queueName != ''">
-                queue_name = #{queueName}
+                queue_name = #{queueName},
             </if>
+
+            <if test="cpuMin != null and cpuMin != ''">
+                cpu_min = #{cpuMin},
+            </if>
+
+            <if test="cpuMax != null and cpuMax != ''">
+                cpu_max = #{cpuMax},
+            </if>
+
+            <if test="cpuCapacity != null and cpuCapacity != ''">
+                cpu_capacity = #{cpuCapacity},
+            </if>
+
+            <if test="cpuInUse != null and cpuInUse != ''">
+                cpu_in_use = #{cpuInUse},
+            </if>
+
+            <if test="memoryMin != null and memoryMin != ''">
+                memory_min = #{memoryMin},
+            </if>
+
+            <if test="memoryMax != null and memoryMax != ''">
+                memory_max = #{memoryMax},
+            </if>
+
+            <if test="memoryCapacity != null and memoryCapacity != ''">
+                memory_capacity = #{memoryCapacity},
+            </if>
+
+            <if test="memoryInUse != null and memoryInUse != ''">
+                memory_in_use = #{memoryInUse},
+            </if>
+
         </set>
         <include refid="where_sql"/>
     </update>
@@ -104,5 +137,13 @@
         from
         <include refid="table"/>
         where id=#{id}
+    </select>
+
+    <select id="getByName" resultType="com.github.krystalics.d10.scheduler.dao.entity.Queue">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        where queue_name=#{queueName}
     </select>
 </mapper>
