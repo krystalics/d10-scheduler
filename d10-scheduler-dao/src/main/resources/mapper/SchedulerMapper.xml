@@ -34,7 +34,7 @@
         </foreach>
     </update>
 
-    <select id="checkUpInstancesAreSuccess">
+    <select id="checkUpInstancesAreSuccess" resultType="java.lang.Integer">
         select count(1)
         from instance_rely ir
                  join version v

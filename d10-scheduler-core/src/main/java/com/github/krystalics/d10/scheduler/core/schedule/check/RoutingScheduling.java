@@ -6,7 +6,6 @@ import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
-
 import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
 import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
 import org.slf4j.Logger;
@@ -20,8 +19,8 @@ import java.util.concurrent.CountDownLatch;
  * @date 2022/1/9
  * @description 时间触发的任务检测
  */
-public class RoutingSchedulingCheck implements ScheduledCheck {
-    private static Logger log = LoggerFactory.getLogger(RoutingSchedulingCheck.class);
+public class RoutingScheduling implements ScheduledCheck {
+    private static Logger log = LoggerFactory.getLogger(RoutingScheduling.class);
 
     private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
     private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
@@ -68,14 +67,14 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
                 final int count = schedulerMapper.checkUpInstancesAreSuccess(instance.getInstanceId());
                 if (count == 0) {
                     instance.setState(VersionState.WAITING.getState());
-                    log.info("{} 's all up instances are already success! update its state to wait", instance.getInstanceId());
+                    log.info("instanceId = {} 's all up instances are already success! update its state to wait", instance.getInstanceId());
                     schedulerMapper.updateInstance(instance);
                     return true;
                 }
                 return false;
             }
         } catch (Exception e) {
-            log.error("something error happened in dependency check when instance = {},caused by {}", instance, e);
+            log.error("something error happened in dependency check when instance = {},caused by ", instance, e);
             return false;
         }
 
@@ -98,7 +97,7 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
                 return true;
             }
         } catch (Exception e) {
-            log.error("something error happened in resource check when instance = {},caused by {}", instance, e);
+            log.error("something error happened in resource check when instance = {},caused by ", instance, e);
             return false;
         }
 
@@ -117,7 +116,7 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
             }
 
         } catch (Exception e) {
-            log.error("something error happened in dispatch when instance = {},caused by {}", instance, e);
+            log.error("something error happened in dispatch when instance = {},caused by ", instance, e);
         }
 
         return false;
@@ -125,7 +124,7 @@ public class RoutingSchedulingCheck implements ScheduledCheck {
 
     @Override
     public void stop() {
-        log.error("time check stop");
+        log.error("routing scheduling stop");
     }
 
     @Override
