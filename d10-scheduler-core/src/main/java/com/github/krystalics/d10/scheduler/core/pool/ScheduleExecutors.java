@@ -13,21 +13,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class ScheduleExecutors {
     private static final int CPU_NUM = Runtime.getRuntime().availableProcessors();
-    private static final ExecutorService timeCheckers = new ThreadPoolExecutor(10, CPU_NUM * 2, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+    private static final ExecutorService routingScheduling = new ThreadPoolExecutor(CPU_NUM, CPU_NUM * 2, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
     private static final ExecutorService dependencyCheckers = new ThreadPoolExecutor(10, CPU_NUM * 2, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
     private static final ExecutorService resourceCheckers = new ThreadPoolExecutor(10, CPU_NUM * 2, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
     private static final ExecutorService runningCheckers = new ThreadPoolExecutor(10, CPU_NUM * 2, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
     public static Future<?> submitTimeCheck(Runnable runnable) {
-        return timeCheckers.submit(runnable);
+        return routingScheduling.submit(runnable);
     }
 
     public static void shutdownTimeCheck() {
-        timeCheckers.shutdown();
+        routingScheduling.shutdown();
     }
 
     public static void shutdownNowTimeCheck() {
-        timeCheckers.shutdownNow();
+        routingScheduling.shutdownNow();
     }
 
     public static Future<?> submitDependencyCheck(Runnable runnable) {
