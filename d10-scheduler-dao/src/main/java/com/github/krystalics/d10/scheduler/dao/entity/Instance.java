@@ -4,7 +4,6 @@ package com.github.krystalics.d10.scheduler.dao.entity;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
@@ -41,7 +40,7 @@ public class Instance implements Serializable {
     /**
      * 实例将被调起的 物理时间点,形如"20140802 10:30",根据crontab填入
      */
-    private ZonedDateTime startTimeTheory;
+    private Date startTimeTheory;
 
     /**
      * 命令配置，已替换版本号变量等
@@ -61,12 +60,12 @@ public class Instance implements Serializable {
     /**
      * 实例运行开始时间
      */
-    private ZonedDateTime runStartTime;
+    private Date runStartTime;
 
     /**
      * 实例运行结束时间
      */
-    private ZonedDateTime runEndTime;
+    private Date runEndTime;
 
     /**
      * 实例执行节点

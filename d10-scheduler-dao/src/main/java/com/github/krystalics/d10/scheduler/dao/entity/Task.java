@@ -3,7 +3,6 @@ package com.github.krystalics.d10.scheduler.dao.entity;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
@@ -60,7 +59,7 @@ public class Task implements Serializable {
      */
     private String jobConf;
 
-    private ZonedDateTime nextInstanceTime;
+    private Date nextInstanceTime;
 
     /**
      * 任务归属人邮箱前缀

@@ -7,16 +7,8 @@ import com.github.krystalics.d10.scheduler.common.utils.CronUtils;
 import com.github.krystalics.d10.scheduler.common.utils.DateUtils;
 import com.github.krystalics.d10.scheduler.core.init.time.ParamExpressionUtils;
 import com.github.krystalics.d10.scheduler.core.pool.InitExecutors;
-import com.github.krystalics.d10.scheduler.dao.entity.Instance;
-import com.github.krystalics.d10.scheduler.dao.entity.InstanceRely;
-import com.github.krystalics.d10.scheduler.dao.entity.Task;
-import com.github.krystalics.d10.scheduler.dao.entity.TaskRely;
-import com.github.krystalics.d10.scheduler.dao.entity.Version;
-import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
-import com.github.krystalics.d10.scheduler.dao.mapper.InstanceRelyMapper;
-import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
-import com.github.krystalics.d10.scheduler.dao.mapper.TaskRelyMapper;
-import com.github.krystalics.d10.scheduler.dao.mapper.VersionMapper;
+import com.github.krystalics.d10.scheduler.dao.entity.*;
+import com.github.krystalics.d10.scheduler.dao.mapper.*;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskRelyQM;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,9 +63,9 @@ public class Initiation {
 
     private CountDownLatch latch;
 
-    ZonedDateTime todayMin;
+    Date todayMin;
 
-    ZonedDateTime todayMax;
+    Date todayMax;
 
     @Autowired
     private CuratorFramework client;
@@ -93,9 +84,9 @@ public class Initiation {
 
             InitExecutors.startEvenShutdown();
 
-            ZonedDateTime now = ZonedDateTime.now(CommonConstants.TIMEZONE_ASIA_SHANGHAI);
-            todayMin = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MIN), CommonConstants.TIMEZONE_ASIA_SHANGHAI);
-            todayMax = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MAX), CommonConstants.TIMEZONE_ASIA_SHANGHAI);
+            Date now = new Date();
+            todayMin = getMinOrMaxDay(now, true);
+            todayMax = getMinOrMaxDay(now, false);
 
             log.info("scheduler start init the tasks, now is {}、and today min is {},max is {}", now, todayMin, todayMax);
             TaskQM taskQM = new TaskQM();
@@ -110,13 +101,13 @@ public class Initiation {
                 InitExecutors.submit(() -> initTask(task));
             });
             latch.await();
-            log.info("init versions and instance finished , cost " + ((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s");
+            log.info("init versions and instance finished , cost " + ((System.currentTimeMillis() / 1000) - now.getTime()) + " s");
 
             latch = new CountDownLatch(tasks.size());
             tasks.forEach((task) -> InitExecutors.submit(() -> initRely(task)));
             latch.await();
 
-            log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s"));
+            log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.getTime()) + " s"));
         } catch (Exception e) {
             log.error("initiation exception、lets shutdown the thread pool!", e);
             InitExecutors.shutdownNow();
@@ -128,7 +119,7 @@ public class Initiation {
     }
 
     public void initTask(Task task) {
-        ZonedDateTime date = todayMin;
+        Date date = todayMin;
         try {
             //小时级任务，需要生成24个版本
             if (FrequencyGranularity.HOUR.getValue() == task.getFrequency()) {
@@ -139,8 +130,8 @@ public class Initiation {
                 date = initVersionAndInstance(task, date);
             }
             //下一次实例化的时间
-            date = CronUtils.nextExecutionDate(date, task.getCrontab());
-            task.setNextInstanceTime(date);
+            ZonedDateTime zonedDateTime = CronUtils.nextExecutionDate(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of(CommonConstants.SYSTEM_TIME_ZONE)), task.getCrontab());
+            task.setNextInstanceTime(Date.from(zonedDateTime.toInstant()));
             taskMapper.update(task);
         } catch (Exception e) {
             log.error("init task error where task id = " + task.getTaskId() + " and task name = " + task.getTaskName(), e);
@@ -156,18 +147,19 @@ public class Initiation {
      * @param date 参考时间
      * @return task具体执行的时间
      */
-    private ZonedDateTime initVersionAndInstance(Task task, ZonedDateTime date) {
-        date = CronUtils.nextExecutionDate(date, task.getCrontab());
-        if (date.isAfter(todayMax)) {
+    private Date initVersionAndInstance(Task task, Date date) {
+        ZonedDateTime zonedDateTime = CronUtils.nextExecutionDate(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of(CommonConstants.SYSTEM_TIME_ZONE)), task.getCrontab());
+        date = Date.from(zonedDateTime.toInstant());
+        if (date.after(todayMax)) {
             return null;
         }
-        String versionNo = DateUtils.versionNo(date, task.getFrequency());
+        String versionNo = DateUtils.versionNo(zonedDateTime, task.getFrequency());
         insertVersionAndInstance(task, versionNo, date);
         return date;
     }
 
     @Transactional
-    public Instance insertVersionAndInstance(Task task, String versionNo, ZonedDateTime startTimeTheory) {
+    public Instance insertVersionAndInstance(Task task, String versionNo, Date startTimeTheory) {
         Version version = versionMapper.findByTaskIdAndVersionNo(task.getTaskId(), versionNo);
         if (version == null) {
             version = generateVersion(task, versionNo);
@@ -212,7 +204,7 @@ public class Initiation {
     /**
      * 先查看数据库中有没有该实例，用于服务重启时
      */
-    public Instance generateInstance(Task task, long versionId, String versionNo, ZonedDateTime startTimeTheory) {
+    public Instance generateInstance(Task task, long versionId, String versionNo, Date startTimeTheory) {
         Instance instance = new Instance();
         instance.setJobConf(replaceParam(task.getJobConf(), versionNo));
         instance.setState(1);
@@ -245,7 +237,7 @@ public class Initiation {
         latch.countDown();
     }
 
-    public void initRelies(long taskId, ZonedDateTime date, Set<Version> versions) {
+    public void initRelies(long taskId, Date date, Set<Version> versions) {
         TaskRelyQM taskRelyQM = new TaskRelyQM();
         taskRelyQM.setTaskId(taskId);
         List<TaskRely> upRelies = taskRelyMapper.list(taskRelyQM);
@@ -257,7 +249,7 @@ public class Initiation {
         }
     }
 
-    public void fillRely(Version version, TaskRely rely, ZonedDateTime date) {
+    public void fillRely(Version version, TaskRely rely, Date date) {
         long upTaskId = rely.getUpTaskId();
 
         Task upTask = tasksMap.get(upTaskId);
@@ -274,7 +266,7 @@ public class Initiation {
             }
         }
 
-        final List<ZonedDateTime> upTaskDates = CronUtils.rangeExecutionDate(date, upTask.getCrontab(), rely.getOffset(), rely.getCnt());
+        final List<ZonedDateTime> upTaskDates = CronUtils.rangeExecutionDate(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of(CommonConstants.SYSTEM_TIME_ZONE)), upTask.getCrontab(), rely.getOffset(), rely.getCnt());
         //构造上游的实例依赖
         for (ZonedDateTime upTaskDate : upTaskDates) {
             final String versionNo = DateUtils.versionNo(upTaskDate, upTask.getFrequency());
@@ -285,6 +277,17 @@ public class Initiation {
 
             instanceRelyMapper.insert(instanceRely);
         }
+    }
+
+    public Date getMinOrMaxDay(Date date, boolean min) {
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault());
+        LocalDateTime dateTime;
+        if (min) {
+            dateTime = localDateTime.minusDays(1).with(LocalTime.MAX);
+        } else {
+            dateTime = localDateTime.with(LocalTime.MAX);
+        }
+        return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
 }
