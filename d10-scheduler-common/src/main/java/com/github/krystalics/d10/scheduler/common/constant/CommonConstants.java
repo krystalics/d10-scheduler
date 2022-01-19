@@ -49,6 +49,8 @@ public class CommonConstants {
 
     public final static int REBALANCED_TRY_TIMES = 3;
 
+    public final static String LOCK_INIT = "/lock-init";
+
     /**
      * 1000条一个分段，进入线程池分开执行
      */

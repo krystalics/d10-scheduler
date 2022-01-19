@@ -20,6 +20,8 @@ import com.github.krystalics.d10.scheduler.dao.mapper.VersionMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskRelyQM;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +73,11 @@ public class Initiation {
     private CountDownLatch latch;
 
     ZonedDateTime todayMin;
+
     ZonedDateTime todayMax;
+
+    @Autowired
+    private CuratorFramework client;
 
     /**
      * mysql表时间字段的值如果为null、那么在范围搜索的时候会直接返回 false
@@ -79,32 +85,45 @@ public class Initiation {
      *
      * @throws InterruptedException
      */
-    public void init() throws InterruptedException {
-        //todo 在redis或者mysql 单独的加锁表 加锁，防止两个节点同时进行init的过程
-        ZonedDateTime now = ZonedDateTime.now(CommonConstants.TIMEZONE_ASIA_SHANGHAI);
-        todayMin = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MIN), CommonConstants.TIMEZONE_ASIA_SHANGHAI);
-        todayMax = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MAX), CommonConstants.TIMEZONE_ASIA_SHANGHAI);
+    public void init() throws Exception {
+        InterProcessSemaphoreMutex mutex = new InterProcessSemaphoreMutex(client, CommonConstants.LOCK_INIT);
+        try {
+            mutex.acquire();
+            log.info("get init lock!");
 
-        log.info("scheduler start init the tasks, now is {}、and today min is {},max is {}", now, todayMin, todayMax);
-        TaskQM taskQM = new TaskQM();
-        taskQM.setState(2);
-        taskQM.setNextInstanceTime(todayMax);
+            InitExecutors.startEvenShutdown();
 
-        List<Task> tasks = taskMapper.list(taskQM);
+            ZonedDateTime now = ZonedDateTime.now(CommonConstants.TIMEZONE_ASIA_SHANGHAI);
+            todayMin = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MIN), CommonConstants.TIMEZONE_ASIA_SHANGHAI);
+            todayMax = ZonedDateTime.of(LocalDateTime.now().with(LocalTime.MAX), CommonConstants.TIMEZONE_ASIA_SHANGHAI);
 
-        latch = new CountDownLatch(tasks.size());
-        tasks.forEach((task) -> {
-            tasksMap.put(task.getTaskId(), task);
-            InitExecutors.submit(() -> initTask(task));
-        });
-        latch.await();
-        log.info("init versions and instance finished , cost " + ((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s");
+            log.info("scheduler start init the tasks, now is {}、and today min is {},max is {}", now, todayMin, todayMax);
+            TaskQM taskQM = new TaskQM();
+            taskQM.setState(2);
+            taskQM.setNextInstanceTime(todayMax);
 
-        latch = new CountDownLatch(tasks.size());
-        tasks.forEach((task) -> InitExecutors.submit(() -> initRely(task)));
-        latch.await();
+            List<Task> tasks = taskMapper.list(taskQM);
 
-        log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s"));
+            latch = new CountDownLatch(tasks.size());
+            tasks.forEach((task) -> {
+                tasksMap.put(task.getTaskId(), task);
+                InitExecutors.submit(() -> initTask(task));
+            });
+            latch.await();
+            log.info("init versions and instance finished , cost " + ((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s");
+
+            latch = new CountDownLatch(tasks.size());
+            tasks.forEach((task) -> InitExecutors.submit(() -> initRely(task)));
+            latch.await();
+
+            log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.toEpochSecond()) + " s"));
+        } catch (Exception e) {
+            log.error("initiation exception、lets shutdown the thread pool!", e);
+            InitExecutors.shutdownNow();
+        } finally {
+            mutex.release();
+        }
+
 
     }
 
@@ -205,6 +224,7 @@ public class Initiation {
 
     /**
      * 将时间参数按照参考时间【版本号 versionNo】替换成真实的时间
+     *
      * @param jobConf
      * @param versionNo
      * @return

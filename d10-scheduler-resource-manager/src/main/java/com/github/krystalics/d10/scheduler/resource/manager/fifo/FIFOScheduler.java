@@ -53,7 +53,7 @@ public class FIFOScheduler implements ResourceScheduler {
      */
     @Override
     public String resourceAllocator(long instanceId, String queueName, double cpuApply, double memoryApply, boolean scramble) throws Exception {
-        InterProcessSemaphoreMutex mutex = new InterProcessSemaphoreMutex(client, ResourceConstants.LOCK_PREFIX + queueName);
+        InterProcessSemaphoreMutex mutex = new InterProcessSemaphoreMutex(client, ResourceConstants.LOCK_QUEUE_PREFIX + queueName);
 
         try {
             mutex.acquire();
