@@ -48,9 +48,9 @@
 - 数据回填：当计算逻辑发生变化，可进行重新刷数来保证新老数据逻辑的一致性
 - 任务失败重试、报警
 - 任务执行过程可观测
+- 多租户建设，资源可争抢。加强资源利用率：详细参考 [多租户--资源体系建设](https://nsnqfr7o7h.feishu.cn/docs/doccnaBJpGkSMctWzpEFNVMKBic#ssEUz5)
 
 #### 未来规划
-- 多租户资源设计：与底层yarn队列打通、实现客户端的资源调度
 - web page
 
 
@@ -61,7 +61,7 @@ todo
 #### 文档目录：
 (除UI与API外)各模块的详细设计参考下面的文档：
 
-1.[任务调度体系](./doc/任务调度体系.md)
+1.[任务调度体系](https://nsnqfr7o7h.feishu.cn/docs/doccnQxif6N9BbsUSageO26ls3j#dpcZ9N)
 
 2.[任务执行架构设计](./doc/任务执行架构设计.md)
 
