@@ -30,7 +30,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
      * @param curatorFramework
      * @param pathChildrenCacheEvent
      * @throws Exception
-     * @important 临时节点 没有CONNECTION_RECONCTED事件
+     * @important 临时节点 没有CONNECTION_RECONNECTED事件
      */
     @Override
     public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {

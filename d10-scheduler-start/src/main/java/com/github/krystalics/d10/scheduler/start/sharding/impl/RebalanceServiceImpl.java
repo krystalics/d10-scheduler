@@ -34,47 +34,33 @@ public class RebalanceServiceImpl implements RebalanceService {
     @Autowired
     private ZookeeperHelper zookeeperService;
 
-    /**
-     * 当新leader替换老leader上位，就会在startRunner和live node delete重复执行 rebalance
-     * 所以需要加一个trylock
-     */
-    private final Lock lock = new ReentrantLock();
 
     /**
-     * todo 连续多次的shard 需要重新继续
-     * @param address
+     * fixme 在切换了leader后会发生两次rebalance 要注意这个，但是两次rebalance；一次在be leader后，一次在/live 节点变化后
+     *  刚成为是需要进行rebalance的，防止/live节点的事件先发生，这时候节点还不是leader；而成为了leader后确不进行rebalance。
+     *
+     * 这里加锁是为了防止连续多个节点变化，同时有多个节点在进行rebalance
+     * @param address 发生变化的节点地址
      */
     @Override
-    public void rebalance(String address) {
+    public synchronized void rebalance(String address) {
         for (int i = 0; i < CommonConstants.REBALANCED_TRY_TIMES; i++) {
             try {
-                if (lock.tryLock()) {
-                    log.info("scheduler system begin rebalanced!");
-                    log.info("1.to create /shard node");
-                    zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.EPHEMERAL);
-                    log.info("2.assign the task to schedulers");
-                    shard();
-                    log.info("wait to receive all live node response!");
-                    shardCheckAck();
-                    log.info("3.delete the /shard node");
-                    zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
-                    zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_RESULT_NODE);
-                    lock.unlock();
-                    break;
-                } else {
-                    log.warn("the former one has get the lock, node = {}", address);
-                    Thread.sleep(1000);
-                    break;
-                }
+                log.info("scheduler system begin rebalanced!");
+                log.info("1.to create /shard node");
+                zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.EPHEMERAL);
+                log.info("2.assign the task to schedulers");
+                shard();
+                log.info("wait to receive all live node response!");
+                shardCheckAck();
+                log.info("3.delete the /shard node");
+                zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
+                zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_RESULT_NODE);
 
+                break;
             } catch (Exception e) {
                 //如果rebalance的时候发生异常，进行unlock、并重新尝试，几次之后会通知管理员进行查看
                 log.error("rebalancing error,{}", e.toString());
-                try {
-                    lock.unlock();
-                } catch (Exception ex) {
-                    log.error("unlock error, {}", ex.toString());
-                }
             }
         }
 
@@ -84,6 +70,7 @@ public class RebalanceServiceImpl implements RebalanceService {
     /**
      * 将现有的live节点与shard节点下的子节点进行对比
      * todo KeeperErrorCode = NoChildrenForEphemerals for /shard/127.0.0.1:8083
+     *
      * @throws Exception
      */
     private void shardCheckAck() throws Exception {
