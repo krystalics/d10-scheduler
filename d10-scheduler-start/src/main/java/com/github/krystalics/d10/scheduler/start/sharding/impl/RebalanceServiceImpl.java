@@ -37,34 +37,25 @@ public class RebalanceServiceImpl implements RebalanceService {
 
     /**
      * fixme 在切换了leader后会发生两次rebalance 要注意这个，但是两次rebalance；一次在be leader后，一次在/live 节点变化后
-     *  刚成为是需要进行rebalance的，防止/live节点的事件先发生，这时候节点还不是leader；而成为了leader后确不进行rebalance。
-     *
+     * 刚成为是需要进行rebalance的，防止/live节点的事件先发生，这时候节点还不是leader；而成为了leader后确不进行rebalance。
+     * <p>
      * 这里加锁是为了防止连续多个节点变化，同时有多个节点在进行rebalance
+     *
      * @param address 发生变化的节点地址
      */
     @Override
-    public synchronized void rebalance(String address) {
-        for (int i = 0; i < CommonConstants.REBALANCED_TRY_TIMES; i++) {
-            try {
-                log.info("scheduler system begin rebalanced!");
-                log.info("1.to create /shard node");
-                zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.EPHEMERAL);
-                log.info("2.assign the task to schedulers");
-                shard();
-                log.info("wait to receive all live node response!");
-                shardCheckAck();
-                log.info("3.delete the /shard node");
-                zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
-                zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_RESULT_NODE);
+    public synchronized void rebalance(String address) throws Exception {
 
-                break;
-            } catch (Exception e) {
-                //如果rebalance的时候发生异常，进行unlock、并重新尝试，几次之后会通知管理员进行查看
-                log.error("rebalancing error,{}", e.toString());
-            }
-        }
-
-
+        log.info("scheduler system begin rebalanced!");
+        log.info("1.to create /shard node");
+        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.EPHEMERAL);
+        log.info("2.assign the task to schedulers");
+        shard();
+        log.info("wait to receive all live node response!");
+        shardCheckAck();
+        log.info("3.delete the /shard node");
+        zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
+        zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_RESULT_NODE);
     }
 
     /**
