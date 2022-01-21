@@ -146,4 +146,26 @@
         <include refid="table"/>
         where queue_name=#{queueName}
     </select>
+
+<!--  用数据库update的方式 尝试着代替在程序中用zk分布式锁  -->
+<!--    <update id="">-->
+<!--        update <include refid="table"/>-->
+<!--        set cpu_in_use = cpu_in_use + #{cpuApply},memory_in_use = memory_in_use + #{memoryApply}-->
+<!--        where (cpu_in_use + #{cpuApply} > cpu_max or memory_in_use + #{memoryApply} > memory_max)-->
+<!--    </update>-->
+
+
+    <select id="getLowPriorityQueues" resultType="com.github.krystalics.d10.scheduler.dao.entity.Queue">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        <![CDATA[
+            where priority <= #{priority} and (cpu_in_use + #{cpuApply} <= cpu_max and memory_in_use + #{memoryApply} <= memory_max)
+        ]]>
+        order by priority
+    </select>
+
+
+
 </mapper>

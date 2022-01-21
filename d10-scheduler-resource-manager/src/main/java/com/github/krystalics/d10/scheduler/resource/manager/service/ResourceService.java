@@ -28,8 +28,16 @@ public class ResourceService {
      * queue    -> cpuInUse,memoryInUse
      */
     @Transactional(rollbackFor = Throwable.class)
-    public void resourceAndInstanceStateUpdate(Instance instance, Queue queue) {
+    public void queueAndInstanceUpdate(Instance instance, Queue queue) {
         instanceMapper.update(instance);
         queueMapper.update(queue);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void resourceScramble(Queue from, Queue to, Instance instance) {
+        instanceMapper.update(instance);
+
+        queueMapper.update(from);
+        queueMapper.update(to);
     }
 }

@@ -75,9 +75,14 @@ public class Instance implements Serializable {
     private Integer autoStart;
 
     /**
-     * 运行在哪个queue上
+     * 客户端资源来自于哪个queue、记录下来便于归还资源
      */
     private String queueName;
+
+    /**
+     * 底层运行在哪个queue上
+     */
+    private String queueInYarn;
 
     /**
      * 实例生成的操作人:默认是scheduler
