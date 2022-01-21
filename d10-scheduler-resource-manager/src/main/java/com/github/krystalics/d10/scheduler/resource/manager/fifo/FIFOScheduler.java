@@ -41,6 +41,8 @@ public class FIFOScheduler implements ResourceScheduler {
 
 
     /**
+     * 基于资源争抢会比较频繁，采用悲观锁的形式。而不是用update去尝试着更新，这种乐观锁的形式
+     *
      * 1./lock-queue/{queueName} 进行分布式锁
      * 2.对队列资源进行判断、因为cpu属于可压缩资源，暂时只考虑内存的资源情况
      * - 1.memWillUse >= queue.getMemoryMax() || cpuWillUse >= queue.getCpuMax()  申请失败
@@ -77,7 +79,7 @@ public class FIFOScheduler implements ResourceScheduler {
 
                 queue.setMemoryInUse(memWillUse);
                 queue.setCpuInUse(cpuWillUse);
-                //事务
+
                 resourceService.queueAndInstanceUpdate(instance, queue);
                 return queueName;
             }

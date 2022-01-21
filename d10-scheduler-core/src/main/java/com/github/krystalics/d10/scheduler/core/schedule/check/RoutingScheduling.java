@@ -5,7 +5,6 @@ import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
-import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
@@ -13,8 +12,8 @@ import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConst
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @author linjiabao001
@@ -42,21 +41,23 @@ public class RoutingScheduling implements ScheduledCheck {
     public void start() throws InterruptedException {
         routingSchedulingStop = false;
 
-        log.info("routing scheduling check start!");
         final Pair<Long, Long> taskIdScope = jobInstance.getTaskIds();
-        log.info("this scheduler's scope is {}", taskIdScope.toString());
+        log.info("routing scheduling check start! this scheduler's scope is {}", taskIdScope.toString());
+
+        Date now = new Date();
+
         final List<VersionInstance> scheduleList = schedulerMapper.routingSchedulingInstances(taskIdScope.getL(), taskIdScope.getR());
         if (scheduleList != null && scheduleList.size() > 0) {
             log.info("get {} version instances to schedule", scheduleList.size());
 
+            //todo 由于resource apply会有针对各个queueName的锁，所以后续的优化可以在依赖检查之后生成一个 <queueName,Instance>的map、再进行后续的资源申请
             final long count = scheduleList.stream()
                     .filter(this::dependencyCheck)
                     .filter(this::resourceApply)
                     .filter(this::dispatch)
                     .count();
 
-            log.info("{} instance has been dispatch to executor in this routing.", count);
-
+            log.info("{} instance has been dispatch to executor in this routing. and cost {} second", count, (System.currentTimeMillis() - now.getTime()) / 1000);
         } else {
             log.warn("nothing to schedule");
         }
