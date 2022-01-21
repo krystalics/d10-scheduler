@@ -45,10 +45,16 @@ public class Task implements Serializable {
     private Integer scheduleType;
 
     /**
-     * 在调度中同时跑的 同一任务的并发数限制
+     * 在调度中同时跑的 同一任务的并发数限制，由用户配置
      */
     private Integer concurrency;
 
+    /**
+     * 任务并发占用、用于在任务申请完资源但是没有进入运行时
+     * concurrentOccupation < concurrency
+     * todo 在数据库中加入该字段
+     */
+    private Integer concurrentOccupation;
     /**
      * quartz的crontab格式,空格分隔
      */

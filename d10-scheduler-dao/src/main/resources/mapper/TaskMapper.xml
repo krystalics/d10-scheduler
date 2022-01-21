@@ -7,13 +7,13 @@
     </sql>
 
     <sql id="fields">
-        task_id
-        as taskId,
+        task_id          as taskId,
         task_name        as taskName,
         type             as type,
         frequency        as frequency,
         schedule_type    as scheduleType,
         concurrency      as concurrency,
+        cnt_in_running   as cntInRunning,
         crontab          as crontab,
         next_instance_time      as nextInstanceTime,
         owner_mail_prefix       as ownerMail,
@@ -128,5 +128,16 @@
         from
         <include refid="table"/>
         where task_id=#{taskId}
+    </select>
+
+<!--  更新成功、说明并发度占用成功；失败说明已经没位子了。避免先行锁再更新  -->
+    <select id="updateTaskConcurrentOccupation">
+        update task
+        set concurrent_occupation = concurrent_occupation + 1
+        where task_id=#{taskId} and concurrency > concurrent_occupation;
+--         select task_id
+--         from task
+--         where task_id=#{taskId} and concurrency > concurrent_occupation
+--         for update;
     </select>
 </mapper>

@@ -5,7 +5,9 @@ import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
+import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
+import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
 import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ public class RoutingScheduling implements ScheduledCheck {
     private static Logger log = LoggerFactory.getLogger(RoutingScheduling.class);
 
     private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
+    private static TaskMapper taskMapper = SpringUtils.getBean(TaskMapper.class);
     private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
     private static ResourceScheduler resourceScheduler = SpringUtils.getBean(ResourceScheduler.class);
 
@@ -92,13 +95,28 @@ public class RoutingScheduling implements ScheduledCheck {
     /**
      * 对WAITING状态进行资源分配、其他状态直接跳过。
      * 这个方法过后，后续的处理中不存在 WAITING 状态的instance
+     * <p>
+     * 1.先对任务的并发度做限制，不能让整个系统就跑一个任务吧; 大致的限制就可以了，
+     * 毕竟任务资源检查与后续任务运行中间间隔一些时间，可能会发现刷数的时候很多任务都通过了并发度验证，进入了运行阶段
+     * 发现真正的运行数量远远超越了当初的限制；解决方案是：1。加本地缓存，通过了任务并发度限制的+1，用这个进行check 2。将这个数字记入mysql
+     * 缓存存在着节点挂掉，在另一个节点无法恢复的风险，还是选择方案2：
+     * <p>
+     * 2.再对任务的队列资源进行申请
      */
     private boolean resourceApply(VersionInstance instance) {
         if (!routingSchedulingStop) {
             try {
                 if (instance.getState().equals(VersionState.WAITING.getState())) {
+                    int cnt = taskMapper.updateTaskConcurrentOccupation(instance.getTaskId());
+                    //结果为0说明没有更新成功，没有占到资源
+                    if (cnt == 0) {
+                        log.warn("task concurrent occupation is fulled! please increase the concurrency");
+                        return false;
+                    }
+
                     String queueName = resourceScheduler.resourceAllocator(instance.getInstanceId(), instance.getQueueName(), instance.getCpuAvg(), instance.getMemoryAvg());
                     if (ResourceConstants.EMPTY_QUEUE.equals(queueName)) {
+                        log.warn("{} has not enough resource!", queueName);
                         return false;
                     }
                     log.info("resource apply success! task queue = {},and finally the instance queue ={}", instance.getQueueName(), queueName);
