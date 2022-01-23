@@ -55,6 +55,7 @@ public class RoutingScheduling implements ScheduledCheck {
             //todo 由于resource apply会有针对各个queueName的锁，所以后续的优化可以在依赖检查之后生成一个 <queueName,Instance>的map、再进行后续的资源申请
             final long count = scheduleList.parallelStream()
                     .filter(this::dependencyCheck)
+                    .filter(this::concurrencyApply)
                     .filter(this::resourceApply)
                     .filter(this::dispatch)
                     .count();
