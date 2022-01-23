@@ -23,5 +23,4 @@ public interface InstanceMapper extends BaseMapper<Instance, InstanceQM> {
      */
     Instance findLastInstanceByVersionId(@Param("versionId") long versionId);
 
-    int checkTaskConcurrency(@Param("taskId") long taskId);
 }

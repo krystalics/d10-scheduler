@@ -4,6 +4,7 @@ import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
+import com.github.krystalics.d10.scheduler.core.transaction.TransactionService;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
@@ -27,6 +28,7 @@ public class RoutingScheduling implements ScheduledCheck {
     private static TaskMapper taskMapper = SpringUtils.getBean(TaskMapper.class);
     private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
     private static ResourceScheduler resourceScheduler = SpringUtils.getBean(ResourceScheduler.class);
+    private static TransactionService transactionService = SpringUtils.getBean(TransactionService.class);
 
     private volatile boolean routingSchedulingStop = false;
 
@@ -74,7 +76,7 @@ public class RoutingScheduling implements ScheduledCheck {
                 if (instance.getState().equals(VersionState.INIT.getState())) {
                     final int count = schedulerMapper.checkUpInstancesAreSuccess(instance.getInstanceId());
                     if (count == 0) {
-                        instance.setState(VersionState.WAITING.getState());
+                        instance.setState(VersionState.WAITING_CON.getState());
                         log.info("instanceId = {} 's all up instances are already success! update its state to wait", instance.getInstanceId());
                         schedulerMapper.updateInstance(instance);
                         return true;
@@ -93,6 +95,26 @@ public class RoutingScheduling implements ScheduledCheck {
         return true;
     }
 
+    private boolean concurrencyApply(VersionInstance instance) {
+        if (!routingSchedulingStop) {
+            try {
+                if (instance.getState().equals(VersionState.WAITING_CON.getState())) {
+                    transactionService.updateTaskAndInstance(instance.getTaskId(), instance.getInstanceId());
+                    log.info("task {} concurrent occupation success!", instance.getTaskId());
+                    return true;
+                }
+            } catch (Exception e) {
+                log.error("something error happened in resource check when instance = {},caused by ", instance, e);
+                return false;
+            }
+
+        } else {
+            throw new RuntimeException("interrupted");
+        }
+
+        return true;
+    }
+
     /**
      * 对WAITING状态进行资源分配、其他状态直接跳过。
      * 这个方法过后，后续的处理中不存在 WAITING 状态的instance
@@ -107,7 +129,7 @@ public class RoutingScheduling implements ScheduledCheck {
     private boolean resourceApply(VersionInstance instance) {
         if (!routingSchedulingStop) {
             try {
-                if (instance.getState().equals(VersionState.WAITING.getState())) {
+                if (instance.getState().equals(VersionState.WAITING_RES.getState())) {
                     int cnt = taskMapper.updateTaskConcurrentOccupation(instance.getTaskId());
                     //结果为0说明没有更新成功，没有占到资源
                     if (cnt == 0) {

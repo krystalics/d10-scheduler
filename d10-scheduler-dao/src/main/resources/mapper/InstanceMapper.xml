@@ -133,10 +133,4 @@
         limit 1;
     </select>
 
-    <select id="checkTaskConcurrency">
-        select count(*)
-        from tb_instance
-        where task_id = #{taskId}
-        and state=4
-    </select>
 </mapper>

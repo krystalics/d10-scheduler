@@ -42,7 +42,7 @@
                  join instance i
                       on v.last_instance_id = i.instance_id
         where ir.instance_id = #{instanceId}
-          and i.state != 5;
+          and i.state != 6;
     </select>
 
     <select id="routingSchedulingInstances" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
@@ -64,7 +64,7 @@
 
         where i.task_id between #{left} and #{right}
         <![CDATA[
-          and i.state < 5
+          and i.state < 6
           and t.state = 2
           and start_time_theory <= NOW()
         ]]>
