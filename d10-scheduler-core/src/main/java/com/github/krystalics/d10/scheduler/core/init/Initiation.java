@@ -7,20 +7,34 @@ import com.github.krystalics.d10.scheduler.common.utils.CronUtils;
 import com.github.krystalics.d10.scheduler.common.utils.DateUtils;
 import com.github.krystalics.d10.scheduler.core.init.time.ParamExpressionUtils;
 import com.github.krystalics.d10.scheduler.core.pool.InitExecutors;
-import com.github.krystalics.d10.scheduler.dao.entity.*;
-import com.github.krystalics.d10.scheduler.dao.mapper.*;
+import com.github.krystalics.d10.scheduler.dao.entity.Instance;
+import com.github.krystalics.d10.scheduler.dao.entity.InstanceRely;
+import com.github.krystalics.d10.scheduler.dao.entity.Task;
+import com.github.krystalics.d10.scheduler.dao.entity.TaskRely;
+import com.github.krystalics.d10.scheduler.dao.entity.Version;
+import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
+import com.github.krystalics.d10.scheduler.dao.mapper.InstanceRelyMapper;
+import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
+import com.github.krystalics.d10.scheduler.dao.mapper.TaskRelyMapper;
+import com.github.krystalics.d10.scheduler.dao.mapper.VersionMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskRelyQM;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -70,51 +84,57 @@ public class Initiation {
     @Autowired
     private CuratorFramework client;
 
+    @Autowired
+    private LeaderLatch leaderLatch;
+
     /**
      * mysql表时间字段的值如果为null、那么在范围搜索的时候会直接返回 false
      * 例如 next_instance_time<='2021-10-10 00:00:00' 一条记录都搜不到
      *
+     * 每天0点触发实例化
      * @throws InterruptedException
      */
+    @Scheduled(cron = "0 0 0 * * *")
     public void init() throws Exception {
-        InterProcessSemaphoreMutex mutex = new InterProcessSemaphoreMutex(client, CommonConstants.LOCK_INIT);
-        try {
-            mutex.acquire();
-            log.info("get init lock!");
+        if (leaderLatch.hasLeadership()) {
+            InterProcessSemaphoreMutex mutex = new InterProcessSemaphoreMutex(client, CommonConstants.LOCK_INIT);
+            try {
+                mutex.acquire();
+                log.info("get init lock!");
 
-            InitExecutors.startEvenShutdown();
+                InitExecutors.startEvenShutdown();
 
-            Date now = new Date();
-            todayMin = getMinOrMaxDay(now, true);
-            todayMax = getMinOrMaxDay(now, false);
+                Date now = new Date();
+                todayMin = getMinOrMaxDay(now, true);
+                todayMax = getMinOrMaxDay(now, false);
 
-            log.info("scheduler start init the tasks, now is {}、and today min is {},max is {}", now, todayMin, todayMax);
-            TaskQM taskQM = new TaskQM();
-            taskQM.setState(2);
-            taskQM.setNextInstanceTime(todayMax);
+                log.info("scheduler start init the tasks, now is {}、and today min is {},max is {}", now, todayMin, todayMax);
+                TaskQM taskQM = new TaskQM();
+                taskQM.setState(2);
+                taskQM.setNextInstanceTime(todayMax);
 
-            List<Task> tasks = taskMapper.list(taskQM);
+                List<Task> tasks = taskMapper.list(taskQM);
 
-            latch = new CountDownLatch(tasks.size());
-            tasks.forEach((task) -> {
-                tasksMap.put(task.getTaskId(), task);
-                InitExecutors.submit(() -> initTask(task));
-            });
-            latch.await();
-            log.info("init versions and instance finished , cost " + ((System.currentTimeMillis() / 1000) - now.getTime()) + " s");
+                latch = new CountDownLatch(tasks.size());
+                tasks.forEach((task) -> {
+                    tasksMap.put(task.getTaskId(), task);
+                    InitExecutors.submit(() -> initTask(task));
+                });
+                latch.await();
+                log.info("init versions and instance finished , cost " + ((System.currentTimeMillis() / 1000) - now.getTime()) + " s");
 
-            latch = new CountDownLatch(tasks.size());
-            tasks.forEach((task) -> InitExecutors.submit(() -> initRely(task)));
-            latch.await();
+                latch = new CountDownLatch(tasks.size());
+                tasks.forEach((task) -> InitExecutors.submit(() -> initRely(task)));
+                latch.await();
 
-            log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.getTime()) + " s"));
-        } catch (Exception e) {
-            log.error("initiation exception、lets shutdown the thread pool!", e);
-            InitExecutors.shutdownNow();
-        } finally {
-            mutex.release();
+                log.info("init relies finished , cost " + (((System.currentTimeMillis() / 1000) - now.getTime()) + " s"));
+            } catch (Exception e) {
+                log.error("initiation exception、lets shutdown the thread pool!", e);
+                InitExecutors.shutdownNow();
+            } finally {
+                mutex.release();
+            }
         }
-
 
     }
 
@@ -138,8 +158,8 @@ public class Initiation {
         } finally {
             latch.countDown();
         }
-        log.info("init task where task id =" + task.getTaskId() + " and task name = " + task.getTaskName() + " success!!!");
 
+        log.info("init task where task id =" + task.getTaskId() + " and task name = " + task.getTaskName() + " success!!!");
     }
 
     /**

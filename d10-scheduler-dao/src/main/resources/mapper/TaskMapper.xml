@@ -42,7 +42,7 @@
                 and state = #{state}
             </if>
 -- 使用java8的localdatetime 不用加 != '' 不然会报和字符串不兼容的错误
-            <if test="nextInstanceTime != null">
+            <if test="nextInstanceTime != null and nextInstanceTime != ''">
 <![CDATA[       and next_instance_time <= #{nextInstanceTime} ]]>
             </if>
 
