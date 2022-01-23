@@ -21,6 +21,7 @@ public class ZookeeperHelper {
 
     @Autowired
     private CuratorFramework client;
+
     /**
      * zookeeper 不适合类似于mysql的查询，这个只作为 项目启动时
      * rebalance的凭证，因为这时候 clusterInfo中的信息还不是完整的
@@ -49,8 +50,13 @@ public class ZookeeperHelper {
         client.delete().forPath(path);
     }
 
-    public void deleteChildrenAndParent(String path) throws Exception {
-        client.delete().deletingChildrenIfNeeded().forPath(path);
+    public void deleteChildrenAndReserveParent(String path) throws Exception {
+        final List<String> children = getChildren(path);
+        if (children != null && children.size() > 0) {
+            for (String child : children) {
+                deleteNode(path + "/" + child);
+            }
+        }
     }
 
     public List<String> getChildren(String path) throws Exception {

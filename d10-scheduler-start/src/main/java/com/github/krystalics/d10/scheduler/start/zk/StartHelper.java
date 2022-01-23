@@ -103,5 +103,6 @@ public class StartHelper {
         zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_ALL_NODES, "cluster all ips", CreateMode.PERSISTENT);
         zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_ALL_NODES + "/" + address, address, CreateMode.PERSISTENT);
         zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
+        zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_SHARD_RESULT_NODE,"shard-ack",CreateMode.PERSISTENT);
     }
 }

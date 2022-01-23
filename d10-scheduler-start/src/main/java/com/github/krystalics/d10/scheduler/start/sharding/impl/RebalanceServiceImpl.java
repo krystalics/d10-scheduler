@@ -8,7 +8,7 @@ import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
 import com.github.krystalics.d10.scheduler.start.sharding.ShardingStrategy;
-import com.github.krystalics.d10.scheduler.start.sharding.impl.ScopeStrategy;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author linjiabao001
@@ -53,27 +51,36 @@ public class RebalanceServiceImpl implements RebalanceService {
         shard();
         log.info("wait to receive all live node response!");
         shardCheckAck();
-        log.info("3.delete the /shard node");
-        zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
-        zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_RESULT_NODE);
     }
 
     /**
      * 将现有的live节点与shard节点下的子节点进行对比
-     * todo KeeperErrorCode = NoChildrenForEphemerals for /shard/127.0.0.1:8083
+     * keypoint curator响应事件的线程就是一个NotifyService-0、
+     *  新建一个线程去做ack的确认，防止触发事件的这个线程一直阻塞在这里，无法响应/shard节点的创建
      *
      * @throws Exception
      */
     private void shardCheckAck() throws Exception {
-        while (true) {
-            final List<String> liveNodes = zookeeperService.liveNodes();
-            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_RESULT_NODE);
-            log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
-            if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
-                return;
+        new Thread(new Runnable() {
+            @SneakyThrows
+            @Override
+            public void run() {
+                while (true) {
+                    final List<String> liveNodes = zookeeperService.liveNodes();
+                    final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_RESULT_NODE);
+                    log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
+                    if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
+                        break;
+                    }
+                    Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
+                }
+
+                log.info("3.delete the /shard node");
+                zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
+                zookeeperService.deleteChildrenAndReserveParent(CommonConstants.ZK_SHARD_RESULT_NODE);
             }
-            Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
-        }
+        }).start();
+
 
     }
 
