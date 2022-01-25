@@ -1,7 +1,7 @@
 package com.github.krystalics.d10.scheduler.core.schedule.strategy;
 
 import com.github.krystalics.d10.scheduler.core.schedule.check.SchedulerCheckHelper;
-import com.github.krystalics.d10.scheduler.core.schedule.check.ReDispatchCheck;
+import com.github.krystalics.d10.scheduler.core.schedule.check.RedispatchScheduling;
 import com.github.krystalics.d10.scheduler.core.schedule.check.RoutingScheduling;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class ScheduleFactory {
     private static final Logger log = LoggerFactory.getLogger(ScheduleFactory.class);
 
     private final static SchedulerCheckHelper routingScheduling = new SchedulerCheckHelper(new RoutingScheduling(), 60000, "scheduling");
-    private final static SchedulerCheckHelper redispatch = new SchedulerCheckHelper(new ReDispatchCheck(), 5 * 60000, "redispatch");
+    private final static SchedulerCheckHelper redispatch = new SchedulerCheckHelper(new RedispatchScheduling(), 5 * 60000, "redispatch");
 
     public static List<ScheduleStrategy> getScheduleList(Strategy strategy) {
         List<ScheduleStrategy> strategies = new ArrayList<>();

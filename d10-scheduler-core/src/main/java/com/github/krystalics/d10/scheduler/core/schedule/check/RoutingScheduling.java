@@ -27,7 +27,6 @@ public class RoutingScheduling implements ScheduledCheck {
     private static Logger log = LoggerFactory.getLogger(RoutingScheduling.class);
 
     private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
-    private static TaskMapper taskMapper = SpringUtils.getBean(TaskMapper.class);
     private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
     private static ResourceScheduler resourceScheduler = SpringUtils.getBean(ResourceScheduler.class);
     private static TransactionService transactionService = SpringUtils.getBean(TransactionService.class);

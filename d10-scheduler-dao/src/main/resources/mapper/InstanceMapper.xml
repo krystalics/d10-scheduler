@@ -106,6 +106,9 @@
             <if test="runStartTime != null and runStartTime != ''">
                 run_start_time = #{runStartTime},
             </if>
+            <if test="runEndTime != null and runEndTime != ''">
+                run_end_time = #{runEndTime},
+            </if>
             <if test="node != null and node != ''">
                 node = #{node},
             </if>

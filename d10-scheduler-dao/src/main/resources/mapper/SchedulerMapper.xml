@@ -3,37 +3,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper">
 
-    <select id="readCouldTimeTriggered" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
-        select instance_id as instanceId,
-               i.state     as state
-        from task as t
-                 join version as v
-                      on t.task_id = v.task_id
-                 join instance i
-                      on v.last_instance_id = i.instance_id
-
-        where t.schedule_type = 0
-          and i.task_id between #{left} and #{right}
-<![CDATA[ and i.state = 1
-          and t.state = 2
-          and start_time_theory <= NOW()
-        ]]>
-    </select>
-
-
-    <update id="batchUpdateState" parameterType="java.util.List">
-        UPDATE instance
-        SET state = CASE
-        <foreach collection="list" item="item" index="index">
-            WHEN instance_id = #{item.instanceId} THEN #{item.state}
-        </foreach>
-        END
-        WHERE instance_id IN
-        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
-            #{item.instanceId}
-        </foreach>
-    </update>
-
     <select id="checkUpInstancesAreSuccess" resultType="java.lang.Integer">
         select count(1)
         from instance_rely ir
@@ -64,7 +33,7 @@
 
         where i.task_id between #{left} and #{right}
         <![CDATA[
-          and i.state < 6
+          and i.state < 5
           and t.state = 2
           and start_time_theory <= NOW()
         ]]>
@@ -78,7 +47,7 @@
         </if>
 
         <if test="queueName != null and queueName != ''">
-             queue_name = #{queueName},
+            queue_name = #{queueName},
         </if>
         <if test="runStartTime != null and runStartTime != ''">
             run_start_time = #{runStartTime},
@@ -89,10 +58,30 @@
         WHERE instance_id = #{instanceId}
     </update>
 
-    <select id="checkQueueResource">
---      todo 获取queue的接口、以及queue的entity等等
-    </select>
 
+    <select id="redispatchSchedulingInstances" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
+        select instance_id       as instanceId,
+               t.task_id         as taskId,
+               v.version_id      as versionId,
+               i.state           as state,
+               t.queue_name      as queueName,
+               t.cpu_avg         as cpuAvg,
+               t.memory_avg      as memoryAvg,
+               start_time_theory as startTimeTheory,
+               concurrency       as concurrency
+
+        from task as t
+                 join version as v
+                      on t.task_id = v.task_id
+                 join instance i
+                      on v.last_instance_id = i.instance_id
+
+        where i.task_id between #{left} and #{right}
+        <![CDATA[
+          and i.state = 9
+          and t.state = 2
+        ]]>
+    </select>
 
 
 </mapper>

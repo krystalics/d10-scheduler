@@ -18,11 +18,6 @@ public class SchedulerMapperTest extends BaseTest {
     @Autowired
     private SchedulerMapper schedulerMapper;
 
-    @Test
-    public void read() {
-        final List<VersionInstance> versionInstances = schedulerMapper.readCouldTimeTriggered(0, 10000);
-        System.out.println(versionInstances.size());
-    }
 
     @Test
     public void route(){
