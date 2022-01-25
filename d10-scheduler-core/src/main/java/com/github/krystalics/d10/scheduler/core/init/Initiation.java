@@ -178,7 +178,11 @@ public class Initiation {
         return date;
     }
 
-    @Transactional
+    /**
+     * 先查看数据库中有没有该版本，用于服务重启时的容错
+     * 再查看数据库中有没有该实例，用于服务重启时的容错
+     *
+     */
     public Instance insertVersionAndInstance(Task task, String versionNo, Date startTimeTheory) {
         Version version = versionMapper.findByTaskIdAndVersionNo(task.getTaskId(), versionNo);
         if (version == null) {
@@ -205,14 +209,6 @@ public class Initiation {
         return instance;
     }
 
-
-    /**
-     * 先查看数据库中有没有该版本，用于服务重启时
-     *
-     * @param task
-     * @param versionNo
-     * @return
-     */
     private Version generateVersion(Task task, String versionNo) {
         Version version = new Version();
         version.setTaskId(task.getTaskId());
@@ -221,9 +217,7 @@ public class Initiation {
         return version;
     }
 
-    /**
-     * 先查看数据库中有没有该实例，用于服务重启时
-     */
+
     public Instance generateInstance(Task task, long versionId, String versionNo, Date startTimeTheory) {
         Instance instance = new Instance();
         instance.setJobConf(replaceParam(task.getJobConf(), versionNo));

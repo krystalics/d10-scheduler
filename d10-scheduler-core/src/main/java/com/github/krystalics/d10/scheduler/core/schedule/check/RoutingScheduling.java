@@ -4,6 +4,7 @@ import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
+import com.github.krystalics.d10.scheduler.core.exception.StopException;
 import com.github.krystalics.d10.scheduler.core.transaction.TransactionService;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
@@ -13,8 +14,9 @@ import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConst
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author linjiabao001
@@ -34,10 +36,11 @@ public class RoutingScheduling implements ScheduledCheck {
 
 
     /**
-     * 采用流的方式将任务分批取出、并给后续的处理步骤
-     * 慢的地方采用流，快的地方采用批
-     * 1。将时间到达的任务取出，并更新状态为waiting
-     * 2。将
+     * 1.将达到运行时间的任务取出
+     * 2.校验依赖是否完成   -并发处理
+     * 3.校验任务并发度    -并发处理
+     * 4.由于资源竞争比较激烈，采用了悲观锁。所以按照queueName进行分桶、串行处理
+     * 5.分发的时候再次进行 并发处理
      */
     @Override
     public void start() throws InterruptedException {
@@ -52,11 +55,28 @@ public class RoutingScheduling implements ScheduledCheck {
         if (scheduleList != null && scheduleList.size() > 0) {
             log.info("get {} version instances to schedule", scheduleList.size());
 
-            //todo 由于resource apply会有针对各个queueName的锁，所以后续的优化可以在依赖检查之后生成一个 <queueName,Instance>的map、再进行后续的资源申请
-            final long count = scheduleList.parallelStream()
+            Map<String, List<VersionInstance>> queueInstancesMap = new ConcurrentHashMap<>();
+            List<VersionInstance> dispatchStandBy = new ArrayList<>();
+
+            List<VersionInstance> taskCondition = scheduleList.parallelStream()
                     .filter(this::dependencyCheck)
                     .filter(this::concurrencyApply)
-                    .filter(this::resourceApply)
+                    .collect(Collectors.toList());
+
+            for (VersionInstance instance : taskCondition) {
+                List<VersionInstance> list = queueInstancesMap.getOrDefault(instance.getQueueName(), new ArrayList<>());
+                list.add(instance);
+                queueInstancesMap.put(instance.getQueueName(), list);
+            }
+
+            queueInstancesMap.forEach((k, v) -> {
+                List<VersionInstance> list = v.stream()
+                        .filter(this::resourceApply)
+                        .collect(Collectors.toList());
+                dispatchStandBy.addAll(list);
+            });
+
+            long count = dispatchStandBy.parallelStream()
                     .filter(this::dispatch)
                     .count();
 
@@ -89,7 +109,7 @@ public class RoutingScheduling implements ScheduledCheck {
                 return false;
             }
         } else {
-            throw new RuntimeException("interrupted");
+            throw new StopException("scheduling has been interrupted");
         }
 
 
@@ -110,7 +130,7 @@ public class RoutingScheduling implements ScheduledCheck {
             }
 
         } else {
-            throw new RuntimeException("interrupted");
+            throw new StopException("scheduling has been interrupted");
         }
 
         return true;
@@ -152,7 +172,7 @@ public class RoutingScheduling implements ScheduledCheck {
             }
 
         } else {
-            throw new RuntimeException("interrupted");
+            throw new StopException("scheduling has been interrupted");
         }
 
         return true;
@@ -174,7 +194,7 @@ public class RoutingScheduling implements ScheduledCheck {
                 log.error("something error happened in dispatch when instance = {},caused by ", instance, e);
             }
         } else {
-            throw new RuntimeException("interrupted");
+            throw new StopException("scheduling has been interrupted");
         }
 
 

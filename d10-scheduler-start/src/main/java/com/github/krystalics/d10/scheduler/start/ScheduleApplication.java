@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author linjiabao001
  * @date 2021/10/5
- * @description
+ * @description fixme 采用了大量的 zk watch机制来监听节点变化等，但是这种机制本身容易受到网络波动的影响。DS中就通过轮询zk的方式来补充这点
  */
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.github.krystalics.d10.scheduler"})
