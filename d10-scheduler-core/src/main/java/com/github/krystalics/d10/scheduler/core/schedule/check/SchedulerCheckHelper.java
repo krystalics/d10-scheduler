@@ -1,34 +1,36 @@
 package com.github.krystalics.d10.scheduler.core.schedule.check;
 
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
+import com.github.krystalics.d10.scheduler.common.constant.ScheduledEnum;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
+import com.github.krystalics.d10.scheduler.core.service.SchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * xxl-job 在后续的版本中脱离了quartz体系，所以这里直接借鉴它的做法。创建项目自己的轮训体系
- * todo 调度器分片的结果这里要可见
+ * xxl-job 在后续的版本中脱离了quartz体系，所以这里直接借鉴它的做法。创建项目自己的轮询体系
  */
 public class SchedulerCheckHelper implements ScheduledCheck {
     private static Logger log = LoggerFactory.getLogger(SchedulerCheckHelper.class);
 
-    public SchedulerCheckHelper(ScheduledCheck scheduledCheck, long polling, String scheduledName) {
+    public SchedulerCheckHelper(ScheduledCheck scheduledCheck, long polling, ScheduledEnum scheduledEnum) {
         this.scheduledCheck = scheduledCheck;
         this.POLLING_INTER = polling;
-        this.scheduledName = scheduledName;
+        this.scheduledEnum = scheduledEnum;
+        this.scheduledName = scheduledEnum.getDesc();
     }
 
-    //轮询的间隔，1min
-    public long POLLING_INTER = 60000;
+    //轮询的间隔
+    public long POLLING_INTER;
     private Thread scheduleThread;
     private volatile boolean scheduleThreadToStop = false;
     private final ScheduledCheck scheduledCheck;
     private final String scheduledName;
+    private final ScheduledEnum scheduledEnum;
 
-    private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
 
     /**
      * 1。将本调度器分片范围的可运行任务取出

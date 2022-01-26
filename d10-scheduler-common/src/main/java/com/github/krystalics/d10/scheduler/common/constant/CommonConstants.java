@@ -10,6 +10,14 @@ import java.time.ZoneId;
 public class CommonConstants {
     public static final String SCHEDULER_USER_TOKEN = "schedulerUserToken";
 
+    public static final String SCHEDULING_THREAD_NAME = "scheduling";
+    public static final String RE_DISPATCH_THREAD_NAME = "redispatch";
+
+    /**
+     * 在实践中系统中超过3天还未运行到终态的实例就不管了,属于垃圾数据
+     */
+    public static final int SYSTEM_SCHEDULING_DATE_LIMIT = 3;
+
     public static final String DEFAULT_CHARSET = "UTF-8";
 
     /**

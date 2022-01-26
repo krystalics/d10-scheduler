@@ -1,33 +1,39 @@
 package com.github.krystalics.d10.scheduler.core.schedule.check;
 
-import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
-import com.github.krystalics.d10.scheduler.common.constant.Pair;
-import com.github.krystalics.d10.scheduler.common.constant.VersionState;
+import com.github.krystalics.d10.scheduler.common.constant.*;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.core.exception.StopException;
-import com.github.krystalics.d10.scheduler.core.transaction.TransactionService;
+import com.github.krystalics.d10.scheduler.core.service.SchedulerService;
+import com.github.krystalics.d10.scheduler.core.service.impl.TransactionService;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
-import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
 import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
  * @author linjiabao001
  * @date 2022/1/9
- * @description 任务调度的主体程序
+ * @description 任务调度的主体程序,
+ * keypoint 在实践中系统中超过3天还未运行到终态的实例就不管了,属于垃圾数据
  */
 public class RoutingScheduling implements ScheduledCheck {
     private static Logger log = LoggerFactory.getLogger(RoutingScheduling.class);
 
     private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
-    private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
+    private static SchedulerService schedulerService = SpringUtils.getBean(SchedulerService.class);
+
     private static ResourceScheduler resourceScheduler = SpringUtils.getBean(ResourceScheduler.class);
     private static TransactionService transactionService = SpringUtils.getBean(TransactionService.class);
 
@@ -45,12 +51,9 @@ public class RoutingScheduling implements ScheduledCheck {
     public void start() throws InterruptedException {
         routingSchedulingStop = false;
 
-        final Pair<Long, Long> taskIdScope = jobInstance.getTaskIds();
-        log.info("routing scheduling check start! this scheduler's scope is {}", taskIdScope.toString());
-
         Date now = new Date();
+        final List<VersionInstance> scheduleList = schedulerService.fetchData(ScheduledEnum.SCHEDULING, now);
 
-        final List<VersionInstance> scheduleList = schedulerMapper.routingSchedulingInstances(taskIdScope.getL(), taskIdScope.getR());
         if (scheduleList != null && scheduleList.size() > 0) {
             log.info("get {} version instances to schedule", scheduleList.size());
 

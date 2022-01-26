@@ -4,6 +4,7 @@ import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public interface SchedulerMapper {
      * @param right 该调度器负责的分片范围上界
      * @return 所有的instance实例
      */
-    List<VersionInstance> routingSchedulingInstances(@Param("left") long left, @Param("right") long right);
+    List<VersionInstance> routingSchedulingInstances(@Param("left") long left, @Param("right") long right, @Param("startDate") Date startDate);
 
     /**
      * 获取失败节点上的所有调度任务
@@ -42,5 +43,5 @@ public interface SchedulerMapper {
      * @param right 该调度器负责的分片范围上界
      * @return 所有的instance实例
      */
-    List<VersionInstance> redispatchSchedulingInstances(@Param("left") long left, @Param("right") long right);
+    List<VersionInstance> redispatchSchedulingInstances(@Param("left") long left, @Param("right") long right, @Param("startDate") Date startDate);
 }

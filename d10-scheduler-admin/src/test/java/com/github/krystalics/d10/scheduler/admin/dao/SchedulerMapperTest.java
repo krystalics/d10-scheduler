@@ -6,6 +6,7 @@ import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public class SchedulerMapperTest extends BaseTest {
 
     @Test
     public void route(){
-        final List<VersionInstance> versionInstances = schedulerMapper.routingSchedulingInstances(0, 10000);
+        final List<VersionInstance> versionInstances = schedulerMapper.routingSchedulingInstances(0, 10000,new Date());
         System.out.println(versionInstances.size());
 //        versionInstances.forEach(System.out::println);
     }

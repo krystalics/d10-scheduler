@@ -1,5 +1,7 @@
 package com.github.krystalics.d10.scheduler.core.schedule.strategy;
 
+import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
+import com.github.krystalics.d10.scheduler.common.constant.ScheduledEnum;
 import com.github.krystalics.d10.scheduler.core.schedule.check.SchedulerCheckHelper;
 import com.github.krystalics.d10.scheduler.core.schedule.check.RedispatchScheduling;
 import com.github.krystalics.d10.scheduler.core.schedule.check.RoutingScheduling;
@@ -18,8 +20,8 @@ public class ScheduleFactory {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduleFactory.class);
 
-    private final static SchedulerCheckHelper routingScheduling = new SchedulerCheckHelper(new RoutingScheduling(), 60000, "scheduling");
-    private final static SchedulerCheckHelper redispatch = new SchedulerCheckHelper(new RedispatchScheduling(), 5 * 60000, "redispatch");
+    private final static SchedulerCheckHelper routingScheduling = new SchedulerCheckHelper(new RoutingScheduling(), 30 * 1000, ScheduledEnum.SCHEDULING);
+    private final static SchedulerCheckHelper redispatch = new SchedulerCheckHelper(new RedispatchScheduling(), 5 * 60 * 1000, ScheduledEnum.REDISPATCH);
 
     public static List<ScheduleStrategy> getScheduleList(Strategy strategy) {
         List<ScheduleStrategy> strategies = new ArrayList<>();

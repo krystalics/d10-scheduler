@@ -35,7 +35,7 @@
         <![CDATA[
           and i.state < 5
           and t.state = 2
-          and start_time_theory <= NOW()
+          and start_time_theory between #{startDate} and NOW()
         ]]>
     </select>
 
@@ -59,6 +59,7 @@
     </update>
 
 
+<!--  由于直接获取jobConf 数据量比较大，就不和其他sql一起复用了  -->
     <select id="redispatchSchedulingInstances" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
         select instance_id       as instanceId,
                t.task_id         as taskId,
@@ -81,6 +82,7 @@
         <![CDATA[
           and i.state = 9
           and t.state = 2
+          and start_time_theory between #{startDate} and NOW()
         ]]>
     </select>
 

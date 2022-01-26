@@ -1,15 +1,17 @@
 package com.github.krystalics.d10.scheduler.core.schedule.check;
 
-import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
-import com.github.krystalics.d10.scheduler.common.constant.Pair;
-import com.github.krystalics.d10.scheduler.common.constant.VersionState;
+import com.github.krystalics.d10.scheduler.common.constant.*;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.core.exception.StopException;
+import com.github.krystalics.d10.scheduler.core.service.SchedulerService;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,18 +25,17 @@ public class RedispatchScheduling implements ScheduledCheck {
     private static Logger log = LoggerFactory.getLogger(RedispatchScheduling.class);
 
     private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
+    private static SchedulerService schedulerService = SpringUtils.getBean(SchedulerService.class);
     private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
     private volatile boolean redispatchSchedulingStop = false;
 
     @Override
     public void start() {
         redispatchSchedulingStop = false;
-        final Pair<Long, Long> taskIdScope = jobInstance.getTaskIds();
-        log.info("redispatch scheduling start! this scheduler's scope is {}", taskIdScope.toString());
 
         Date now = new Date();
 
-        final List<VersionInstance> scheduleList = schedulerMapper.redispatchSchedulingInstances(taskIdScope.getL(), taskIdScope.getR());
+        final List<VersionInstance> scheduleList = schedulerService.fetchData(ScheduledEnum.REDISPATCH, now);
         if (scheduleList != null && scheduleList.size() > 0) {
 
             long count = 0;
