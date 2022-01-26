@@ -11,7 +11,6 @@ import java.util.Date;
  * @see com.github.krystalics.d10.scheduler.dao.entity.Version
  * @see com.github.krystalics.d10.scheduler.dao.entity.Instance
  * <p>
- * todo 取出默认是utc时间、或者可以把zone换一下
  */
 @Data
 public class VersionInstance {
@@ -29,6 +28,7 @@ public class VersionInstance {
     private String node;
     private Integer autoStart;
     private String queueName;
+    private String queueInYarn;
     private Double cpuAvg;
     private Double memoryAvg;
     private Date ctime;

@@ -62,14 +62,15 @@
     <select id="redispatchSchedulingInstances" resultType="com.github.krystalics.d10.scheduler.dao.biz.VersionInstance">
         select instance_id       as instanceId,
                t.task_id         as taskId,
+               v.version_no      as versionNo
                v.version_id      as versionId,
+               start_time_theory as startTimeTheory,
+               job_conf          as jobConf,
                i.state           as state,
                t.queue_name      as queueName,
+               i.queue_in_yarn   as queueInYarn,
                t.cpu_avg         as cpuAvg,
-               t.memory_avg      as memoryAvg,
-               start_time_theory as startTimeTheory,
-               concurrency       as concurrency
-
+               t.memory_avg      as memoryAvg
         from task as t
                  join version as v
                       on t.task_id = v.task_id

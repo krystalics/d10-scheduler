@@ -2,7 +2,9 @@ package com.github.krystalics.d10.scheduler.core.schedule.check;
 
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
+import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
+import com.github.krystalics.d10.scheduler.core.exception.StopException;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @Author linjiabao001
@@ -30,22 +33,57 @@ public class RedispatchScheduling implements ScheduledCheck {
         log.info("redispatch scheduling start! this scheduler's scope is {}", taskIdScope.toString());
 
         Date now = new Date();
-        //todo 改成获取需要重新调度的instance
-        final List<VersionInstance> scheduleList = schedulerMapper.routingSchedulingInstances(taskIdScope.getL(), taskIdScope.getR());
+
+        final List<VersionInstance> scheduleList = schedulerMapper.redispatchSchedulingInstances(taskIdScope.getL(), taskIdScope.getR());
         if (scheduleList != null && scheduleList.size() > 0) {
 
+            long count = 0;
+
+            for (VersionInstance instance : scheduleList) {
+                boolean dispatched = dispatch(instance);
+                if (dispatched) {
+                    count++;
+                }
+            }
+
+            log.info("{} instance has been redispatch to executor in this round-trip. and cost {} second", count, (System.currentTimeMillis() - now.getTime()) / 1000);
+        } else {
+            log.warn("nothing to redispatch");
         }
+    }
+
+
+    private boolean dispatch(VersionInstance instance) {
+        if (!redispatchSchedulingStop) {
+            try {
+                if (instance.getState().equals(VersionState.ReDispatch.getState())) {
+                    //todo 选择节点，分发任务到executor
+
+                    log.info("redispatch success! instanceId = {}", instance.getInstanceId());
+                    instance.setState(VersionState.RUNNING.getState());
+                    schedulerMapper.updateInstance(instance);
+                    return true;
+                }
+
+            } catch (Exception e) {
+                log.error("something error happened in redispatch when instance = {},caused by ", instance, e);
+            }
+        } else {
+            throw new StopException("rescheduling has been interrupted");
+        }
+
+
+        return false;
     }
 
     @Override
     public void stop() {
         redispatchSchedulingStop = true;
         log.warn("redispatch check stop");
-
     }
 
     @Override
     public boolean checkStop() {
-        return true;
+        return redispatchSchedulingStop;
     }
 }

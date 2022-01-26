@@ -52,9 +52,7 @@ public class SchedulerCheckHelper implements ScheduledCheck {
                 }
                 log.info(">>>>>>>>>d10-scheduler {} start.", scheduledName);
                 while (!scheduleThreadToStop) {
-                    final Pair<Long, Long> taskIds = jobInstance.getTaskIds();
-                    log.info("this scheduler's scope is {}", taskIds.toString());
-                    // Scan Job
+
                     long start = System.currentTimeMillis();
 
                     try {

@@ -13,6 +13,7 @@ import java.util.Date;
  *
  * @author krysta
  * @since 2021-10-02
+ * todo instance 重新分发的时候找个字段记录一下之前的运行节点
  */
 @Data
 public class Instance implements Serializable {

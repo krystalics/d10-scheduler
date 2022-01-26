@@ -204,6 +204,6 @@ public class RoutingScheduling implements ScheduledCheck {
 
     @Override
     public boolean checkStop() {
-        return true;
+        return routingSchedulingStop;
     }
 }

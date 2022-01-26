@@ -34,4 +34,13 @@ public interface SchedulerMapper {
      * @return 所有的instance实例
      */
     List<VersionInstance> routingSchedulingInstances(@Param("left") long left, @Param("right") long right);
+
+    /**
+     * 获取失败节点上的所有调度任务
+     *
+     * @param left  该调度器负责的分片范围下界
+     * @param right 该调度器负责的分片范围上界
+     * @return 所有的instance实例
+     */
+    List<VersionInstance> redispatchSchedulingInstances(@Param("left") long left, @Param("right") long right);
 }
