@@ -49,7 +49,7 @@ public class ServiceBean {
         if (initialized.get()) {
             return;
         }
-        String packagePath = "com/github/krystalics/";
+        String packagePath = "com/github/krystalics";
 
         Reflections f = new Reflections(packagePath);
         List<Class<?>> list = new ArrayList<>(f.getTypesAnnotatedWith(RpcService.class));
