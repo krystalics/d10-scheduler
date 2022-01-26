@@ -49,8 +49,9 @@ public class ServiceBean {
         if (initialized.get()) {
             return;
         }
-        String packagePath = "com/github/krystalics";
 
+        String packagePath = "com/github/krystalics";
+        //keypoint reflections 0.10.2 版本扫描不到bean、倒是0.9.12版本可以
         Reflections f = new Reflections(packagePath);
         List<Class<?>> list = new ArrayList<>(f.getTypesAnnotatedWith(RpcService.class));
         list.forEach(rpcClass -> {
