@@ -24,6 +24,8 @@
         <module>d10-scheduler-executor</module>
         <module>d10-scheduler-start</module>
         <module>d10-scheduler-resource-manager</module>
+        <module>dolphinscheduler-remote</module>
+        <module>d10-scheduler-rpc</module>
     </modules>
 
     <dependencyManagement>
