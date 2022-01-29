@@ -17,9 +17,12 @@
 
 package com.github.krystalics.d10.scheduler.rpc.common;
 
+import lombok.ToString;
+
 /**
  * RpcResponse
  */
+@ToString
 public class RpcResponse {
 
     private String requestId;

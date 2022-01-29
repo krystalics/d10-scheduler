@@ -27,6 +27,8 @@ import java.lang.annotation.Target;
 
 /**
  * Rpc
+ *
+ * @author DS
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -37,6 +39,9 @@ public @interface Rpc {
      */
     int retries() default 3;
 
+    /**
+     * keypoint 异步调用的方法，直接的返回值是空值；真正有用的是 远程执行完成，触发回调后的第二次返回值
+     */
     boolean async() default false;
 
     boolean ack() default false;
@@ -51,8 +56,5 @@ public @interface Rpc {
     Class<? extends AbstractRpcCallBack> serviceCallback() default AbstractRpcCallBack.class;
 
     Class<? extends AbstractRpcCallBack> ackCallback() default AbstractRpcCallBack.class;
-
-
-
 
 }

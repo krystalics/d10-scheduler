@@ -25,7 +25,7 @@ import com.github.krystalics.d10.scheduler.rpc.base.Rpc;
 public interface IUserService {
 
     @Rpc(async = true, serviceCallback = UserCallback.class)
-    Boolean say(String s);
+    String say(String s) throws InterruptedException;
 
     Integer hi(int num);
 

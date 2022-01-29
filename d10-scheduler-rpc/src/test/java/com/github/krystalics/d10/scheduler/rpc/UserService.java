@@ -29,23 +29,28 @@ public class UserService implements IUserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
+    /**
+     * sleep 2s 模拟异步调用
+     *
+     * @return
+     */
     @Override
-    public Boolean say(String s) {
-
-        logger.info("Kris UserService say-------------------------------Synchronous call msg{}", s);
-        return true;
+    public String say(String s) throws InterruptedException {
+        Thread.sleep(2000);
+        logger.info("Kris UserService say-------------------------------asynchronous call msg{}", s);
+        return "fine!";
     }
 
     @Override
     public Integer hi(int num) {
 
-        logger.info("Kris UserService hi-------------------------------async call msg{}", num);
+        logger.info("Kris UserService hi-------------------------------sync call msg{}", num);
         return ++num;
     }
 
     @Override
     public Boolean callBackIsFalse(String s) {
         logger.info("Kris UserService callBackIsFalse-------------------------------async call msg{}", s);
-        return null;
+        return true;
     }
 }

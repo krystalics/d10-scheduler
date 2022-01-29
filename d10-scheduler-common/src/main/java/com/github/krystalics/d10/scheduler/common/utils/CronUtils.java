@@ -22,7 +22,6 @@ import java.util.Optional;
  * SPRING:也包含完整的周期概念，与quartz的书写方式可能略有差异
  * <p>本系统的crontab表达式选择的是：QUARTZ
  * 注意在表示周的时候 1 = 周日sunday<p>
- * todo jdk 时间概念 zonedDatedTime 和 Joda 两个的融合
  */
 public class CronUtils {
 

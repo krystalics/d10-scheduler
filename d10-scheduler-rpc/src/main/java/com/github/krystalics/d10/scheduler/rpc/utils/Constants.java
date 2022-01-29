@@ -49,7 +49,6 @@ public class Constants {
     public static final int CPUS = Runtime.getRuntime().availableProcessors();
 
 
-
     public static final String LOCAL_ADDRESS = NetUtils.getHost();
 
     /**
@@ -66,5 +65,7 @@ public class Constants {
      * warm up time
      */
     public static final int WARM_UP_TIME = 10 * 60 * 1000;
+
+    public static final String D10_SCHEDULER_RPC_PACKAGE = PropertyUtils.getString("d10.scheduler.rpc.package");
 
 }

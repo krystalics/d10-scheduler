@@ -52,7 +52,6 @@ public class Task implements Serializable {
     /**
      * 任务并发占用、用于在任务申请完资源但是没有进入运行时
      * concurrentOccupation < concurrency
-     * todo 在数据库中加入该字段
      */
     private Integer concurrentOccupation;
     /**

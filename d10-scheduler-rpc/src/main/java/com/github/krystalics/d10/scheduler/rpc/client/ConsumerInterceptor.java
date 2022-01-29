@@ -18,27 +18,24 @@
 package com.github.krystalics.d10.scheduler.rpc.client;
 
 
-import com.github.krystalics.d10.scheduler.rpc.utils.Host;
-import com.github.krystalics.d10.scheduler.rpc.exceptions.RemotingException;
-
 import com.github.krystalics.d10.scheduler.rpc.base.Rpc;
 import com.github.krystalics.d10.scheduler.rpc.common.AbstractRpcCallBack;
 import com.github.krystalics.d10.scheduler.rpc.common.RpcRequest;
 import com.github.krystalics.d10.scheduler.rpc.common.RpcResponse;
+import com.github.krystalics.d10.scheduler.rpc.exceptions.RemotingException;
 import com.github.krystalics.d10.scheduler.rpc.protocol.EventType;
 import com.github.krystalics.d10.scheduler.rpc.protocol.MessageHeader;
 import com.github.krystalics.d10.scheduler.rpc.protocol.RpcProtocol;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyClient;
 import com.github.krystalics.d10.scheduler.rpc.serializer.RpcSerializer;
-
-import java.lang.reflect.Method;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.github.krystalics.d10.scheduler.rpc.utils.Host;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Method;
 
 /**
  * ConsumerInterceptor
@@ -55,7 +52,7 @@ public class ConsumerInterceptor {
     }
 
     @RuntimeType
-    public Object intercept(@AllArguments Object[] args, @Origin Method method) throws RemotingException {
+    public Object intercept(@AllArguments Object[] args, @Origin Method method) throws RemotingException, Exception {
         RpcRequest request = buildReq(args, method);
 
         String serviceName = method.getDeclaringClass().getSimpleName() + method.getName();
@@ -71,7 +68,7 @@ public class ConsumerInterceptor {
 
         while (retries-- > 0) {
             RpcResponse rsp;
-            rsp = nettyClient.sendMsg(host, protocol, async);
+            rsp = nettyClient.sendMsg(host, protocol, async, method);
             //success
             if (null != rsp && rsp.getStatus() == 0) {
                 return rsp.getResult();
@@ -100,7 +97,7 @@ public class ConsumerInterceptor {
             Rpc rpc = method.getAnnotation(Rpc.class);
             consumerConfig.setAsync(rpc.async());
             consumerConfig.setServiceCallBackClass(rpc.serviceCallback());
-            if (!rpc.serviceCallback().isInstance(AbstractRpcCallBack.class)) {
+            if (!AbstractRpcCallBack.class.equals(rpc.serviceCallback()) && AbstractRpcCallBack.class.isAssignableFrom(rpc.serviceCallback())) {
                 consumerConfig.setCallBack(true);
             }
             consumerConfig.setAckCallBackClass(rpc.ackCallback());

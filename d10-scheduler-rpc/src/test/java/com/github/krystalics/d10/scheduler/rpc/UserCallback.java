@@ -28,8 +28,17 @@ public class UserCallback extends AbstractRpcCallBack {
 
     private static final Logger logger = LoggerFactory.getLogger(UserCallback.class);
 
+    /**
+     * UserCallback的使用demo
+     * @Rpc(async = true, serviceCallback = UserCallback.class)
+     * String say(String s) throws InterruptedException;
+     *
+     * 下面的object具体类型 需要根据调用的方法返回类型设置(这个demo中是String)，尽量一个callback类只被一个地方用到。
+     * @param object response
+     */
     @Override
     public void run(Object object) {
+        //
         String msg = (String) object;
         logger.debug("Kris---------------------------------userCallBack msg is {}", msg);
     }

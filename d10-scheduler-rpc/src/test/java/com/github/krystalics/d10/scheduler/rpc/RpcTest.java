@@ -45,14 +45,19 @@ public class RpcTest {
     }
 
     @Test
-    public void sendTest() {
+    public void sendTest() throws InterruptedException {
         Integer result = userService.hi(3);
         Assert.assertSame(4, result);
         result = userService.hi(4);
         Assert.assertSame(5, result);
-        userService.say("sync");
-        userService.callBackIsFalse("async no call back");
+        //异步调用会第一时间返回一个空的结果，只有在远程调用返回 触发回调才会有收获
+        final String say = userService.say("async");
+        System.out.println("say first resp: " + say);
+        final Boolean callBackIsFalse = userService.callBackIsFalse("async no call back");
+        System.out.println("callBackIsFalse first resp: " + callBackIsFalse);
         userService.hi(999999);
+
+        Thread.sleep(5000);
     }
 
     @After

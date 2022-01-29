@@ -4,6 +4,7 @@ import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.entity.Instance;
 import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
+import com.github.krystalics.d10.scheduler.rpc.base.RpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.Objects;
  * @Description
  */
 @Service
+@RpcService
 public class CallBackService {
 
     @Autowired

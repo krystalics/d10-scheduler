@@ -27,20 +27,9 @@ import com.github.krystalics.d10.scheduler.rpc.common.RpcResponse;
 import com.github.krystalics.d10.scheduler.rpc.config.NettyClientConfig;
 import com.github.krystalics.d10.scheduler.rpc.future.RpcFuture;
 import com.github.krystalics.d10.scheduler.rpc.protocol.RpcProtocol;
-
-import java.net.InetSocketAddress;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.github.krystalics.d10.scheduler.rpc.utils.Constants;
 import com.github.krystalics.d10.scheduler.rpc.utils.Host;
 import com.github.krystalics.d10.scheduler.rpc.utils.NettyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -53,6 +42,16 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Method;
+import java.net.InetSocketAddress;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * NettyClient
@@ -110,7 +109,7 @@ public class NettyClient {
     /**
      * create channel
      *
-     * @param host host
+     * @param host   host
      * @param isSync sync flag
      * @return channel
      */
@@ -192,7 +191,7 @@ public class NettyClient {
         isStarted.compareAndSet(false, true);
     }
 
-    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async) {
+    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async, Method method) throws Exception {
 
         Channel channel = getChannel(host);
         assert channel != null;
@@ -208,11 +207,22 @@ public class NettyClient {
         }
         RpcRequestTable.put(protocol.getMsgHeader().getRequestId(), rpcRequestCache);
         channel.writeAndFlush(protocol);
+
         RpcResponse result = null;
         if (Boolean.TRUE.equals(async)) {
             result = new RpcResponse();
             result.setStatus((byte) 0);
-            result.setResult(true);
+            //keypoint 异步调用 先返回空值
+            result.setResult(null);
+
+//            final Class<?> returnType = method.getReturnType();
+//            需要类有具体的空构造函数、异步调用会先返回一个目标方法的无用空值，在后续的回调中返回真正的结果
+//            if (returnType.equals(Boolean.class)) {
+//                result.setResult(true);
+//            } else {
+////                result.setResult(returnType.newInstance());
+//                result.setResult(null);
+//            }
             return result;
         }
         try {

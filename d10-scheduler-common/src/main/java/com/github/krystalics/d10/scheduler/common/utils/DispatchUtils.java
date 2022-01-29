@@ -40,7 +40,6 @@ public class DispatchUtils {
         String requestUrl = domainUrl + requestURI;
         /**
          * 可以指定匹配url：/tool/diaodu/test -> /diaodu/test
-         * todo 这种依靠urlMapping需要手动输入对应的映射关系，不够灵活
          */
         if (uriMappingMap != null && !uriMappingMap.isEmpty()) {
             String mappingUri = uriMappingMap.get(requestURI);

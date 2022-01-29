@@ -23,8 +23,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.github.krystalics.d10.scheduler.rpc.utils.Constants;
+import com.github.krystalics.d10.scheduler.rpc.utils.PropertyUtils;
+import org.apache.logging.log4j.util.PropertiesUtil;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +49,12 @@ public class ServiceBean {
     }
 
     private static synchronized void init() {
-        // todo config
         if (initialized.get()) {
             return;
         }
 
-        String packagePath = "com/github/krystalics";
         //keypoint reflections 0.10.2 版本扫描不到bean、倒是0.9.12版本可以
-        Reflections f = new Reflections(packagePath);
+        Reflections f = new Reflections(Constants.D10_SCHEDULER_RPC_PACKAGE);
         List<Class<?>> list = new ArrayList<>(f.getTypesAnnotatedWith(RpcService.class));
         list.forEach(rpcClass -> {
             RpcService rpcService = rpcClass.getAnnotation(RpcService.class);
