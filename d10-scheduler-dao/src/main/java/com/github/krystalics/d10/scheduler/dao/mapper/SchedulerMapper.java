@@ -1,6 +1,6 @@
 package com.github.krystalics.d10.scheduler.dao.mapper;
 
-import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
+import com.github.krystalics.d10.scheduler.common.constant.VersionInstance;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

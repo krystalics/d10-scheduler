@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.dao.biz;
+package com.github.krystalics.d10.scheduler.common.constant;
 
 import lombok.Data;
 
@@ -8,8 +8,8 @@ import java.util.Date;
  * @author linjiabao001
  * @date 2022/1/3
  * @description 属于运行中的实例，是底层version表与instance表的聚合
- * @see com.github.krystalics.d10.scheduler.dao.entity.Version
- * @see com.github.krystalics.d10.scheduler.dao.entity.Instance
+ * see com.github.krystalics.d10.scheduler.dao.entity.Version
+ *     com.github.krystalics.d10.scheduler.dao.entity.Instance
  * <p>
  */
 @Data

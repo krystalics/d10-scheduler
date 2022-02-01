@@ -1,13 +1,15 @@
 package com.github.krystalics.d10.scheduler.start;
 
+import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
+import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.core.init.Initiation;
-import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
+import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
+import com.github.krystalics.d10.scheduler.rpc.remote.NettyServer;
 import com.github.krystalics.d10.scheduler.start.sharding.impl.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.start.zk.StartHelper;
-import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ElectionListener;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +61,8 @@ public class ScheduleApplication {
         @Autowired
         private Initiation initiation;
 
+        private NettyServer nettyServer;
+
         /**
          * 作为leader的话、会将自身的id或者 ip 写进 /election节点中
          * 阻塞至成为新的leader后会进行 shard 重新分片的工作
@@ -85,6 +89,7 @@ public class ScheduleApplication {
 
                     leaderLatch.await();
                     rebalanceService.rebalance(address);
+                    nettyServer = new NettyServer(new NettyServerConfig());
 
 //                  initiation.init();
                 }
@@ -95,7 +100,7 @@ public class ScheduleApplication {
              */
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 D10Scheduler.getInstance().stop();
-            },"shutdown-hook"));
+            }, "shutdown-hook"));
         }
 
         @Bean

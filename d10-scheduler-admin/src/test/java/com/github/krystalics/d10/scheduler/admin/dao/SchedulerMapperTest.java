@@ -1,7 +1,7 @@
 package com.github.krystalics.d10.scheduler.admin.dao;
 
 import com.github.krystalics.d10.scheduler.admin.BaseTest;
-import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
+import com.github.krystalics.d10.scheduler.common.constant.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.github.krystalics.d10.scheduler.core.callback;
 
 import com.github.krystalics.d10.scheduler.common.constant.VersionState;
-import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
+import com.github.krystalics.d10.scheduler.common.constant.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.entity.Instance;
 import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
 import com.github.krystalics.d10.scheduler.rpc.base.RpcService;

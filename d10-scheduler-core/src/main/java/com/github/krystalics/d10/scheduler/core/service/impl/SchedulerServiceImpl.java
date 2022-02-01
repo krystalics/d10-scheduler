@@ -4,9 +4,14 @@ import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.constant.ScheduledEnum;
+import com.github.krystalics.d10.scheduler.common.constant.VersionInstance;
+import com.github.krystalics.d10.scheduler.core.load.balance.LoadBalancer;
+import com.github.krystalics.d10.scheduler.core.load.balance.LoadBalancerFactory;
 import com.github.krystalics.d10.scheduler.core.service.SchedulerService;
-import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
+import com.github.krystalics.d10.scheduler.rpc.api.ITaskRunnerService;
+import com.github.krystalics.d10.scheduler.rpc.client.RpcClient;
+import com.github.krystalics.d10.scheduler.rpc.utils.Host;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,4 +61,20 @@ public class SchedulerServiceImpl implements SchedulerService {
 
         return list;
     }
+
+    /**
+     * 先进行节点选择，然后使用rpc进行分发任务
+     * @param instance instance具体的信息
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public boolean dispatch(VersionInstance instance) throws Exception {
+        final LoadBalancer balancer = LoadBalancerFactory.instance();
+        final Host host = balancer.suitableHost(instance);
+        RpcClient client = new RpcClient();
+        final ITaskRunnerService taskRunnerService = client.create(ITaskRunnerService.class, host);
+        return taskRunnerService.addInstance(instance);
+    }
+
 }

@@ -5,16 +5,13 @@ import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.core.exception.StopException;
 import com.github.krystalics.d10.scheduler.core.service.SchedulerService;
 import com.github.krystalics.d10.scheduler.core.service.impl.TransactionService;
-import com.github.krystalics.d10.scheduler.dao.biz.VersionInstance;
+import com.github.krystalics.d10.scheduler.common.constant.VersionInstance;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
 import com.github.krystalics.d10.scheduler.resource.manager.ResourceScheduler;
 import com.github.krystalics.d10.scheduler.resource.manager.common.ResourceConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
