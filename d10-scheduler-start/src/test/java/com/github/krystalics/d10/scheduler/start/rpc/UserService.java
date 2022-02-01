@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.github.krystalics.d10.scheduler.rpc;
+package com.github.krystalics.d10.scheduler.start.rpc;
 
 import com.github.krystalics.d10.scheduler.rpc.base.RpcService;
 import org.slf4j.Logger;
@@ -52,11 +52,5 @@ public class UserService implements IUserService {
     public Boolean callBackIsFalse(String s) {
         logger.info("Kris UserService callBackIsFalse-------------------------------async call msg{}", s);
         return true;
-    }
-
-    @Override
-    public String returnType(String type) {
-        logger.info("Kris UserService returnType -------------------------------async call msg{}", type);
-        return "string";
     }
 }

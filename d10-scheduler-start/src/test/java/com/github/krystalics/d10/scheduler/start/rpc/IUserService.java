@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.github.krystalics.d10.scheduler.rpc;
+package com.github.krystalics.d10.scheduler.start.rpc;
 
 import com.github.krystalics.d10.scheduler.rpc.base.Rpc;
 
@@ -31,7 +31,4 @@ public interface IUserService {
 
     @Rpc(async = true)
     Boolean callBackIsFalse(String s);
-
-    @Rpc(async = true, serviceCallback = UserCallback.class)
-    String returnType(String type);
 }

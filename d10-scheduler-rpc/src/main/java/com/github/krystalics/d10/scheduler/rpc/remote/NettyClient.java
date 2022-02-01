@@ -42,16 +42,15 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import net.openhft.affinity.AffinityStrategies;
+import net.openhft.affinity.AffinityThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * NettyClient
@@ -135,29 +134,16 @@ public class NettyClient {
 
     /**
      * client init
-     *
+     * 使用AffinityThreadFactory让不同的工作线程绑定不同的cpu、减少线程切换的开销
+     * 利用的是线程亲和性的特点 https://github.com/OpenHFT/Java-Thread-Affinity#controlling-the-affinity-more-directly
      * @param clientConfig client config
      */
     private NettyClient(final NettyClientConfig clientConfig) {
         this.clientConfig = clientConfig;
         if (NettyUtils.useEpoll()) {
-            this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
+            this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new AffinityThreadFactory("NettyClient", AffinityStrategies.DIFFERENT_CORE));
         } else {
-            this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
+            this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new AffinityThreadFactory("NettyClient", AffinityStrategies.DIFFERENT_CORE));
         }
         this.start();
 
@@ -191,7 +177,7 @@ public class NettyClient {
         isStarted.compareAndSet(false, true);
     }
 
-    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async, Method method) throws Exception {
+    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async) {
 
         Channel channel = getChannel(host);
         assert channel != null;
@@ -214,15 +200,6 @@ public class NettyClient {
             result.setStatus((byte) 0);
             //keypoint 异步调用 先返回空值
             result.setResult(null);
-
-//            final Class<?> returnType = method.getReturnType();
-//            需要类有具体的空构造函数、异步调用会先返回一个目标方法的无用空值，在后续的回调中返回真正的结果
-//            if (returnType.equals(Boolean.class)) {
-//                result.setResult(true);
-//            } else {
-////                result.setResult(returnType.newInstance());
-//                result.setResult(null);
-//            }
             return result;
         }
         try {

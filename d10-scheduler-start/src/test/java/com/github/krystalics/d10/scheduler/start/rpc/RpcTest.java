@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.github.krystalics.d10.scheduler.rpc;
+package com.github.krystalics.d10.scheduler.start.rpc;
 
 
 import com.github.krystalics.d10.scheduler.rpc.client.IRpcClient;
@@ -24,10 +24,11 @@ import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyClient;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyServer;
 import com.github.krystalics.d10.scheduler.rpc.utils.Host;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 public class RpcTest {
     private NettyServer nettyServer;
@@ -36,7 +37,7 @@ public class RpcTest {
 
     private Host host;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         nettyServer = new NettyServer(new NettyServerConfig());
         IRpcClient rpcClient = new RpcClient();
@@ -46,23 +47,19 @@ public class RpcTest {
 
     @Test
     public void sendTest() throws InterruptedException {
-//        Integer result = userService.hi(3);
-//        Assert.assertSame(4, result);
-//        result = userService.hi(4);
-//        Assert.assertSame(5, result);
-//        //异步调用会第一时间返回一个空的结果，只有在远程调用返回 触发回调才会有收获
-//        final String say = userService.say("async");
-//        System.out.println("say first resp: " + say);
+        Integer result = userService.hi(3);
+        result = userService.hi(4);
+        //异步调用会第一时间返回一个空的结果，只有在远程调用返回 触发回调才会有收获
+        final String say = userService.say("async");
+        System.out.println("say first resp: " + say);
         final Boolean callBackIsFalse = userService.callBackIsFalse("async no call back");
-//        System.out.println("callBackIsFalse first resp: " + callBackIsFalse);
-//        userService.hi(999999);
-
-//        userService.returnType("string");
+        System.out.println("callBackIsFalse first resp: " + callBackIsFalse);
+        userService.hi(999999);
 
         Thread.sleep(5000);
     }
 
-    @After
+    @AfterEach
     public void after() {
         NettyClient.getInstance().close();
         nettyServer.close();

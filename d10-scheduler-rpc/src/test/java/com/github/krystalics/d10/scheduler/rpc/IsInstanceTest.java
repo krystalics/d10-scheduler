@@ -1,6 +1,7 @@
 package com.github.krystalics.d10.scheduler.rpc;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * @author linjiabao001
@@ -21,19 +22,19 @@ public class IsInstanceTest {
         Base base = new Base();
         Derived derived = new Derived();
 
-        System.out.println(Derived.class.isInstance(base));
-        System.out.println(Base.class.isInstance(base));
+        Assertions.assertFalse(Derived.class.isInstance(base));
+        Assertions.assertTrue(Derived.class.isInstance(derived));
+        Assertions.assertTrue(Base.class.isInstance(base));
+        Assertions.assertTrue(Base.class.isInstance(derived));
 
-        System.out.println(Derived.class.isInstance(derived));
-        System.out.println(Base.class.isInstance(derived));
+        Assertions.assertFalse(Derived.class.isInstance(Base.class));
+        Assertions.assertFalse(Derived.class.isInstance(Derived.class));
+        Assertions.assertFalse(Base.class.isInstance(Base.class));
+        Assertions.assertFalse(Base.class.isInstance(Derived.class));
 
-        System.out.println(Derived.class.isInstance(Base.class));
-        System.out.println(Base.class.isInstance(Base.class));
-        System.out.println(Base.class.isInstance(Derived.class));
+        Assertions.assertTrue(Base.class.isAssignableFrom(Derived.class));
+        Assertions.assertFalse(Derived.class.equals(Base.class));
 
-        System.out.println(Base.class.isAssignableFrom(Derived.class));
-        System.out.println(Derived.class.equals(Base.class));
-        System.out.println(Base.class.equals(Base.class));
     }
 
 }
