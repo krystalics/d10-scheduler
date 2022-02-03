@@ -1,4 +1,4 @@
-package com.github.krystalics.d10.scheduler.core.callback;
+package com.github.krystalics.d10.scheduler.core.rpc;
 
 import com.github.krystalics.d10.scheduler.common.constant.VersionState;
 import com.github.krystalics.d10.scheduler.common.constant.VersionInstance;

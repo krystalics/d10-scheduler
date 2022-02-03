@@ -18,20 +18,12 @@
 package com.github.krystalics.d10.scheduler.rpc.remote;
 
 
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.github.krystalics.d10.scheduler.rpc.codec.NettyDecoder;
 import com.github.krystalics.d10.scheduler.rpc.codec.NettyEncoder;
 import com.github.krystalics.d10.scheduler.rpc.common.RpcRequest;
 import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
 import com.github.krystalics.d10.scheduler.rpc.utils.Constants;
 import com.github.krystalics.d10.scheduler.rpc.utils.NettyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -43,6 +35,13 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import net.openhft.affinity.AffinityStrategies;
+import net.openhft.affinity.AffinityThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * NettyServer
@@ -84,41 +83,11 @@ public class NettyServer {
     public NettyServer(final NettyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
         if (NettyUtils.useEpoll()) {
-            this.bossGroup = new EpollEventLoopGroup(1, new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerBossThread_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
-
-            this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
+            this.bossGroup = new EpollEventLoopGroup(1, new AffinityThreadFactory("NettyServerBossThread", AffinityStrategies.DIFFERENT_CORE));
+            this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), new AffinityThreadFactory("NettyServerWorkerThread", AffinityStrategies.DIFFERENT_CORE));
         } else {
-            this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerBossThread_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
-
-            this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
+            this.bossGroup = new NioEventLoopGroup(1, new AffinityThreadFactory("NettyServerBossThread", AffinityStrategies.DIFFERENT_CORE));
+            this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new AffinityThreadFactory("NettyServerWorkerThread", AffinityStrategies.DIFFERENT_CORE));
         }
         this.start();
     }

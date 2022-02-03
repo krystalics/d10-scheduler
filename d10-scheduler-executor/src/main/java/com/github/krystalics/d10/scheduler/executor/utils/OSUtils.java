@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.krystalics.d10.scheduler.common.utils;
+package com.github.krystalics.d10.scheduler.executor.utils;
 
-import com.github.krystalics.d10.scheduler.common.shell.ShellExecutor;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
@@ -35,7 +35,11 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 /**
@@ -102,22 +106,22 @@ public class OSUtils {
      *
      * @return load average
      */
-    public static double loadAverage() {
-        double loadAverage;
-        try {
-            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
-            loadAverage = osBean.getSystemLoadAverage();
-        } catch (Exception e) {
-            logger.error("get operation system load average exception, try another method ", e);
-            loadAverage = hal.getProcessor().getSystemLoadAverage();
-            if (Double.isNaN(loadAverage)) {
-                return NEGATIVE_ONE;
-            }
-        }
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(loadAverage));
-    }
+//    public static double loadAverage() {
+//        double loadAverage;
+//        try {
+//            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+//            loadAverage = osBean.getSystemLoadAverage();
+//        } catch (Exception e) {
+//            logger.error("get operation system load average exception, try another method ", e);
+//            loadAverage = hal.getProcessor().getSystemLoadAverage();
+//            if (Double.isNaN(loadAverage)) {
+//                return NEGATIVE_ONE;
+//            }
+//        }
+//        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
+//        df.setRoundingMode(RoundingMode.HALF_UP);
+//        return Double.parseDouble(df.format(loadAverage));
+//    }
 
     /**
      * get cpu usage
@@ -125,15 +129,35 @@ public class OSUtils {
      * @return cpu usage
      */
     public static double cpuUsage() {
+//        CentralProcessor processor = hal.getProcessor();
+//        final long[] systemCpuLoadTicks = processor.getSystemCpuLoadTicks();
+//
+//        final double totalCpu = processor.getSystemCpuLoadBetweenTicks(systemCpuLoadTicks);
+//        final long idle = systemCpuLoadTicks[CentralProcessor.TickType.IDLE.getIndex()];
+////        double cpuUsage = (double) systemCpuLoadTicks;
+//        if (Double.isNaN(cpuUsage)) {
+//            return NEGATIVE_ONE;
+//        }
+//
+//        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
+//        df.setRoundingMode(RoundingMode.HALF_UP);
+//        return Double.parseDouble(df.format(cpuUsage));
+        return 0;
+    }
+
+    public static int cpuLogicalProcessorCount() {
         CentralProcessor processor = hal.getProcessor();
-        double cpuUsage = processor.getSystemCpuLoad();
-        if (Double.isNaN(cpuUsage)) {
-            return NEGATIVE_ONE;
-        }
+        return processor.getLogicalProcessorCount();
+    }
+
+
+    public static double memoryLogicalMaxSize() {
+        GlobalMemory memory = hal.getMemory();
+        double availablePhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(cpuUsage));
+        return Double.parseDouble(df.format(availablePhysicalMemorySize));
     }
 
     public static List<String> getUserList() {
@@ -274,7 +298,7 @@ public class OSUtils {
     /**
      * create linux user
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -288,7 +312,7 @@ public class OSUtils {
     /**
      * create mac user (Supports Mac OSX 10.10+)
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -307,7 +331,7 @@ public class OSUtils {
     /**
      * create windows user
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -391,22 +415,22 @@ public class OSUtils {
     /**
      * check memory and cpu usage
      *
-     * @param maxCpuloadAvg maxCpuloadAvg
+     * @param maxCpuloadAvg  maxCpuloadAvg
      * @param reservedMemory reservedMemory
      * @return check memory and cpu usage
      */
-    public static Boolean checkResource(double maxCpuloadAvg, double reservedMemory) {
-        // system load average
-        double loadAverage = loadAverage();
-        // system available physical memory
-        double availablePhysicalMemorySize = availablePhysicalMemorySize();
-        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
-            logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
-                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
-            return false;
-        } else {
-            return true;
-        }
-    }
+//    public static Boolean checkResource(double maxCpuloadAvg, double reservedMemory) {
+//        // system load average
+//        double loadAverage = loadAverage();
+//        // system available physical memory
+//        double availablePhysicalMemorySize = availablePhysicalMemorySize();
+//        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
+//            logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
+//                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
+//            return false;
+//        } else {
+//            return true;
+//        }
+//    }
 
 }

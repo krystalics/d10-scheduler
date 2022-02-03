@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.krystalics.d10.scheduler.dao.mapper.NodeMapper">
+    <sql id="table">
+        node
+    </sql>
+
+    <sql id="fields">
+        id               as id,
+        node_address     as nodeAddress,
+        cpu_use          as cpuUse,
+        cpu_capacity     as cpuCapacity,
+        memory_use       as memoryUse,
+        memory_capacity  as memoryCapacity,
+        avg_load         as avgLoad,
+        ctime            as ctime,
+        mtime            as mtime
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            1 = 1
+            <if test="nodeAddress != null and nodeAddress != ''">
+                and node_address = #{nodeAddress}
+            </if>
+
+        </where>
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        <include refid="table"/>(
+        node_address,
+        cpu_use,
+        cpu_capacity,
+        memory_use,
+        memory_capacity,
+        avg_load)
+        value(
+        #{nodeAddress},
+        #{cpuUse},
+        #{cpuCapacity},
+        #{memoryUse},
+        #{memoryCapacity},
+        #{avgLoad})
+        on duplicate key update
+        cpu_use = values(cpu_use),
+        cpu_capacity = values(cpu_capacity),
+        memory_use = values(memory_use),
+        memory_capacity = values(memory_capacity),
+        avg_load = values(avg_load)
+    </insert>
+
+    <select id="list" resultType="com.github.krystalics.d10.scheduler.dao.entity.Node">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        <include refid="where_sql"/>
+        <if test="orderByOperation != null">
+            <foreach collection="orderByOperation.itemOperators" item="opr" separator="," open="order by ">
+                ${opr.column} ${opr.operator}
+            </foreach>
+        </if>
+        <if test="page != null">
+            limit #{page.offset},#{page.limit}
+        </if>
+    </select>
+
+    <select id="count" resultType="int">
+        select count(*) from
+        <include refid="table"/>
+        <include refid="where_sql"/>
+    </select>
+
+
+    <update id="update">
+        update
+        <include refid="table"/>
+        <set>
+            <if test="cpuUse != null and cpuUse != ''">
+                cpu_use = #{cpuUse},
+            </if>
+            <if test="cpuCapacity != null and cpuCapacity != ''">
+                cpu_capacity = #{cpuCapacity},
+            </if>
+
+            <if test="memoryUse != null and memoryUse != ''">
+                memory_use = #{memoryUse},
+            </if>
+            <if test="memoryCapacity != null and memoryCapacity != ''">
+                memory_capacity = #{memoryCapacity},
+            </if>
+
+            <if test="avgLoad != null and avgLoad != ''">
+                avg_load = #{avgLoad},
+            </if>
+        </set>
+        <include refid="where_sql"/>
+    </update>
+
+    <select id="getById" resultType="com.github.krystalics.d10.scheduler.dao.entity.Node">
+        select
+        <include refid="fields"/>
+        from
+        <include refid="table"/>
+        where id=#{id}
+    </select>
+
+</mapper>

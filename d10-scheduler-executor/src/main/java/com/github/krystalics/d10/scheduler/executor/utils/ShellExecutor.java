@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.krystalics.d10.scheduler.common.shell;
+package com.github.krystalics.d10.scheduler.executor.utils;
 
 import java.io.BufferedReader;
 import java.io.File;

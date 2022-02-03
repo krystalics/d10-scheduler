@@ -1,0 +1,28 @@
+zk:
+  scheduler:
+    address: 127.0.0.1
+    username: lin
+    password: lin
+
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/scheduler?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: root
+
+
+###mybatis配置###
+#配置实体类的别名
+mybatis:
+  type-aliases-package: com.github.krystalics.d10.scheduler.dao.entity
+  #指定映射文件的位置
+  mapper-locations: classpath:mapper/*Mapper.xml
+
+logging:
+  level:
+    org:
+      springframework: error
+
+server:
+  port: 10088
