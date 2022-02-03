@@ -14,7 +14,7 @@
         memory_use       as memoryUse,
         memory_capacity  as memoryCapacity,
         avg_load_1       as avgLoad1,
-        avg_load_5       as avgLoad5
+        avg_load_5       as avgLoad5,
         avg_load_15      as avgLoad15,
         alive            as alive,
         ctime            as ctime,
@@ -28,6 +28,10 @@
                 and node_address = #{nodeAddress}
             </if>
 
+
+            <if test="alive != null">
+                alive = #{alive},
+            </if>
         </where>
     </sql>
 
@@ -114,6 +118,10 @@
             </if>
             <if test="avgLoad15 != null and avgLoad15 != ''">
                 avg_load_15 = #{avgLoad15},
+            </if>
+
+            <if test="alive != null and alive != ''">
+                alive = #{alive},
             </if>
         </set>
         <include refid="where_sql"/>

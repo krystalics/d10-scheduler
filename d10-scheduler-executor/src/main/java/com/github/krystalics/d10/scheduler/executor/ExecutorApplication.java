@@ -21,6 +21,7 @@ public class ExecutorApplication {
         serverConfig.setListenPort(Constants.EXECUTOR_SERVER_PORT);
         NettyServer nettyServer = new NettyServer(serverConfig);
         nettyServer.start();
+        //todo 注册到zk中、进行故障的负载均衡？还是
 
         SpringApplication.run(ExecutorApplication.class, args);
     }

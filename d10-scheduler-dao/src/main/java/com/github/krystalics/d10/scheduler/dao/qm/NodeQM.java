@@ -12,5 +12,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class NodeQM extends BaseQM {
-
+    private String nodeAddress;
+    private Boolean alive;
 }

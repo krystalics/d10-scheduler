@@ -27,7 +27,7 @@ public class ReportService implements CommandLineRunner {
     }
 
 
-    @Scheduled(cron = "*/30 * * * * ")
+    @Scheduled(cron = "*/30 * * * * *")
     public void report(){
         log.info("common report");
         nodeMapper.insert(ReportUtils.nodeInfo());

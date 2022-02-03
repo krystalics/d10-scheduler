@@ -66,4 +66,8 @@ public class CommonConstants {
 
     public final static int SHARD_ACK_WAITING = 1000;
 
+    /**
+     * 5min为界限
+     */
+    public final static int EXECUTOR_ALIVE_CHECK_LIMIT_TIME = 5;
 }
