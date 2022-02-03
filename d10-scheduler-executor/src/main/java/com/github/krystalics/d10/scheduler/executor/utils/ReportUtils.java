@@ -18,7 +18,11 @@ public class ReportUtils {
         node.setCpuCapacity(1.0 * OSUtils.cpuLogicalProcessorCount());
         node.setMemoryUse(OSUtils.memoryUsage());
         node.setMemoryCapacity(OSUtils.memoryLogicalMaxSize());
-//        node.setAvgLoad(OSUtils.loadAverage());
+        final double[] loads = OSUtils.loadAverage();
+        node.setAvgLoad1(loads[0]);
+        node.setAvgLoad5(loads[1]);
+        node.setAvgLoad15(loads[2]);
+        node.setAlive(true);
         return node;
     }
 }

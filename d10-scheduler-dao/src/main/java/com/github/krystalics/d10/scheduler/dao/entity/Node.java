@@ -20,7 +20,10 @@ public class Node implements Serializable {
     private Double cpuCapacity;
     private Double memoryUse;
     private Double memoryCapacity;
-    private Double avgLoad;
+    private Double avgLoad1;
+    private Double avgLoad5;
+    private Double avgLoad15;
+    private Boolean alive;
     private Date ctime;
     private Date mtime;
 }

@@ -31,7 +31,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -40,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -106,43 +106,50 @@ public class OSUtils {
      *
      * @return load average
      */
-//    public static double loadAverage() {
-//        double loadAverage;
-//        try {
-//            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
-//            loadAverage = osBean.getSystemLoadAverage();
-//        } catch (Exception e) {
-//            logger.error("get operation system load average exception, try another method ", e);
-//            loadAverage = hal.getProcessor().getSystemLoadAverage();
-//            if (Double.isNaN(loadAverage)) {
-//                return NEGATIVE_ONE;
-//            }
-//        }
-//        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-//        df.setRoundingMode(RoundingMode.HALF_UP);
-//        return Double.parseDouble(df.format(loadAverage));
-//    }
+    public static double[] loadAverage() {
+        final double[] systemLoadAverage = hal.getProcessor().getSystemLoadAverage(3);
+        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        double[] result = new double[3];
+        result[0] = Double.parseDouble(df.format(systemLoadAverage[0]));
+        result[1] = Double.parseDouble(df.format(systemLoadAverage[1]));
+        result[2] = Double.parseDouble(df.format(systemLoadAverage[2]));
+        return result;
+    }
 
     /**
      * get cpu usage
+     * 1s的时间间隔中 系统的cpu使用情况
      *
      * @return cpu usage
      */
     public static double cpuUsage() {
-//        CentralProcessor processor = hal.getProcessor();
-//        final long[] systemCpuLoadTicks = processor.getSystemCpuLoadTicks();
-//
-//        final double totalCpu = processor.getSystemCpuLoadBetweenTicks(systemCpuLoadTicks);
-//        final long idle = systemCpuLoadTicks[CentralProcessor.TickType.IDLE.getIndex()];
-////        double cpuUsage = (double) systemCpuLoadTicks;
-//        if (Double.isNaN(cpuUsage)) {
-//            return NEGATIVE_ONE;
-//        }
-//
-//        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-//        df.setRoundingMode(RoundingMode.HALF_UP);
-//        return Double.parseDouble(df.format(cpuUsage));
-        return 0;
+        CentralProcessor processor = hal.getProcessor();
+        final long[] prevTicks = processor.getSystemCpuLoadTicks();
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        long[] ticks = processor.getSystemCpuLoadTicks();
+        long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
+        long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
+        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
+        long steal = ticks[CentralProcessor.TickType.STEAL.getIndex()] - prevTicks[CentralProcessor.TickType.STEAL.getIndex()];
+        long cSys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
+        long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
+        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
+        long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
+        long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
+
+        double cpuUsage = 1.0 - (idle * 1.0 / totalCpu);
+        if (Double.isNaN(cpuUsage)) {
+            return NEGATIVE_ONE;
+        }
+
+        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return Double.parseDouble(df.format(cpuUsage));
     }
 
     public static int cpuLogicalProcessorCount() {
@@ -419,18 +426,18 @@ public class OSUtils {
      * @param reservedMemory reservedMemory
      * @return check memory and cpu usage
      */
-//    public static Boolean checkResource(double maxCpuloadAvg, double reservedMemory) {
-//        // system load average
-//        double loadAverage = loadAverage();
-//        // system available physical memory
-//        double availablePhysicalMemorySize = availablePhysicalMemorySize();
-//        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
-//            logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
-//                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
-//            return false;
-//        } else {
-//            return true;
-//        }
-//    }
+    public static Boolean checkResource(double maxCpuloadAvg, double reservedMemory) {
+        // system load average last minute
+        double loadAverage = loadAverage()[0];
+        // system available physical memory
+        double availablePhysicalMemorySize = availablePhysicalMemorySize();
+        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
+            logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
+                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 }

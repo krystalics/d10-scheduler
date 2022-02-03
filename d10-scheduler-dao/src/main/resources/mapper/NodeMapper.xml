@@ -13,7 +13,10 @@
         cpu_capacity     as cpuCapacity,
         memory_use       as memoryUse,
         memory_capacity  as memoryCapacity,
-        avg_load         as avgLoad,
+        avg_load_1       as avgLoad1,
+        avg_load_5       as avgLoad5
+        avg_load_15      as avgLoad15,
+        alive            as alive,
         ctime            as ctime,
         mtime            as mtime
     </sql>
@@ -37,20 +40,29 @@
         cpu_capacity,
         memory_use,
         memory_capacity,
-        avg_load)
+        avg_load_1,
+        avg_load_5,
+        avg_load_15,
+        alive)
         value(
         #{nodeAddress},
         #{cpuUse},
         #{cpuCapacity},
         #{memoryUse},
         #{memoryCapacity},
-        #{avgLoad})
+        #{avgLoad1},
+        #{avgLoad5},
+        #{avgLoad15},
+        #{alive})
         on duplicate key update
         cpu_use = values(cpu_use),
         cpu_capacity = values(cpu_capacity),
         memory_use = values(memory_use),
         memory_capacity = values(memory_capacity),
-        avg_load = values(avg_load)
+        avg_load_1 = values(avg_load_1),
+        avg_load_5 = values(avg_load_5),
+        avg_load_15 = values(avg_load_15),
+        alive=values(alive)
     </insert>
 
     <select id="list" resultType="com.github.krystalics.d10.scheduler.dao.entity.Node">
@@ -94,8 +106,14 @@
                 memory_capacity = #{memoryCapacity},
             </if>
 
-            <if test="avgLoad != null and avgLoad != ''">
-                avg_load = #{avgLoad},
+            <if test="avgLoad1 != null and avgLoad1 != ''">
+                avg_load_1 = #{avgLoad1},
+            </if>
+            <if test="avgLoad5 != null and avgLoad5 != ''">
+                avg_load_5 = #{avgLoad5},
+            </if>
+            <if test="avgLoad15 != null and avgLoad15 != ''">
+                avg_load_15 = #{avgLoad15},
             </if>
         </set>
         <include refid="where_sql"/>
