@@ -18,20 +18,16 @@
 package com.github.krystalics.d10.scheduler.rpc.config;
 
 import com.github.krystalics.d10.scheduler.rpc.base.RpcService;
+import com.github.krystalics.d10.scheduler.rpc.utils.Constants;
+import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.github.krystalics.d10.scheduler.rpc.utils.Constants;
-import com.github.krystalics.d10.scheduler.rpc.utils.PropertyUtils;
-import org.apache.logging.log4j.util.PropertiesUtil;
-import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * ServiceBean find all rpcService

@@ -17,15 +17,12 @@ import org.junit.jupiter.api.Test;
  * @description
  */
 public class DispatchTest {
-    private NettyServer nettyServer;
-
     private ITaskRunnerService taskRunnerService;
 
     private Host host;
 
     @BeforeEach
     public void before() throws Exception {
-        nettyServer = new NettyServer(new NettyServerConfig());
         IRpcClient rpcClient = new RpcClient();
         host = new Host("127.0.0.1", 12346);
         taskRunnerService = rpcClient.create(ITaskRunnerService.class, host);
@@ -39,6 +36,5 @@ public class DispatchTest {
     @AfterEach
     public void after() {
         NettyClient.getInstance().close();
-        nettyServer.close();
     }
 }
