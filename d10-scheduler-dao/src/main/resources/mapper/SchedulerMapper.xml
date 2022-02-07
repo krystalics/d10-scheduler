@@ -65,6 +65,7 @@
                t.task_id         as taskId,
                v.version_no      as versionNo
                v.version_id      as versionId,
+               t.type            as t.type,
                start_time_theory as startTimeTheory,
                job_conf          as jobConf,
                i.state           as state,

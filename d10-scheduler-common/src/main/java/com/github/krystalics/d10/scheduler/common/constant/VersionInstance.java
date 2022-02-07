@@ -9,7 +9,7 @@ import java.util.Date;
  * @date 2022/1/3
  * @description 属于运行中的实例，是底层version表与instance表的聚合
  * see com.github.krystalics.d10.scheduler.dao.entity.Version
- *     com.github.krystalics.d10.scheduler.dao.entity.Instance
+ * com.github.krystalics.d10.scheduler.dao.entity.Instance
  * <p>
  */
 @Data
@@ -17,6 +17,7 @@ public class VersionInstance {
     private Long taskId;
     private Long versionId;
     private Long instanceId;
+    private Integer type;
     private String versionNo;
     private Integer retryRemainTimes;
     private Date startTimeTheory;

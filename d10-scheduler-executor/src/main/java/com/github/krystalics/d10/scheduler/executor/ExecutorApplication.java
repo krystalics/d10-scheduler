@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
  * @author linjiabao001
  * @date 2022/2/1
  * @description
+ * todo 启动时需要清理节点上它之前运行可能残留的任务、
+ * todo 节点挂了后，自启动脚本
  */
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.github.krystalics.d10.scheduler"})

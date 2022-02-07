@@ -73,6 +73,12 @@ public class Instance implements Serializable {
      */
     private String node;
 
+    /**
+     * 之前实例执行节点
+     * todo 加到表中
+     */
+    private String nodeBefore;
+
     private Integer autoStart;
 
     /**
@@ -96,6 +102,16 @@ public class Instance implements Serializable {
      * 重跑时会记录用户的操作原因
      */
     private String operationReason;
+
+    /**
+     * todo 加入表中、执行时本地进程id
+     */
+    private Integer processId;
+
+    /**
+     * todo 加入表中、执行时可能采集到的yarnId、用逗号分割
+     */
+    private String yarnIds;
 
     /**
      * 记录生成时间，实际上也就是 实例化开始时间
