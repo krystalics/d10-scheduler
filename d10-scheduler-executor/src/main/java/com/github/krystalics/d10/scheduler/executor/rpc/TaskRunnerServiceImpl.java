@@ -9,6 +9,7 @@ import com.github.krystalics.d10.scheduler.dao.entity.Instance;
 import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
 import com.github.krystalics.d10.scheduler.executor.common.Constants;
 import com.github.krystalics.d10.scheduler.executor.service.ResourceService;
+import com.github.krystalics.d10.scheduler.executor.utils.LogUtils;
 import com.github.krystalics.d10.scheduler.executor.utils.OSUtils;
 import com.github.krystalics.d10.scheduler.executor.worker.InstanceRunPool;
 import com.github.krystalics.d10.scheduler.rpc.api.ITaskRunnerService;
@@ -62,8 +63,7 @@ public class TaskRunnerServiceImpl implements ITaskRunnerService {
             Date now = new Date();
             i.setRunStartTime(now);
             i.setNode(IPUtils.getHost());
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            String jobAddress = Constants.LOG_FILE_ADDRESS_PREFIX + dateTimeFormatter.format(now.toInstant()) + File.separator + TaskType.fromInt(instance.getType()).getDesc() + File.separator + instance.getInstanceId();
+            String jobAddress = LogUtils.logDir(TaskType.fromInt(instance.getType()).getDesc(),instance.getInstanceId());
             i.setJobLogAddress(jobAddress);
 
             instanceMapper.update(i);

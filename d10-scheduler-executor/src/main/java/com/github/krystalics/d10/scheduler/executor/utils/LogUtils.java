@@ -95,13 +95,13 @@ public class LogUtils {
     /**
      * 根据executor类型，返回该executor的log目录路径
      *
-     * @param type 任务类型
+     * @param type       任务类型
      * @param instanceId 实例id
      * @return 日志路径
      */
     public static String logDir(String type, long instanceId) {
         String executeDate = DateFormatUtils.format(new Date(), "yyyyMMdd");
-        return Constants.LOG_FILE_ADDRESS_PREFIX + executeDate + "/" + type + "/";
+        return Constants.LOG_FILE_ADDRESS_PREFIX + executeDate + "/" + type + "/" + instanceId + ".html";
     }
 
     public static int appendLog(String path, String logInfo) {

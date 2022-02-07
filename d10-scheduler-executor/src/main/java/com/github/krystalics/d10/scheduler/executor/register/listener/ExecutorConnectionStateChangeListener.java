@@ -60,12 +60,12 @@ public class ExecutorConnectionStateChangeListener implements ConnectionStateLis
                 log.info("already connect to zk");
                 break;
             case READ_ONLY:
-                log.error("something error happended,zk is in read-only state");
+                log.error("something error happened,zk is in read-only state");
                 break;
             case RECONNECTED:
                 String address = IPUtils.getHost() + ":" + port;
-                log.info("{} reconnect to zk、need to create node by hand", address);
-                zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES, address, CreateMode.EPHEMERAL);
+                log.info("{} executor node reconnect to zookeeper、need to create node again", address);
+                zookeeperService.createNodeIfNotExist(CommonConstants.ZK_EXECUTOR_LIVE, address, CreateMode.EPHEMERAL);
                 break;
             default:
                 throw new RuntimeException("unknown zk connection state " + connectionState);
