@@ -1,11 +1,17 @@
 package com.github.krystalics.d10.scheduler.executor;
 
+import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.executor.common.Constants;
+import com.github.krystalics.d10.scheduler.executor.register.ExecutorStartHelper;
 import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyServer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -16,15 +22,29 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.github.krystalics.d10.scheduler"})
 public class ExecutorApplication {
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws Exception {
+        //start netty server
         final NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(Constants.EXECUTOR_SERVER_PORT);
+        serverConfig.setListenPort(Constants.EXECUTOR_NETTY_SERVER_PORT);
         NettyServer nettyServer = new NettyServer(serverConfig);
         nettyServer.start();
-        //todo 注册到zk中、进行故障的负载均衡？还是
 
         SpringApplication.run(ExecutorApplication.class, args);
     }
 
+    @Component
+    @Slf4j
+    static class ExecutorStartUp implements CommandLineRunner {
+
+        @Autowired
+        private ExecutorStartHelper startHelper;
+
+        @Override
+        public void run(String... args) throws Exception {
+            startHelper.initCuratorCaches();
+            startHelper.initZkPaths();
+        }
+    }
 
 }

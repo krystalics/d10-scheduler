@@ -12,7 +12,7 @@ import com.github.krystalics.d10.scheduler.executor.common.Constants;
 public class ReportUtils {
     public static Node nodeInfo() {
         Node node = new Node();
-        final String address = IPUtils.getHost() + ":" + Constants.EXECUTOR_SERVER_PORT;
+        final String address = IPUtils.getHost() + ":" + Constants.EXECUTOR_NETTY_SERVER_PORT;
         node.setNodeAddress(address);
         node.setCpuUse(OSUtils.cpuUsage());
         node.setCpuCapacity(1.0 * OSUtils.cpuLogicalProcessorCount());

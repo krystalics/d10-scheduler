@@ -59,6 +59,10 @@ public class CommonConstants {
 
     public final static String LOCK_INIT = "/lock-init";
 
+    public final static String ZK_EXECUTOR_LIVE = "/executor-live";
+
+    public final static String ZK_EXECUTOR_ALL = "/executor-all";
+
     /**
      * 1000条一个分段，进入线程池分开执行
      */

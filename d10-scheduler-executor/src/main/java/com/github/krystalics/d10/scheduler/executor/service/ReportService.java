@@ -23,13 +23,13 @@ public class ReportService implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("first report");
-        nodeMapper.insert(ReportUtils.nodeInfo());
+//        nodeMapper.insert(ReportUtils.nodeInfo());
     }
 
 
     @Scheduled(cron = "*/30 * * * * *")
     public void report(){
         log.info("common report");
-        nodeMapper.insert(ReportUtils.nodeInfo());
+//        nodeMapper.insert(ReportUtils.nodeInfo());
     }
 }

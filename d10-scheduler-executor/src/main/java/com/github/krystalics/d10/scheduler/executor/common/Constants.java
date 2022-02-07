@@ -8,5 +8,5 @@ import com.github.krystalics.d10.scheduler.rpc.utils.PropertyUtils;
  * @description
  */
 public class Constants {
-    public static final int EXECUTOR_SERVER_PORT = PropertyUtils.getInt("executor.server.port", 12347);
+    public static final int EXECUTOR_NETTY_SERVER_PORT = PropertyUtils.getInt("executor.netty.server.port", 12347);
 }
