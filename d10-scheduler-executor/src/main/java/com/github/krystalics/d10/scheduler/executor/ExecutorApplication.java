@@ -3,6 +3,7 @@ package com.github.krystalics.d10.scheduler.executor;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.executor.common.Constants;
 import com.github.krystalics.d10.scheduler.executor.register.ExecutorStartHelper;
+import com.github.krystalics.d10.scheduler.executor.worker.InstanceRunPool;
 import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyServer;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +18,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author linjiabao001
  * @date 2022/2/1
- * @description
- * todo 启动时需要清理节点上它之前运行可能残留的任务、
+ * @description todo 启动时需要清理节点上它之前运行可能残留的任务、
  * todo 节点挂了后，自启动脚本
  */
 @SpringBootApplication
@@ -33,6 +33,11 @@ public class ExecutorApplication {
         nettyServer.start();
 
         SpringApplication.run(ExecutorApplication.class, args);
+
+        /**
+         * register hooks, which are called before the process exits
+         */
+        Runtime.getRuntime().addShutdownHook(new Thread(InstanceRunPool::shutdownNow, "shutdown-hook"));
     }
 
     @Component

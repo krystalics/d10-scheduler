@@ -10,6 +10,7 @@ import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
 import com.github.krystalics.d10.scheduler.executor.common.Constants;
 import com.github.krystalics.d10.scheduler.executor.service.ResourceService;
 import com.github.krystalics.d10.scheduler.executor.utils.OSUtils;
+import com.github.krystalics.d10.scheduler.executor.worker.InstanceRunPool;
 import com.github.krystalics.d10.scheduler.rpc.api.ITaskRunnerService;
 import com.github.krystalics.d10.scheduler.rpc.base.RpcService;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class TaskRunnerServiceImpl implements ITaskRunnerService {
         }
 
         if (resourceService.resourceApply(instance.getCpuAvg(), instance.getMemoryAvg())) {
-            //todo put into thread pool
+            InstanceRunPool.add(instance);
             updateInstance(instance);
             return true;
         }
