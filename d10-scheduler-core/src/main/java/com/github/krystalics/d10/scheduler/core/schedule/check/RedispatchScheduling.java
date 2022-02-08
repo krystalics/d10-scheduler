@@ -18,11 +18,9 @@ import java.util.List;
  * @Description 对状态为失败以及executor节点失败上的任务进行重新的分发
  */
 public class RedispatchScheduling implements ScheduledCheck {
-    private static Logger log = LoggerFactory.getLogger(RedispatchScheduling.class);
+    private static final Logger log = LoggerFactory.getLogger(RedispatchScheduling.class);
 
-    private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
-    private static SchedulerService schedulerService = SpringUtils.getBean(SchedulerService.class);
-    private static JobInstance jobInstance = SpringUtils.getBean(JobInstance.class);
+    private static final SchedulerService schedulerService = SpringUtils.getBean(SchedulerService.class);
     private volatile boolean redispatchSchedulingStop = false;
 
     @Override
@@ -54,11 +52,8 @@ public class RedispatchScheduling implements ScheduledCheck {
         if (!redispatchSchedulingStop) {
             try {
                 if (instance.getState().equals(VersionState.ReDispatch.getState())) {
-                    //todo 选择节点，分发任务到executor
-
+                    schedulerService.dispatch(instance);
                     log.info("redispatch success! instanceId = {}", instance.getInstanceId());
-                    instance.setState(VersionState.RUNNING.getState());
-                    schedulerMapper.updateInstance(instance);
                     return true;
                 }
 

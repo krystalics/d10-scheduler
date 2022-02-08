@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
  * keypoint 在实践中系统中超过3天还未运行到终态的实例就不管了,属于垃圾数据
  */
 public class RoutingScheduling implements ScheduledCheck {
-    private static Logger log = LoggerFactory.getLogger(RoutingScheduling.class);
+    private static final Logger log = LoggerFactory.getLogger(RoutingScheduling.class);
 
-    private static SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
-    private static SchedulerService schedulerService = SpringUtils.getBean(SchedulerService.class);
+    private static final SchedulerMapper schedulerMapper = SpringUtils.getBean(SchedulerMapper.class);
+    private static final SchedulerService schedulerService = SpringUtils.getBean(SchedulerService.class);
 
-    private static ResourceScheduler resourceScheduler = SpringUtils.getBean(ResourceScheduler.class);
-    private static TransactionService transactionService = SpringUtils.getBean(TransactionService.class);
+    private static final ResourceScheduler resourceScheduler = SpringUtils.getBean(ResourceScheduler.class);
+    private static final TransactionService transactionService = SpringUtils.getBean(TransactionService.class);
 
     private volatile boolean routingSchedulingStop = false;
 
@@ -177,11 +177,8 @@ public class RoutingScheduling implements ScheduledCheck {
         if (!routingSchedulingStop) {
             try {
                 if (instance.getState().equals(VersionState.PENDING.getState())) {
-                    //todo 分发任务到executor
-
+                    schedulerService.dispatch(instance);
                     log.info("dispatch success! instanceId = {}", instance.getInstanceId());
-                    instance.setState(VersionState.RUNNING.getState());
-                    schedulerMapper.updateInstance(instance);
                     return true;
                 }
 
