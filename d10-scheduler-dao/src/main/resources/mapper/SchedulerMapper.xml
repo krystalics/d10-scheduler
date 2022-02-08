@@ -87,9 +87,5 @@
         ]]>
     </select>
 
-    <select id="instancesInDownNodes">
-        select
-    </select>
-
 
 </mapper>
