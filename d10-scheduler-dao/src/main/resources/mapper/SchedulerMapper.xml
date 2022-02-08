@@ -35,7 +35,7 @@
         <![CDATA[
           and i.state < 5
           and t.state = 2
-          and start_time_theory between #{startDate} and NOW()
+          and ctime between #{startDate} and NOW()
         ]]>
     </select>
 
@@ -83,7 +83,7 @@
         <![CDATA[
           and i.state = 9
           and t.state = 2
-          and start_time_theory between #{startDate} and NOW()
+          and ctime between #{startDate} and NOW()
         ]]>
     </select>
 
