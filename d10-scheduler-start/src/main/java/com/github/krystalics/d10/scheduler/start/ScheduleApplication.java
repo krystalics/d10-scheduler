@@ -43,6 +43,9 @@ public class ScheduleApplication {
         @Value("${server.port}")
         private int port;
 
+        @Value("${netty.server.port}")
+        private int nettyPort;
+
         @Autowired
         private ElectionListener electionListener;
 
@@ -87,12 +90,14 @@ public class ScheduleApplication {
                     leaderLatch.addListener(electionListener);
                     leaderLatch.start();
 
-                    leaderLatch.await();
-                    rebalanceService.rebalance(address);
                     NettyServerConfig serverConfig = new NettyServerConfig();
-                    serverConfig.setListenPort(13221);
+                    serverConfig.setListenPort(nettyPort);
                     nettyServer = new NettyServer(serverConfig);
                     nettyServer.start();
+
+                    leaderLatch.await();
+                    rebalanceService.rebalance(address);
+
 //                  initiation.init();
                 }
             }, "election");

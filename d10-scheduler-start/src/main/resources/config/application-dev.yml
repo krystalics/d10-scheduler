@@ -1,2 +1,6 @@
 server:
   port: 8082
+
+netty:
+  server:
+    port: 12458
