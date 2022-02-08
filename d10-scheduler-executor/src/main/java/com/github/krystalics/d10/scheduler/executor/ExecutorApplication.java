@@ -3,6 +3,8 @@ package com.github.krystalics.d10.scheduler.executor;
 import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
 import com.github.krystalics.d10.scheduler.executor.common.Constants;
 import com.github.krystalics.d10.scheduler.executor.register.ExecutorStartHelper;
+import com.github.krystalics.d10.scheduler.executor.utils.ClearUtils;
+import com.github.krystalics.d10.scheduler.executor.utils.OSUtils;
 import com.github.krystalics.d10.scheduler.executor.worker.InstanceRunPool;
 import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyServer;
@@ -18,14 +20,16 @@ import org.springframework.stereotype.Component;
 /**
  * @author linjiabao001
  * @date 2022/2/1
- * @description todo 启动时需要清理节点上它之前运行可能残留的任务、
- * todo 节点挂了后，自启动脚本
+ * @description
  */
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.github.krystalics.d10.scheduler"})
 public class ExecutorApplication {
 
     public static void main(String[] args) throws Exception {
+        //启动时需要清理节点上它之前运行可能残留的任务
+        ClearUtils.killAllSubProcesses();
+
         //start netty server
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(Constants.EXECUTOR_NETTY_SERVER_PORT);

@@ -66,6 +66,7 @@ public class RebalanceServiceImpl implements RebalanceService {
             @Override
             public void run() {
                 while (true) {
+                    //todo 响应中断
                     final List<String> liveNodes = zookeeperService.liveNodes();
                     final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_RESULT_NODE);
                     log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);

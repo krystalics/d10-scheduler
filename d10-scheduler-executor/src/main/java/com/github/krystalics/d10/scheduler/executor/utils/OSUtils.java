@@ -411,6 +411,35 @@ public class OSUtils {
     }
 
     /**
+     * Execute the bash -c
+     *
+     * @param command command
+     * @return output
+     * @throws IOException errors
+     */
+    public static String exeBash(String command) throws IOException {
+        List<String> cmds = new ArrayList<>();
+        cmds.add("bash");
+        cmds.add("-c");
+        cmds.add(command);
+        return exeShell(cmds.toArray(new String[0]));
+    }
+
+    public static String[] getProcessIds(String processName) throws IOException {
+        String command = "ps -ef | grep " + processName + " | grep -v grep | awk '{print $2}'";
+        return exeBash(command).split("\n");
+    }
+
+    public static void killProcesses(String[] processIds) throws IOException {
+        if (processIds.length > 0 && !"".equals(processIds[0])) {
+            for (String processId : processIds) {
+                String command = "kill -9 " + processId;
+                exeCmd(command);
+            }
+        }
+    }
+
+    /**
      * get process id
      *
      * @return process id

@@ -13,4 +13,6 @@ public class Constants {
     public static final double MEMORY_USAGE_LIMIT = 0.8;
 
     public static final String LOG_FILE_ADDRESS_PREFIX = "/tmp/executor/";
+    public static final String SUB_PROCESS_PREFIX = "executor-sub-process";
+    public static final String SUB_PROCESS_NAME_FORMAT = "executor-sub-process-${taskId}-${versionId}-${instanceId}-${owner}-${node}";
 }
