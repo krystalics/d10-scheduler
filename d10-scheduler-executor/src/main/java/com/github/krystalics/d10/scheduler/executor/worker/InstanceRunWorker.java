@@ -23,5 +23,6 @@ public class InstanceRunWorker implements Runnable {
     public void run() {
         log.info("instance is running:{}", instance);
         //todo 具体的执行步骤
+        //todo 运行之前先check下在yarn或者k8s上是否有对应的任务存在，如果存在kill掉后再拉起任务
     }
 }

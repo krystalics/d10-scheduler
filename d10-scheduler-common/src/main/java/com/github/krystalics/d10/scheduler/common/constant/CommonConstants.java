@@ -55,7 +55,7 @@ public class CommonConstants {
 
     public final static String ZK_SHARD_RESULT_NODE = "/shard-result";
 
-    public final static int REBALANCED_TRY_TIMES = 3;
+    public final static int COMMON_RETRY_TIMES = 3;
 
     public final static String LOCK_INIT = "/lock-init";
 
