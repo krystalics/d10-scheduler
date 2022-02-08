@@ -13,7 +13,6 @@ import java.util.Date;
  *
  * @author krysta
  * @since 2021-10-02
- * todo instance 重新分发的时候找个字段记录一下之前的运行节点
  */
 @Data
 public class Instance implements Serializable {
@@ -75,7 +74,6 @@ public class Instance implements Serializable {
 
     /**
      * 之前实例执行节点
-     * todo 加到表中
      */
     private String nodeBefore;
 
@@ -104,14 +102,10 @@ public class Instance implements Serializable {
     private String operationReason;
 
     /**
-     * todo 加入表中、执行时本地进程id
+     * 执行时可能采集到的yarn applicationId或者k8s上的任务id
+     * 在远程执行的id
      */
-    private Integer processId;
-
-    /**
-     * todo 加入表中、执行时可能采集到的yarnId、用逗号分割
-     */
-    private String yarnIds;
+    private Integer remoteId;
 
     /**
      * 记录生成时间，实际上也就是 实例化开始时间

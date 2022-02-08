@@ -27,6 +27,7 @@ public class VersionInstance {
     private Date runStartTime;
     private Date runEndTime;
     private String node;
+    private Integer remoteId;
     private Integer autoStart;
     private String queueName;
     private String queueInYarn;

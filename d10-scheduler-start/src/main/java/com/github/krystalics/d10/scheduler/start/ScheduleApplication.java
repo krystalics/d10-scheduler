@@ -74,7 +74,7 @@ public class ScheduleApplication {
          */
         @Override
         public void run(String... args) throws Exception {
-            new Thread(new Runnable() {
+            final Thread init = new Thread(new Runnable() {
                 @SneakyThrows
                 @Override
                 public void run() {
@@ -89,11 +89,15 @@ public class ScheduleApplication {
 
                     leaderLatch.await();
                     rebalanceService.rebalance(address);
-                    nettyServer = new NettyServer(new NettyServerConfig());
-
+                    NettyServerConfig serverConfig = new NettyServerConfig();
+                    serverConfig.setListenPort(13221);
+                    nettyServer = new NettyServer(serverConfig);
+                    nettyServer.start();
 //                  initiation.init();
                 }
-            }, "election").start();
+            }, "election");
+
+            init.start();
 
             /**
              * register hooks, which are called before the process exits

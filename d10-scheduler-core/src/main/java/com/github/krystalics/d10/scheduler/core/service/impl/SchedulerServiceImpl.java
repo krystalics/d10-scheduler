@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +50,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         List<VersionInstance> list = new ArrayList<>();
 
         LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(now.getTime()), ZoneId.systemDefault());
-        LocalDateTime startDateTime = localDateTime.minusDays(CommonConstants.SYSTEM_SCHEDULING_DATE_LIMIT).with(LocalDateTime.MAX);
+        LocalDateTime startDateTime = localDateTime.minusDays(CommonConstants.SYSTEM_SCHEDULING_DATE_LIMIT).with(LocalTime.MAX);
         Date startDate = Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant());
         final Pair<Long, Long> taskIdScope = jobInstance.getTaskIds();
 

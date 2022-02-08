@@ -35,7 +35,7 @@
         <![CDATA[
           and i.state < 5
           and t.state = 2
-          and ctime between #{startDate} and NOW()
+          and i.ctime between #{startDate} and NOW()
         ]]>
     </select>
 
@@ -63,11 +63,12 @@
     <select id="redispatchSchedulingInstances" resultType="com.github.krystalics.d10.scheduler.common.constant.VersionInstance">
         select instance_id       as instanceId,
                t.task_id         as taskId,
-               v.version_no      as versionNo
+               v.version_no      as versionNo,
                v.version_id      as versionId,
-               t.type            as t.type,
+               t.type            as type,
                start_time_theory as startTimeTheory,
-               job_conf          as jobConf,
+               i.job_conf        as jobConf,
+               i.remote_id       as remoteId,
                i.state           as state,
                t.queue_name      as queueName,
                i.queue_in_yarn   as queueInYarn,
@@ -83,7 +84,7 @@
         <![CDATA[
           and i.state = 9
           and t.state = 2
-          and ctime between #{startDate} and NOW()
+          and i.ctime between #{startDate} and NOW()
         ]]>
     </select>
 
