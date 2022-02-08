@@ -2,6 +2,7 @@ package com.github.krystalics.d10.scheduler.start.monitor;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.dao.entity.Node;
+import com.github.krystalics.d10.scheduler.dao.mapper.InstanceMapper;
 import com.github.krystalics.d10.scheduler.dao.mapper.NodeMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.NodeQM;
 import com.github.krystalics.d10.scheduler.rpc.api.INodeService;
@@ -29,6 +30,9 @@ public class ExecutorMonitor {
     @Autowired
     private NodeMapper nodeMapper;
 
+    @Autowired
+    private InstanceMapper instanceMapper;
+
     /**
      * 每分钟check1次
      */
@@ -44,6 +48,9 @@ public class ExecutorMonitor {
                 if (!checkNodeAlive(node.getNodeAddress())) {
                     node.setAlive(false);
                     nodeMapper.update(node);
+
+                    //将死亡节点的instance更新为redispatch状态
+                    instanceMapper.updateDownNodeInstances(node.getNodeAddress());
                 }
             }
         }

@@ -7,7 +7,8 @@
     </sql>
 
     <sql id="fields">
-        instance_id         as instanceId,
+        instance_id
+        as instanceId,
         task_id             as taskId,
         version_id          as versionId,
         start_time_theory   as startTimeTheory,
@@ -45,17 +46,17 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="instanceId">
         insert into
         <include refid="table"/>(
-        instance_id       ,
-        task_id           ,
-        version_id        ,
+        instance_id ,
+        task_id ,
+        version_id ,
         start_time_theory ,
-        job_conf          ,
-        state             ,
-        job_log_address   ,
-        run_start_time    ,
-        run_end_time      ,
-        node              ,
-        auto_start        )
+        job_conf ,
+        state ,
+        job_log_address ,
+        run_start_time ,
+        run_end_time ,
+        node ,
+        auto_start )
         value(
         #{instanceId},
         #{taskId},
@@ -116,6 +117,14 @@
         WHERE instance_id = #{instanceId}
     </update>
 
+    <update id="updateDownNodeInstances">
+        UPDATE
+        <include refid="table"/>
+        <set>
+             state = 9
+        </set>
+        WHERE node=#{node} and state=4
+    </update>
 
 
     <select id="getById" resultType="com.github.krystalics.d10.scheduler.dao.entity.Instance">

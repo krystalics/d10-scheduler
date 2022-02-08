@@ -23,4 +23,6 @@ public interface InstanceMapper extends BaseMapper<Instance, InstanceQM> {
      */
     Instance findLastInstanceByVersionId(@Param("versionId") long versionId);
 
+    void updateDownNodeInstances(@Param("node") String node);
+
 }
