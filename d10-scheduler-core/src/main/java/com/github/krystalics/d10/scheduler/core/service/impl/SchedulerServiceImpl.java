@@ -8,7 +8,10 @@ import com.github.krystalics.d10.scheduler.common.constant.VersionInstance;
 import com.github.krystalics.d10.scheduler.core.load.balance.LoadBalancer;
 import com.github.krystalics.d10.scheduler.core.load.balance.LoadBalancerFactory;
 import com.github.krystalics.d10.scheduler.core.service.SchedulerService;
+import com.github.krystalics.d10.scheduler.dao.entity.Node;
+import com.github.krystalics.d10.scheduler.dao.mapper.NodeMapper;
 import com.github.krystalics.d10.scheduler.dao.mapper.SchedulerMapper;
+import com.github.krystalics.d10.scheduler.dao.qm.NodeQM;
 import com.github.krystalics.d10.scheduler.rpc.api.ITaskRunnerService;
 import com.github.krystalics.d10.scheduler.rpc.client.RpcClient;
 import com.github.krystalics.d10.scheduler.rpc.utils.Host;
@@ -20,6 +23,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +40,9 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     @Autowired
     private JobInstance jobInstance;
+
+    @Autowired
+    private NodeMapper nodeMapper;
 
     @Override
     public List<VersionInstance> fetchData(ScheduledEnum scheduledEnum, Date now) {
@@ -63,18 +70,34 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     /**
-     * 先进行节点选择，然后使用rpc进行分发任务
+     * 节点轮询选择，使用rpc进行分发任务
+     * 如果被拒绝再试下一个
+     *
      * @param instance instance具体的信息
      * @return
      * @throws Exception
      */
     @Override
-    public boolean dispatch(VersionInstance instance) throws Exception {
-        final LoadBalancer balancer = LoadBalancerFactory.instance();
-        final Host host = balancer.suitableHost(instance);
-        RpcClient client = new RpcClient();
-        final ITaskRunnerService taskRunnerService = client.create(ITaskRunnerService.class, host);
-        return taskRunnerService.addInstance(instance);
+    public boolean dispatch(VersionInstance instance) {
+        NodeQM nodeQM = new NodeQM();
+        nodeQM.setAlive(true);
+        List<Node> nodes = nodeMapper.list(nodeQM);
+        Collections.shuffle(nodes);
+
+        for (Node node : nodes) {
+            try {
+                RpcClient client = new RpcClient();
+                final ITaskRunnerService taskRunnerService = client.create(ITaskRunnerService.class, new Host(node.getNodeAddress()));
+                boolean success = taskRunnerService.addInstance(instance);
+                if (success) {
+                    return true;
+                }
+            } catch (Exception e) {
+                log.error("dispatch instance {} to {} error: {}", instance.getInstanceId(), node.getNodeAddress(), e);
+            }
+        }
+
+        return false;
     }
 
 }

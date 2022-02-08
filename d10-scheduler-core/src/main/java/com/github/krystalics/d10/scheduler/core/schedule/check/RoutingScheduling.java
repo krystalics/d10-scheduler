@@ -177,11 +177,8 @@ public class RoutingScheduling implements ScheduledCheck {
         if (!routingSchedulingStop) {
             try {
                 if (instance.getState().equals(VersionState.PENDING.getState())) {
-                    //todo 分发任务到executor
-
+                    schedulerService.dispatch(instance);
                     log.info("dispatch success! instanceId = {}", instance.getInstanceId());
-                    instance.setState(VersionState.RUNNING.getState());
-                    schedulerMapper.updateInstance(instance);
                     return true;
                 }
 
