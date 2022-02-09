@@ -107,6 +107,10 @@ public class Instance implements Serializable {
      */
     private Integer remoteId;
 
+    private Integer priority;
+
+    private Integer bizPriority;
+
     /**
      * 记录生成时间，实际上也就是 实例化开始时间
      */

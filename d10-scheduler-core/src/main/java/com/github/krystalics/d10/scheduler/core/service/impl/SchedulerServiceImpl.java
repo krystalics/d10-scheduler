@@ -66,6 +66,8 @@ public class SchedulerServiceImpl implements SchedulerService {
             default:
         }
 
+        //按照priority、biz priority 进行降序排列，保证优先级高的先调度
+        Collections.sort(list);
 
         return list;
     }
