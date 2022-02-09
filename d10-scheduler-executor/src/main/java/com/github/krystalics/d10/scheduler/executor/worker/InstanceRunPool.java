@@ -10,7 +10,7 @@ import java.util.concurrent.*;
  * @Description 运行时线程池
  */
 public class InstanceRunPool {
-    private static final ExecutorService service = new ThreadPoolExecutor(Integer.MAX_VALUE, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, null, (RejectedExecutionHandler) null);
+    private static final ExecutorService service = new ThreadPoolExecutor(Integer.MAX_VALUE, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new ArrayBlockingQueue<Runnable>(1));
     private static final ConcurrentHashMap<Long, Future<?>> pool = new ConcurrentHashMap<>();
 
     public static void add(VersionInstance instance) {

@@ -61,7 +61,7 @@ public class TaskRunnerServiceImpl implements ITaskRunnerService {
             Date now = new Date();
             i.setRunStartTime(now);
             i.setNode(IPUtils.getHost());
-            String jobAddress = LogUtils.logDir(TaskType.fromInt(instance.getType()).getDesc(),instance.getInstanceId());
+            String jobAddress = LogUtils.logFile(TaskType.fromInt(instance.getType()).getDesc(), instance.getInstanceId(), now);
             i.setJobLogAddress(jobAddress);
 
             instanceMapper.update(i);

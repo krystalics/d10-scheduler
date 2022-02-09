@@ -104,8 +104,9 @@ public class Instance implements Serializable {
     /**
      * 执行时可能采集到的yarn applicationId或者k8s上的任务id
      * 在远程执行的id
+     * todo id在表中改成string
      */
-    private Integer remoteId;
+    private String remoteId;
 
     private Integer priority;
 

@@ -99,21 +99,30 @@ public class LogUtils {
      * @param instanceId 实例id
      * @return 日志路径
      */
-    public static String logDir(String type, long instanceId) {
-        String executeDate = DateFormatUtils.format(new Date(), "yyyyMMdd");
-        return Constants.LOG_FILE_ADDRESS_PREFIX + executeDate + "/" + type + "/" + instanceId + ".html";
+    public static String logFile(String type, long instanceId, Date date) {
+        return logDir(type, date) + "/" + instanceId + ".html";
     }
 
-    public static int appendLog(String path, String logInfo) {
+    /**
+     * 根据executor类型，返回该executor的log目录路径
+     *
+     * @param type 任务类型
+     * @param date 日期
+     * @return 日志路径
+     */
+    public static String logDir(String type, Date date) {
+        String executeDate = DateFormatUtils.format(date, "yyyyMMdd");
+        return Constants.LOG_FILE_ADDRESS_PREFIX + executeDate + "/" + type;
+    }
+
+    public static void appendLog(String path, String logInfo) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             logInfo = "[" + sdf.format(new Date()) + "] -- " + logInfo + "\n";
             FileUtils.writeStringToFile(new File(path), logInfo, Charset.defaultCharset(), true);
-            return 0;
 
         } catch (IOException e) {
             LOGGER.warn("append log failed. log dir is {}", path);
-            return -1;
         }
     }
 
@@ -191,7 +200,7 @@ public class LogUtils {
             os.flush();
             os.close();
         } catch (Exception e) {
-            LogUtils.appendLog(logPath, "task failed caused by {}", e);
+            appendLog(logPath, "task failed caused by {}", e);
             throw new RuntimeException(e);
         }
         return process;
