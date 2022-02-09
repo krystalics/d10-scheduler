@@ -57,6 +57,11 @@ public class CommonConstants {
 
     public final static int COMMON_RETRY_TIMES = 3;
 
+    /**
+     * 默认重试间隔1s
+     */
+    public final static int COMMON_RETRY_STOP_TIME = 1;
+
     public final static String LOCK_INIT = "/lock-init";
 
     public final static String ZK_EXECUTOR_LIVE = "/executor-live";

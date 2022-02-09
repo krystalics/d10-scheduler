@@ -41,6 +41,10 @@ public class VersionInstance implements Comparable<VersionInstance> {
 
     @Override
     public int compareTo(VersionInstance o) {
+        if (o == null) {
+            //降序排列 : 相当于右边是0减一个有值的、
+            return -1;
+        }
         if (this.priority.equals(o.priority)) {
             return o.bizPriority - this.bizPriority;
         }
