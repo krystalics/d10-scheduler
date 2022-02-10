@@ -2,12 +2,13 @@ package com.github.krystalics.d10.scheduler.start.zk.listener;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
-import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
-
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
+import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.zookeeper.CreateMode;
@@ -23,6 +24,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Slf4j
 public class ConnectionStateChangeListener implements ConnectionStateListener {
+
+    @Autowired
+    private LeaderLatch leaderLatch;
 
     @Autowired
     private ZookeeperHelper zookeeperService;
@@ -57,6 +61,10 @@ public class ConnectionStateChangeListener implements ConnectionStateListener {
             case SUSPENDED:
                 log.error("node lost the connection with zookeeper!");
                 D10Scheduler.getInstance().stop();
+
+                if (leaderLatch.hasLeadership()) {
+
+                }
                 break;
             case CONNECTED:
                 log.info("already connect to zk");

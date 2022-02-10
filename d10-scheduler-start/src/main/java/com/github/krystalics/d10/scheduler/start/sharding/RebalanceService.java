@@ -12,4 +12,9 @@ public interface RebalanceService {
      * @throws Exception
      */
     void rebalance(String address) throws Exception;
+
+    /**
+     * 停止shard
+     */
+    void stop();
 }

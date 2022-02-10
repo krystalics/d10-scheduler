@@ -1,10 +1,6 @@
 package com.github.krystalics.d10.scheduler.core.schedule.check;
 
-import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.constant.ScheduledEnum;
-import com.github.krystalics.d10.scheduler.common.utils.SpringUtils;
-import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
-import com.github.krystalics.d10.scheduler.core.service.SchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +78,7 @@ public class SchedulerCheckHelper implements ScheduledCheck {
 
                 }
 
-                log.info(">>>>>>>>>>> d10-scheduler, JobScheduleHelper#scheduleThread stop");
+                log.info(">>>>>>>>>>> d10-scheduler, {} stop", scheduledName);
             }
         });
         scheduleThread.setDaemon(true);

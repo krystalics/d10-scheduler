@@ -3,9 +3,9 @@ package com.github.krystalics.d10.scheduler.start.sharding.impl;
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
+import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
-import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
 import com.github.krystalics.d10.scheduler.start.sharding.ShardingStrategy;
 import lombok.SneakyThrows;
@@ -32,6 +32,8 @@ public class RebalanceServiceImpl implements RebalanceService {
     @Autowired
     private ZookeeperHelper zookeeperService;
 
+    private Thread ackThread;
+
 
     /**
      * fixme 在切换了leader后会发生两次rebalance 要注意这个，但是两次rebalance；一次在be leader后，一次在/live 节点变化后
@@ -46,7 +48,7 @@ public class RebalanceServiceImpl implements RebalanceService {
 
         log.info("scheduler system begin rebalanced!");
         log.info("1.to create /shard node");
-        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.EPHEMERAL);
+        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.PERSISTENT);
         log.info("2.assign the task to schedulers");
         shard();
         log.info("wait to receive all live node response!");
@@ -56,33 +58,57 @@ public class RebalanceServiceImpl implements RebalanceService {
     /**
      * 将现有的live节点与shard节点下的子节点进行对比
      * keypoint curator响应事件的线程就是一个NotifyService-0、
-     *  新建一个线程去做ack的确认，防止触发事件的这个线程一直阻塞在这里，无法响应/shard节点的创建
+     * 新建一个线程去做ack的确认，防止触发事件的这个线程一直阻塞在这里，无法响应/shard节点的创建
      *
+     * fixme 连续的shard线程不安全、存在两个线程在check live的情况；然后其中一个线程将/shard-result里面清空了 然后有个线程被干扰了、一直处于ack状态
      * @throws Exception
      */
     private void shardCheckAck() throws Exception {
-        new Thread(new Runnable() {
+        ackThread = new Thread(new Runnable() {
             @SneakyThrows
             @Override
             public void run() {
                 while (true) {
-                    //todo 响应中断
-                    final List<String> liveNodes = zookeeperService.liveNodes();
-                    final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_RESULT_NODE);
-                    log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
-                    if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
-                        break;
+                    try{
+                        //防止网络抖动，访问zk出异常 然后导致check结束
+                        if (!ackThread.isInterrupted()) {
+                            final List<String> liveNodes = zookeeperService.liveNodes();
+                            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_RESULT_NODE);
+                            log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
+                            if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
+                                break;
+                            }
+                            Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
+                        }
+                    }catch(Exception e){
                     }
-                    Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
                 }
 
                 log.info("3.delete the /shard node");
                 zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
                 zookeeperService.deleteChildrenAndReserveParent(CommonConstants.ZK_SHARD_RESULT_NODE);
             }
-        }).start();
+        });
 
+        ackThread.start();
 
+    }
+
+    @Override
+    public void stop() {
+        if (ackThread != null) {
+            if (ackThread.getState() != Thread.State.TERMINATED) {
+                // interrupt and wait
+                ackThread.interrupt();
+                try {
+                    ackThread.join();
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+
+            log.warn("shard ack has been stopped,the /shard node has not been delete,and scheduler won't restart!");
+        }
     }
 
     /**

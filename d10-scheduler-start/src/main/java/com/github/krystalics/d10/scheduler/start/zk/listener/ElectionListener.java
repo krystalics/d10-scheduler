@@ -4,6 +4,7 @@ package com.github.krystalics.d10.scheduler.start.zk.listener;
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class ElectionListener implements LeaderLatchListener {
     @Value("${server.port:8080}")
     private int port;
 
+    @Autowired
+    private RebalanceService rebalanceService;
+
     @Override
     public void isLeader() {
         try {
@@ -43,7 +47,8 @@ public class ElectionListener implements LeaderLatchListener {
      */
     @Override
     public void notLeader() {
-        log.info("i'm not the leader like before");
+        log.warn("i'm not the leader like before!need stop something");
+        rebalanceService.stop();
     }
 
 

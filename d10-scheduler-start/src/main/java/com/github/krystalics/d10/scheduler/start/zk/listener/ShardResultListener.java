@@ -81,6 +81,7 @@ public class ShardResultListener implements CuratorCacheListener {
 
     public void ack() throws Exception {
         log.info("get new scope,{}", jobInstance);
+        log.info("wait the leader ack all node!");
         String address = IPUtils.getHost() + ":" + port;
         zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_RESULT_NODE, "shard-ack", CreateMode.PERSISTENT);
         zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_RESULT_NODE + "/" + address, address, CreateMode.EPHEMERAL);
