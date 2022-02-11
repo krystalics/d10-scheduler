@@ -3,11 +3,13 @@ package com.github.krystalics.d10.scheduler.start.zk;
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
+import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
+import com.github.krystalics.d10.scheduler.start.event.EventType;
 import com.github.krystalics.d10.scheduler.start.zk.listener.AllNodesChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ConnectionStateChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.LeaderChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.LiveNodesChangeListener;
-import com.github.krystalics.d10.scheduler.start.zk.listener.ShardResultListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ShardListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -44,9 +46,6 @@ public class StartHelper {
     private LiveNodesChangeListener liveNodesChangeListener;
 
     @Autowired
-    private ShardResultListener shardResultListener;
-
-    @Autowired
     private ConnectionStateChangeListener connectionStateChangeListener;
 
     @Autowired
@@ -60,7 +59,6 @@ public class StartHelper {
         String address = IPUtils.getHost() + ":" + port;
         return new LeaderLatch(client, CommonConstants.ZK_ELECTION, address, LeaderLatch.CloseMode.NOTIFY_LEADER);
     }
-
 
 
     /**
@@ -84,10 +82,8 @@ public class StartHelper {
         allNodesCache.listenable().addListener(allNodesCacheListener);
 
         CuratorCache liveNodesCache = CuratorCache.build(client, CommonConstants.ZK_LIVE_NODES);
-        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(CommonConstants.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
+        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().forPathChildrenCache(CommonConstants.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
         liveNodesCache.listenable().addListener(liveNodesCacheListener);
-        //由于shard的结果是写进/live节点，所以就绑定在这个cache下
-        liveNodesCache.listenable().addListener(shardResultListener);
 
         client.start();
         leaderChangeCache.start();
@@ -98,11 +94,55 @@ public class StartHelper {
 
     public void initZkPaths(String address) throws Exception {
         log.info("create zk init paths if need!");
-        zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_LEADER, "leader ip", CreateMode.PERSISTENT);
         zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES, "cluster live ips", CreateMode.PERSISTENT);
         zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_ALL_NODES, "cluster all ips", CreateMode.PERSISTENT);
         zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_ALL_NODES + "/" + address, address, CreateMode.PERSISTENT);
         zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
-        zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_SHARD_RESULT_NODE,"shard-ack",CreateMode.PERSISTENT);
+    }
+
+    public void registerEventTypes() {
+        EventThreadPool.register(EventType.LIVE_NODE_ADD, (param) -> {
+            try {
+                liveNodesChangeListener.add(param);
+            } catch (Exception e) {
+                log.error("live node add error: {}", e);
+            }
+        });
+
+        EventThreadPool.register(EventType.LIVE_NODE_DEL, (param) -> {
+            try {
+                liveNodesChangeListener.delete(param);
+            } catch (Exception e) {
+                log.error("live node delete error: {}", e);
+            }
+        });
+
+        EventThreadPool.register(EventType.CONNECTION_LOST, (param) -> {
+            log.info("stop the scheduler because of {}", EventType.CONNECTION_LOST);
+            D10Scheduler.getInstance().stop();
+        });
+
+        EventThreadPool.register(EventType.SHARD_CHANGE, (param) -> {
+            try {
+                shardListener.shardReceive(param);
+            } catch (Exception e) {
+                log.error("shard receive error: {}", e);
+
+            }
+        });
+
+        EventThreadPool.register(EventType.SHARD_ADD, (param) -> {
+            log.info("stop the scheduler because of {}", EventType.SHARD_ADD);
+            D10Scheduler.getInstance().stop();
+        });
+
+        EventThreadPool.register(EventType.SHARD_DEL, (param) -> {
+            try {
+                log.info("start the scheduler because of {}", EventType.SHARD_DEL);
+                D10Scheduler.getInstance().start();
+            } catch (InterruptedException e) {
+                log.error("shard delete error {}", e);
+            }
+        });
     }
 }

@@ -3,10 +3,12 @@ package com.github.krystalics.d10.scheduler.start.sharding.impl;
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
+import com.github.krystalics.d10.scheduler.common.utils.RetryerUtils;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
-import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
+import com.github.krystalics.d10.scheduler.start.sharding.ShardService;
 import com.github.krystalics.d10.scheduler.start.sharding.ShardingStrategy;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +26,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class RebalanceServiceImpl implements RebalanceService {
+public class ShardServiceImpl implements ShardService {
 
     @Autowired
     private TaskMapper taskMapper;
@@ -32,7 +34,7 @@ public class RebalanceServiceImpl implements RebalanceService {
     @Autowired
     private ZookeeperHelper zookeeperService;
 
-    private Thread ackThread;
+    private volatile Thread ackThread;
 
 
     /**
@@ -44,11 +46,12 @@ public class RebalanceServiceImpl implements RebalanceService {
      * @param address 发生变化的节点地址
      */
     @Override
-    public synchronized void rebalance(String address) throws Exception {
+    public synchronized void shard(String address) throws Exception {
 
         log.info("scheduler system begin rebalanced!");
         log.info("1.to create /shard node");
         zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.PERSISTENT);
+        RetryerUtils.retryCall(() -> zookeeperService.exists(CommonConstants.ZK_SHARD_NODE), true);
         log.info("2.assign the task to schedulers");
         shard();
         log.info("wait to receive all live node response!");
@@ -57,10 +60,8 @@ public class RebalanceServiceImpl implements RebalanceService {
 
     /**
      * 将现有的live节点与shard节点下的子节点进行对比
-     * keypoint curator响应事件的线程就是一个NotifyService-0、
      * 新建一个线程去做ack的确认，防止触发事件的这个线程一直阻塞在这里，无法响应/shard节点的创建
      *
-     * fixme 连续的shard线程不安全、存在两个线程在check live的情况；然后其中一个线程将/shard-result里面清空了 然后有个线程被干扰了、一直处于ack状态
      * @throws Exception
      */
     private void shardCheckAck() throws Exception {
@@ -69,27 +70,27 @@ public class RebalanceServiceImpl implements RebalanceService {
             @Override
             public void run() {
                 while (true) {
-                    try{
+                    try {
                         //防止网络抖动，访问zk出异常 然后导致check结束
                         if (!ackThread.isInterrupted()) {
                             final List<String> liveNodes = zookeeperService.liveNodes();
-                            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_RESULT_NODE);
+                            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_NODE);
                             log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
                             if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
                                 break;
                             }
                             Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
                         }
-                    }catch(Exception e){
+                    } catch (Exception e) {
                     }
                 }
 
                 log.info("3.delete the /shard node");
-                zookeeperService.deleteNode(CommonConstants.ZK_SHARD_NODE);
-                zookeeperService.deleteChildrenAndReserveParent(CommonConstants.ZK_SHARD_RESULT_NODE);
+                zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_NODE);
             }
-        });
+        }, "shard-ack");
 
+        ackThread.setDaemon(true);
         ackThread.start();
 
     }
@@ -134,8 +135,7 @@ public class RebalanceServiceImpl implements RebalanceService {
 
         ShardingStrategy shardingStrategy = new ScopeStrategy();
         final List<JobInstance> sharding = shardingStrategy.sharding(jobInstances, taskSize);
-        zookeeperService.setData(CommonConstants.ZK_LIVE_NODES, JSONUtils.toJSONStringWithoutCircleDetect(sharding));
-        log.info("sharding result is {}", sharding);
+        zookeeperService.setData(CommonConstants.ZK_SHARD_NODE, JSONUtils.toJSONStringWithoutCircleDetect(sharding));
     }
 
 }

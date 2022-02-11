@@ -4,9 +4,10 @@ package com.github.krystalics.d10.scheduler.start.zk.listener;
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
-import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
+import com.github.krystalics.d10.scheduler.start.sharding.ShardService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
+import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -20,20 +21,20 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class ElectionListener implements LeaderLatchListener {
     @Autowired
-    private ZookeeperHelper zookeeperService;
+    private ZookeeperHelper zookeeperHelper;
 
     @Value("${server.port:8080}")
     private int port;
 
     @Autowired
-    private RebalanceService rebalanceService;
+    private ShardService shardService;
 
     @Override
     public void isLeader() {
         try {
             String address = IPUtils.getHost() + ":" + port;
             log.info("i'm the leader,and my address is {}", address);
-            zookeeperService.setData(CommonConstants.ZK_LEADER, address);
+            zookeeperHelper.createNodeIfNotExist(CommonConstants.ZK_LEADER, address, CreateMode.EPHEMERAL);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,7 +49,7 @@ public class ElectionListener implements LeaderLatchListener {
     @Override
     public void notLeader() {
         log.warn("i'm not the leader like before!need stop something");
-        rebalanceService.stop();
+        shardService.stop();
     }
 
 

@@ -36,10 +36,38 @@ import com.github.rholder.retry.WaitStrategies;
 public class RetryerUtils {
     private static Retryer<Boolean> defaultRetryerResultCheck;
     private static Retryer<Boolean> defaultRetryerResultNoCheck;
+    private static Retryer<Boolean> longRetryerResultCheck;
+    private static Retryer<Boolean> longRetryerResultNoCheck;
 
     private RetryerUtils() {
         throw new UnsupportedOperationException("Construct RetryerUtils");
     }
+
+    private static Retryer<Boolean> getLongDefaultRetryerResultNoCheck() {
+        if (longRetryerResultNoCheck == null) {
+            longRetryerResultNoCheck = RetryerBuilder
+                    .<Boolean>newBuilder()
+                    .retryIfException()
+                    .withWaitStrategy(WaitStrategies.fixedWait(CommonConstants.COMMON_RETRY_STOP_TIME, TimeUnit.SECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterAttempt(CommonConstants.COMMON_RETRY_TIMES * 10))
+                    .build();
+        }
+        return longRetryerResultNoCheck;
+    }
+
+    private static Retryer<Boolean> getLongDefaultRetryerResultCheck() {
+        if (longRetryerResultCheck == null) {
+            longRetryerResultCheck = RetryerBuilder
+                    .<Boolean>newBuilder()
+                    .retryIfResult(Boolean.FALSE::equals)
+                    .retryIfException()
+                    .withWaitStrategy(WaitStrategies.fixedWait(CommonConstants.COMMON_RETRY_STOP_TIME, TimeUnit.SECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterAttempt(CommonConstants.COMMON_RETRY_TIMES * 10))
+                    .build();
+        }
+        return longRetryerResultCheck;
+    }
+
 
     private static Retryer<Boolean> getDefaultRetryerResultNoCheck() {
         if (defaultRetryerResultNoCheck == null) {
@@ -66,10 +94,14 @@ public class RetryerUtils {
         return checkResult ? getDefaultRetryer() : getDefaultRetryerResultNoCheck();
     }
 
+    public static Retryer<Boolean> getDefaultRetryerLong(boolean checkResult) {
+        return checkResult ? getLongDefaultRetryerResultCheck() : getLongDefaultRetryerResultNoCheck();
+    }
+
     /**
      * Gets default retryer.
      * the retryer will retry 3 times if exceptions throw
-     * and wait 1 second between each retry
+     * and wait 3 second between each retry
      *
      * @return the default retryer
      */
@@ -100,6 +132,10 @@ public class RetryerUtils {
         return getDefaultRetryer(checkResult).call(callable);
     }
 
+    public static Boolean retryCallLong(final Callable<Boolean> callable, boolean checkResult) throws ExecutionException, RetryException {
+        return getDefaultRetryerLong(checkResult).call(callable);
+    }
+
     /**
      * Use RETRYER to invoke the Callable before returning true
      *
@@ -110,5 +146,17 @@ public class RetryerUtils {
      */
     public static Boolean retryCall(final Callable<Boolean> callable) throws ExecutionException, RetryException {
         return retryCall(callable, true);
+    }
+
+    /**
+     * Use RETRYER to invoke the Callable before returning true
+     *
+     * @param callable the callable
+     * @return the boolean
+     * @throws ExecutionException the execution exception
+     * @throws RetryException     the retry exception
+     */
+    public static Boolean retryCallLong(final Callable<Boolean> callable) throws ExecutionException, RetryException {
+        return retryCallLong(callable, true);
     }
 }

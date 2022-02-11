@@ -46,6 +46,19 @@ public class ZookeeperHelper {
                 .forPath(path, data.getBytes(StandardCharsets.UTF_8));
     }
 
+    public void createNodeWithoutParent(String path, String data, CreateMode mode) throws Exception {
+        if (client.checkExists().forPath(path) != null) {
+            return;
+        }
+        client.create()
+                .withMode(mode)
+                .forPath(path, data.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public boolean exists(String path) throws Exception {
+        return client.checkExists().forPath(path) != null;
+    }
+
     public void deleteNode(String path) throws Exception {
         client.delete().forPath(path);
     }
@@ -59,8 +72,17 @@ public class ZookeeperHelper {
         }
     }
 
+    public void deleteChildrenAndParent(String path) throws Exception {
+        client.delete().deletingChildrenIfNeeded().forPath(path);
+    }
+
     public List<String> getChildren(String path) throws Exception {
         return client.getChildren().forPath(path);
     }
 
+
+    public String getData(String path) throws Exception {
+        byte[] bytes = client.getData().forPath(path);
+        return new String(bytes);
+    }
 }

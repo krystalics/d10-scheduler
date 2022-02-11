@@ -1,6 +1,13 @@
 package com.github.krystalics.d10.scheduler.start.zk.listener;
 
-import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
+import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
+import com.github.krystalics.d10.scheduler.common.utils.RetryerUtils;
+import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
+import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
+import com.github.krystalics.d10.scheduler.start.event.EventType;
+import com.github.krystalics.d10.scheduler.start.event.EventWorker;
+import com.github.krystalics.d10.scheduler.start.sharding.ShardService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
@@ -19,10 +26,13 @@ import org.springframework.context.annotation.Configuration;
 public class LiveNodesChangeListener implements PathChildrenCacheListener {
 
     @Autowired
-    private RebalanceService rebalanceService;
+    private ShardService shardService;
 
     @Autowired
     public LeaderLatch leaderLatch;
+
+    @Autowired
+    private ZookeeperHelper zookeeperHelper;
 
     /**
      * 临时节点发生一些异常情况、就直接移除
@@ -36,15 +46,14 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
     public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
         switch (pathChildrenCacheEvent.getType()) {
             case CHILD_ADDED:
-//          case CONNECTION_RECONNECTED: 临时节点 没有CONNECTION_RECONCTED事件
-                add(pathChildrenCacheEvent);
+                EventThreadPool.submit(new EventWorker(EventType.LIVE_NODE_ADD, new String(pathChildrenCacheEvent.getData().getData())));
                 break;
             case CHILD_UPDATED:
                 // value not change cause IP not change in a session time
                 break;
             case CONNECTION_LOST:
             case CHILD_REMOVED:
-                delete(pathChildrenCacheEvent);
+                EventThreadPool.submit(new EventWorker(EventType.LIVE_NODE_DEL, new String(pathChildrenCacheEvent.getData().getData())));
                 break;
             case CONNECTION_SUSPENDED:
                 //当进行 Leader 选举和 lock 锁等操作时，需要先挂起客户端的连接。注意这里的会话挂起并不等于关闭会话，也不会触发诸如删除临时节点等操作
@@ -54,29 +63,32 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         }
     }
 
-    /**
-     * 当
-     *
-     * @param pathChildrenCacheEvent
-     * @throws Exception
-     */
-    public void add(PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
-        final String newNode = new String(pathChildrenCacheEvent.getData().getData());
-        log.info("new node is {}", newNode);
-        if(leaderLatch.hasLeadership()){
+    public void add(String node) throws Exception {
+        log.info("new node is {}", node);
+        checkLeaderExist();
+        if (leaderLatch.hasLeadership()) {
             log.info("i'm leader , new node has been added to the system, start rebalanced!");
-            rebalanceService.rebalance(newNode);
+            shardService.shard(node);
         }
     }
 
-    public void delete(PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
-        final String node = new String(pathChildrenCacheEvent.getData().getData());
+    public void delete(String node) throws Exception {
+
         log.info("node has been deleted {}", node);
-        if(leaderLatch.hasLeadership()){
+        checkLeaderExist();
+        if (leaderLatch.hasLeadership()) {
             log.info("i'm leader , node has been deleted from the system, start rebalanced!");
-            rebalanceService.rebalance(node);
+            shardService.shard(node);
         }
 
+    }
 
+    public void checkLeaderExist() throws Exception {
+        log.info("check leader exist before shard!");
+        boolean exist = RetryerUtils.retryCallLong(() -> zookeeperHelper.exists(CommonConstants.ZK_LEADER), true);
+        if (!exist) {
+            log.error("no leader ! system error");
+            System.exit(-1);
+        }
     }
 }

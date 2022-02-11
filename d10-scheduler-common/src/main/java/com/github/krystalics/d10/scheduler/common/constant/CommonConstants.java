@@ -58,9 +58,9 @@ public class CommonConstants {
     public final static int COMMON_RETRY_TIMES = 3;
 
     /**
-     * 默认重试间隔1s
+     * 默认重试间隔3s
      */
-    public final static int COMMON_RETRY_STOP_TIME = 1;
+    public final static int COMMON_RETRY_STOP_TIME = 3;
 
     public final static String LOCK_INIT = "/lock-init";
 
@@ -79,4 +79,7 @@ public class CommonConstants {
      * 5min为界限
      */
     public final static int EXECUTOR_ALIVE_CHECK_LIMIT_TIME = 5;
+
+    public static final int CPU_NUM = Runtime.getRuntime().availableProcessors();
+
 }

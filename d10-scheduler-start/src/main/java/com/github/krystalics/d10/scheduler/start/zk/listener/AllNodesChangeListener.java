@@ -1,5 +1,7 @@
 package com.github.krystalics.d10.scheduler.start.zk.listener;
 
+import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
+import com.github.krystalics.d10.scheduler.start.event.EventWorker;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
@@ -27,17 +29,13 @@ public class AllNodesChangeListener implements PathChildrenCacheListener {
     public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) {
         switch (pathChildrenCacheEvent.getType()) {
             case CHILD_ADDED:
-                final String newNode = new String(pathChildrenCacheEvent.getData().getData());
-                log.info("new node is {}", newNode);
-//                ClusterInfo.addToAllNodes(newNode);
+                //
                 break;
             case CHILD_UPDATED:
                 // value not change cause IP not change in a session time
                 break;
             case CHILD_REMOVED:
-                final String node = new String(pathChildrenCacheEvent.getData().getData());
-                log.info("node has been deleted {}", node);
-//                ClusterInfo.removeFromAllNodes(node);
+                //
                 break;
             default:
 

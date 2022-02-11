@@ -4,7 +4,9 @@ import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
-import com.github.krystalics.d10.scheduler.start.sharding.RebalanceService;
+import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
+import com.github.krystalics.d10.scheduler.start.event.EventType;
+import com.github.krystalics.d10.scheduler.start.event.EventWorker;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -59,12 +61,7 @@ public class ConnectionStateChangeListener implements ConnectionStateListener {
         switch (connectionState) {
             case LOST:
             case SUSPENDED:
-                log.error("node lost the connection with zookeeper!");
-                D10Scheduler.getInstance().stop();
-
-                if (leaderLatch.hasLeadership()) {
-
-                }
+                EventThreadPool.submit(new EventWorker(EventType.CONNECTION_LOST,"node lost the connection with zookeeper!"));
                 break;
             case CONNECTED:
                 log.info("already connect to zk");

@@ -3,12 +3,10 @@ package com.github.krystalics.d10.scheduler.start;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
-import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.core.init.Initiation;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyServer;
-import com.github.krystalics.d10.scheduler.start.sharding.impl.RebalanceServiceImpl;
 import com.github.krystalics.d10.scheduler.start.zk.StartHelper;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ElectionListener;
 import lombok.SneakyThrows;
@@ -50,13 +48,7 @@ public class ScheduleApplication {
         private ElectionListener electionListener;
 
         @Autowired
-        private ZookeeperHelper zookeeperService;
-
-        @Autowired
         private StartHelper startHelper;
-
-        @Autowired
-        private RebalanceServiceImpl rebalanceService;
 
         @Autowired
         private LeaderLatch leaderLatch;
@@ -85,6 +77,7 @@ public class ScheduleApplication {
                     log.info("init action begin! this node address is {}", address);
                     startHelper.initCuratorCaches();
                     startHelper.initZkPaths(address);
+                    startHelper.registerEventTypes();
 
                     log.info("try to be a leader!");
                     leaderLatch.addListener(electionListener);
@@ -96,11 +89,10 @@ public class ScheduleApplication {
                     nettyServer.start();
 
                     leaderLatch.await();
-                    rebalanceService.rebalance(address);
 
 //                  initiation.init();
                 }
-            }, "election");
+            }, "startThread");
 
             init.start();
 
