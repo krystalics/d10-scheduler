@@ -7,6 +7,9 @@ import com.github.krystalics.d10.scheduler.core.init.Initiation;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyServer;
+import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
+import com.github.krystalics.d10.scheduler.start.event.EventType;
+import com.github.krystalics.d10.scheduler.start.event.EventWorker;
 import com.github.krystalics.d10.scheduler.start.zk.StartHelper;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ElectionListener;
 import lombok.SneakyThrows;
@@ -75,18 +78,22 @@ public class ScheduleApplication {
                 public void run() {
                     String address = IPUtils.getHost() + ":" + port;
                     log.info("init action begin! this node address is {}", address);
-                    startHelper.initCuratorCaches();
-                    startHelper.initZkPaths(address);
-                    startHelper.registerEventTypes();
-
                     log.info("try to be a leader!");
                     leaderLatch.addListener(electionListener);
                     leaderLatch.start();
+                    startHelper.initCuratorCaches();
+                    startHelper.initZkPaths(address);
+                    startHelper.registerEventTypes();
+                    //由于创建之处并不会响应live事件，需要手动触发一下
+                    EventThreadPool.submit(new EventWorker(EventType.LIVE_NODE_ADD, address));
 
-                    NettyServerConfig serverConfig = new NettyServerConfig();
-                    serverConfig.setListenPort(nettyPort);
-                    nettyServer = new NettyServer(serverConfig);
-                    nettyServer.start();
+
+
+
+//                    NettyServerConfig serverConfig = new NettyServerConfig();
+//                    serverConfig.setListenPort(nettyPort);
+//                    nettyServer = new NettyServer(serverConfig);
+//                    nettyServer.start();
 
                     leaderLatch.await();
 

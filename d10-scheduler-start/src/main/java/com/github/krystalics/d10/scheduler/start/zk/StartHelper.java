@@ -6,6 +6,7 @@ import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
 import com.github.krystalics.d10.scheduler.start.event.EventType;
+import com.github.krystalics.d10.scheduler.start.event.EventWorker;
 import com.github.krystalics.d10.scheduler.start.zk.listener.AllNodesChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ConnectionStateChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.LeaderChangeListener;
@@ -71,10 +72,26 @@ public class StartHelper {
         log.info("create listeners for nodes changed!");
         client.getConnectionStateListenable().addListener(connectionStateChangeListener);
 
-        CuratorCache leaderChangeCache = CuratorCache.build(client, CommonConstants.ZK_LEADER);
-        leaderChangeCache.listenable().addListener(leaderChangeListener);
+//        CuratorCache leaderChangeCache = CuratorCache.build(client, CommonConstants.ZK_LEADER);
+//        leaderChangeCache.listenable().addListener(leaderChangeListener);
 
-        CuratorCache shardCache = CuratorCache.build(client, CommonConstants.ZK_SHARD_NODE);
+        CuratorCache shardCache = CuratorCache.build(client, CommonConstants.ZK_SHARD);
+        CuratorCacheListener shardListener = CuratorCacheListener.builder()
+                .forAll((type, oldNode, newNode) -> {
+                    switch (type) {
+                        case NODE_CREATED:
+                            EventThreadPool.submit(new EventWorker(EventType.SHARD_ADD, new String(newNode.getData())));
+                            break;
+                        case NODE_CHANGED:
+                            EventThreadPool.submit(new EventWorker(EventType.SHARD_CHANGE, new String(newNode.getData())));
+                            break;
+                        case NODE_DELETED:
+                            EventThreadPool.submit(new EventWorker(EventType.SHARD_DEL, new String(oldNode.getData())));
+                            break;
+                        default:
+                            throw new RuntimeException("unknown node event type " + type.name());
+                    }
+                }).afterInitialized().build();
         shardCache.listenable().addListener(shardListener);
 
         CuratorCache allNodesCache = CuratorCache.build(client, CommonConstants.ZK_ALL_NODES);
@@ -82,11 +99,11 @@ public class StartHelper {
         allNodesCache.listenable().addListener(allNodesCacheListener);
 
         CuratorCache liveNodesCache = CuratorCache.build(client, CommonConstants.ZK_LIVE_NODES);
-        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().forPathChildrenCache(CommonConstants.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
+        CuratorCacheListener liveNodesCacheListener = CuratorCacheListener.builder().afterInitialized().forPathChildrenCache(CommonConstants.ZK_LIVE_NODES, client, liveNodesChangeListener).build();
         liveNodesCache.listenable().addListener(liveNodesCacheListener);
 
         client.start();
-        leaderChangeCache.start();
+//        leaderChangeCache.start();
         shardCache.start();
         allNodesCache.start();
         liveNodesCache.start();

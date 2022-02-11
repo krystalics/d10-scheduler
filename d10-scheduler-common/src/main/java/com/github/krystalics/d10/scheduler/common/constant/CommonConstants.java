@@ -51,7 +51,7 @@ public class CommonConstants {
 
     public final static String ZK_ALL_NODES = "/all";
 
-    public final static String ZK_SHARD_NODE = "/shard";
+    public final static String ZK_SHARD = "/shard";
 
     public final static String ZK_SHARD_RESULT_NODE = "/shard-result";
 

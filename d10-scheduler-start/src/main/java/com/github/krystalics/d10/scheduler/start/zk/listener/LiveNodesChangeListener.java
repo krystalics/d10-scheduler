@@ -67,7 +67,6 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         log.info("new node is {}", node);
         checkLeaderExist();
         if (leaderLatch.hasLeadership()) {
-            log.info("i'm leader , new node has been added to the system, start rebalanced!");
             shardService.shard(node);
         }
     }
@@ -77,7 +76,6 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         log.info("node has been deleted {}", node);
         checkLeaderExist();
         if (leaderLatch.hasLeadership()) {
-            log.info("i'm leader , node has been deleted from the system, start rebalanced!");
             shardService.shard(node);
         }
 

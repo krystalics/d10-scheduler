@@ -63,6 +63,12 @@ public class ZookeeperHelper {
         client.delete().forPath(path);
     }
 
+    public void deleteIfExists(String path) throws Exception {
+        if (exists(path)) {
+            deleteChildrenAndParent(path);
+        }
+    }
+
     public void deleteChildrenAndReserveParent(String path) throws Exception {
         final List<String> children = getChildren(path);
         if (children != null && children.size() > 0) {

@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
 import java.util.List;
 
 /**
@@ -65,14 +64,6 @@ public class ShardListener implements CuratorCacheListener {
         }
     }
 
-    public void ack() throws Exception {
-        log.info("get new scope,{}", jobInstance);
-        log.info("wait the leader ack all node!");
-        String address = IPUtils.getHost() + ":" + port;
-        zookeeperService.createNodeWithoutParent(CommonConstants.ZK_SHARD_NODE + "/" + address, address, CreateMode.EPHEMERAL);
-    }
-
-
     public void shardReceive(String result) throws Exception {
         log.info("sharding result is {}", result);
         final List<JobInstance> jobInstances = JSON.parseArray(result, JobInstance.class);
@@ -96,5 +87,12 @@ public class ShardListener implements CuratorCacheListener {
                 break;
             }
         }
+    }
+
+    public void ack() throws Exception {
+        log.info("get new scope,{}", jobInstance);
+        log.info("wait the leader ack all node!");
+        String address = IPUtils.getHost() + ":" + port;
+        zookeeperService.createNodeWithoutParent(CommonConstants.ZK_SHARD + "/" + address, address, CreateMode.EPHEMERAL);
     }
 }

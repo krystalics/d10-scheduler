@@ -1,7 +1,9 @@
 package com.github.krystalics.d10.scheduler.start.sharding.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
+import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.common.utils.JSONUtils;
 import com.github.krystalics.d10.scheduler.common.utils.RetryerUtils;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
@@ -10,7 +12,6 @@ import com.github.krystalics.d10.scheduler.dao.mapper.TaskMapper;
 import com.github.krystalics.d10.scheduler.dao.qm.TaskQM;
 import com.github.krystalics.d10.scheduler.start.sharding.ShardService;
 import com.github.krystalics.d10.scheduler.start.sharding.ShardingStrategy;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,20 +39,19 @@ public class ShardServiceImpl implements ShardService {
 
 
     /**
-     * fixme 在切换了leader后会发生两次rebalance 要注意这个，但是两次rebalance；一次在be leader后，一次在/live 节点变化后
-     * 刚成为是需要进行rebalance的，防止/live节点的事件先发生，这时候节点还不是leader；而成为了leader后确不进行rebalance。
-     * <p>
-     * 这里加锁是为了防止连续多个节点变化，同时有多个节点在进行rebalance
+     * 这里加锁是为了防止连续多个节点变化，同时有多个节点在进行rebalance、需要按顺序进行
      *
+     * todo 改变完全基于 zk watcher事件的思路，比如1。通知停止调度，2。分片变更，3。重新调度 使用rpc进行同步
+     *  - 事件的异步执行，顺序混乱影响比较大。
      * @param address 发生变化的节点地址
      */
     @Override
     public synchronized void shard(String address) throws Exception {
-
         log.info("scheduler system begin rebalanced!");
+        zookeeperService.deleteIfExists(CommonConstants.ZK_SHARD);
         log.info("1.to create /shard node");
-        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD_NODE, address, CreateMode.PERSISTENT);
-        RetryerUtils.retryCall(() -> zookeeperService.exists(CommonConstants.ZK_SHARD_NODE), true);
+        zookeeperService.createNodeIfNotExist(CommonConstants.ZK_SHARD, "shard-result", CreateMode.PERSISTENT);
+        RetryerUtils.retryCall(() -> zookeeperService.exists(CommonConstants.ZK_SHARD), true);
         log.info("2.assign the task to schedulers");
         shard();
         log.info("wait to receive all live node response!");
@@ -65,33 +65,53 @@ public class ShardServiceImpl implements ShardService {
      * @throws Exception
      */
     private void shardCheckAck() throws Exception {
-        ackThread = new Thread(new Runnable() {
-            @SneakyThrows
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        //防止网络抖动，访问zk出异常 然后导致check结束
-                        if (!ackThread.isInterrupted()) {
-                            final List<String> liveNodes = zookeeperService.liveNodes();
-                            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_NODE);
-                            log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
-                            if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
-                                break;
-                            }
-                            Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
-                        }
-                    } catch (Exception e) {
+
+        while (true) {
+            try {
+                //防止网络抖动，访问zk出异常 然后导致check结束
+                if (!ackThread.isInterrupted()) {
+                    final List<String> liveNodes = zookeeperService.liveNodes();
+                    final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD);
+                    log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
+                    if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
+                        break;
                     }
+                    Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
                 }
-
-                log.info("3.delete the /shard node");
-                zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_NODE);
+            } catch (Exception e) {
             }
-        }, "shard-ack");
+        }
 
-        ackThread.setDaemon(true);
-        ackThread.start();
+        log.info("3.delete the /shard node");
+        zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD);
+
+//        ackThread = new Thread(new Runnable() {
+//            @SneakyThrows
+//            @Override
+//            public void run() {
+//                while (true) {
+//                    try {
+//                        //防止网络抖动，访问zk出异常 然后导致check结束
+//                        if (!ackThread.isInterrupted()) {
+//                            final List<String> liveNodes = zookeeperService.liveNodes();
+//                            final List<String> children = zookeeperService.getChildren(CommonConstants.ZK_SHARD_NODE);
+//                            log.info("check live node and accept the shard result's node. live nodes ={},ack nodes={}", liveNodes, children);
+//                            if (liveNodes.containsAll(children) && children.containsAll(liveNodes)) {
+//                                break;
+//                            }
+//                            Thread.sleep(CommonConstants.SHARD_ACK_WAITING);
+//                        }
+//                    } catch (Exception e) {
+//                    }
+//                }
+//
+//                log.info("3.delete the /shard node");
+//                zookeeperService.deleteChildrenAndParent(CommonConstants.ZK_SHARD_NODE);
+//            }
+//        }, "shard-ack");
+//
+//        ackThread.setDaemon(true);
+//        ackThread.start();
 
     }
 
@@ -113,16 +133,12 @@ public class ShardServiceImpl implements ShardService {
     }
 
     /**
-     * 使用shard策略将任务分片，然后将分片结果写入 /live 节点中
-     * 不直接写入/shard 节点是因为，有时执行的太快，等其他节点启动时，shard已经结束，节点被删了
-     * 方便其他节点接收到节点创建的信号，防止流程太快，其他节点接收不到node_change的信号 ，节点就被删除了
-     * 所以将其结果写入 /live 中
+     * 使用shard策略将任务分片，然后将分片结果写入 /shard 节点中
      *
      * @throws Exception
      */
     public void shard() throws Exception {
         final List<String> liveNodes = zookeeperService.liveNodes();
-        log.info("rebalanced ,all live nodes are {}", liveNodes);
         List<JobInstance> jobInstances = new ArrayList<>();
         for (String liveNode : liveNodes) {
             JobInstance instance = new JobInstance();
@@ -135,7 +151,7 @@ public class ShardServiceImpl implements ShardService {
 
         ShardingStrategy shardingStrategy = new ScopeStrategy();
         final List<JobInstance> sharding = shardingStrategy.sharding(jobInstances, taskSize);
-        zookeeperService.setData(CommonConstants.ZK_SHARD_NODE, JSONUtils.toJSONStringWithoutCircleDetect(sharding));
+        zookeeperService.setData(CommonConstants.ZK_SHARD, JSONUtils.toJSONStringWithoutCircleDetect(sharding));
     }
 
 }

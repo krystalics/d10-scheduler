@@ -61,7 +61,7 @@ public class ConnectionStateChangeListener implements ConnectionStateListener {
         switch (connectionState) {
             case LOST:
             case SUSPENDED:
-                EventThreadPool.submit(new EventWorker(EventType.CONNECTION_LOST,"node lost the connection with zookeeper!"));
+                EventThreadPool.submit(new EventWorker(EventType.CONNECTION_LOST, "node lost the connection with zookeeper!"));
                 break;
             case CONNECTED:
                 log.info("already connect to zk");
@@ -72,7 +72,7 @@ public class ConnectionStateChangeListener implements ConnectionStateListener {
             case RECONNECTED:
                 String address = IPUtils.getHost() + ":" + port;
                 log.info("{} reconnect to zk、need to create node by hand", address);
-                zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES, address, CreateMode.EPHEMERAL);
+                zookeeperService.createNodeIfNotExist(CommonConstants.ZK_LIVE_NODES + "/" + address, address, CreateMode.EPHEMERAL);
                 break;
             default:
                 throw new RuntimeException("unknown zk connection state " + connectionState);
