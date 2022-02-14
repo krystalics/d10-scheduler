@@ -4,7 +4,7 @@ package com.github.krystalics.d10.scheduler.start.zk.listener;
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
-import com.github.krystalics.d10.scheduler.start.sharding.ShardService;
+import com.github.krystalics.d10.scheduler.start.sharding.IShardService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.zookeeper.CreateMode;
@@ -27,7 +27,7 @@ public class ElectionListener implements LeaderLatchListener {
     private int port;
 
     @Autowired
-    private ShardService shardService;
+    private IShardService IShardService;
 
     @Override
     public void isLeader() {
@@ -49,7 +49,7 @@ public class ElectionListener implements LeaderLatchListener {
     @Override
     public void notLeader() {
         log.warn("i'm not the leader like before!need stop something");
-        shardService.stop();
+        IShardService.stopShard();
     }
 
 

@@ -1,7 +1,9 @@
 package com.github.krystalics.d10.scheduler.start.zk;
 
 import com.github.krystalics.d10.scheduler.common.constant.CommonConstants;
+import com.github.krystalics.d10.scheduler.common.constant.JobInstance;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
+import com.github.krystalics.d10.scheduler.common.utils.RetryerUtils;
 import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
@@ -55,6 +57,9 @@ public class StartHelper {
     @Value("${server.port}")
     private int port;
 
+    @Autowired
+    private JobInstance instance;
+
     @Bean
     public LeaderLatch leaderLatch() {
         String address = IPUtils.getHost() + ":" + port;
@@ -80,7 +85,7 @@ public class StartHelper {
                 .forAll((type, oldNode, newNode) -> {
                     switch (type) {
                         case NODE_CREATED:
-                            EventThreadPool.submit(new EventWorker(EventType.SHARD_ADD, new String(newNode.getData())));
+                            EventThreadPool.submit(new EventWorker(EventType.SHARD_BEGIN, new String(newNode.getData())));
                             break;
                         case NODE_CHANGED:
                             EventThreadPool.submit(new EventWorker(EventType.SHARD_CHANGE, new String(newNode.getData())));
@@ -120,17 +125,17 @@ public class StartHelper {
     public void registerEventTypes() {
         EventThreadPool.register(EventType.LIVE_NODE_ADD, (param) -> {
             try {
-                liveNodesChangeListener.add(param);
+                liveNodesChangeListener.add((String) param);
             } catch (Exception e) {
-                log.error("live node add error: {}", e);
+                log.error("live node add error: ", e);
             }
         });
 
         EventThreadPool.register(EventType.LIVE_NODE_DEL, (param) -> {
             try {
-                liveNodesChangeListener.delete(param);
+                liveNodesChangeListener.delete((String) param);
             } catch (Exception e) {
-                log.error("live node delete error: {}", e);
+                log.error("live node delete error: ", e);
             }
         });
 
@@ -139,18 +144,16 @@ public class StartHelper {
             D10Scheduler.getInstance().stop();
         });
 
-        EventThreadPool.register(EventType.SHARD_CHANGE, (param) -> {
-            try {
-                shardListener.shardReceive(param);
-            } catch (Exception e) {
-                log.error("shard receive error: {}", e);
 
-            }
-        });
-
-        EventThreadPool.register(EventType.SHARD_ADD, (param) -> {
-            log.info("stop the scheduler because of {}", EventType.SHARD_ADD);
+        EventThreadPool.register(EventType.SHARD_BEGIN, (param) -> {
+            log.info("stop the scheduler because of {}", EventType.SHARD_BEGIN);
             D10Scheduler.getInstance().stop();
+            instance.setTaskIds(((JobInstance) param).getTaskIds());
+            try {
+                RetryerUtils.retryCall(() -> shardListener.ack(),false);
+            } catch (Exception e) {
+                log.error("shard ack error! ",e);
+            }
         });
 
         EventThreadPool.register(EventType.SHARD_DEL, (param) -> {
@@ -158,7 +161,7 @@ public class StartHelper {
                 log.info("start the scheduler because of {}", EventType.SHARD_DEL);
                 D10Scheduler.getInstance().start();
             } catch (InterruptedException e) {
-                log.error("shard delete error {}", e);
+                log.error("shard delete error ", e);
             }
         });
     }

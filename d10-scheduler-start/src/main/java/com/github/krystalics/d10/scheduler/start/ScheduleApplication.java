@@ -88,12 +88,10 @@ public class ScheduleApplication {
                     EventThreadPool.submit(new EventWorker(EventType.LIVE_NODE_ADD, address));
 
 
-
-
-//                    NettyServerConfig serverConfig = new NettyServerConfig();
-//                    serverConfig.setListenPort(nettyPort);
-//                    nettyServer = new NettyServer(serverConfig);
-//                    nettyServer.start();
+                    NettyServerConfig serverConfig = new NettyServerConfig();
+                    serverConfig.setListenPort(nettyPort);
+                    nettyServer = new NettyServer(serverConfig);
+                    nettyServer.start();
 
                     leaderLatch.await();
 

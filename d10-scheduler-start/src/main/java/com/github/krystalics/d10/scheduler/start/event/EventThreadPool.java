@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 public class EventThreadPool {
     private final static ExecutorService service = new ThreadPoolExecutor(CommonConstants.CPU_NUM, CommonConstants.CPU_NUM * 2, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>(50));
 
-    private final static ConcurrentHashMap<EventType, Consumer<String>> eventProcessCache = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<EventType, Consumer<Object>> eventProcessCache = new ConcurrentHashMap<>();
 
     public static Future<?> submit(Runnable runnable) {
         return service.submit(runnable);
@@ -27,11 +27,11 @@ public class EventThreadPool {
         service.shutdownNow();
     }
 
-    public static void register(EventType type, Consumer<String> consumer) {
+    public static void register(EventType type, Consumer<Object> consumer) {
         eventProcessCache.put(type, consumer);
     }
 
-    public static Consumer<String> processor(EventType type) {
+    public static Consumer<Object> processor(EventType type) {
         return eventProcessCache.get(type);
     }
 

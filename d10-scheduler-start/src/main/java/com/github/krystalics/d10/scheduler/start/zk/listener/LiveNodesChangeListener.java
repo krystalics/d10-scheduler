@@ -6,8 +6,7 @@ import com.github.krystalics.d10.scheduler.common.zk.ZookeeperHelper;
 import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
 import com.github.krystalics.d10.scheduler.start.event.EventType;
 import com.github.krystalics.d10.scheduler.start.event.EventWorker;
-import com.github.krystalics.d10.scheduler.start.sharding.ShardService;
-import lombok.SneakyThrows;
+import com.github.krystalics.d10.scheduler.start.sharding.IShardService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
@@ -26,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 public class LiveNodesChangeListener implements PathChildrenCacheListener {
 
     @Autowired
-    private ShardService shardService;
+    private IShardService IShardService;
 
     @Autowired
     public LeaderLatch leaderLatch;
@@ -47,6 +46,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         switch (pathChildrenCacheEvent.getType()) {
             case CHILD_ADDED:
                 EventThreadPool.submit(new EventWorker(EventType.LIVE_NODE_ADD, new String(pathChildrenCacheEvent.getData().getData())));
+//                add(new String(pathChildrenCacheEvent.getData().getData()));
                 break;
             case CHILD_UPDATED:
                 // value not change cause IP not change in a session time
@@ -67,7 +67,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         log.info("new node is {}", node);
         checkLeaderExist();
         if (leaderLatch.hasLeadership()) {
-            shardService.shard(node);
+            IShardService.shard();
         }
     }
 
@@ -76,7 +76,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         log.info("node has been deleted {}", node);
         checkLeaderExist();
         if (leaderLatch.hasLeadership()) {
-            shardService.shard(node);
+            IShardService.shard();
         }
 
     }
@@ -86,7 +86,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         boolean exist = RetryerUtils.retryCallLong(() -> zookeeperHelper.exists(CommonConstants.ZK_LEADER), true);
         if (!exist) {
             log.error("no leader ! system error");
-            System.exit(-1);
         }
+        log.info("leader exist!");
     }
 }

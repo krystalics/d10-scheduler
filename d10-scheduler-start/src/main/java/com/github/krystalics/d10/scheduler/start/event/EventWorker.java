@@ -14,18 +14,18 @@ public class EventWorker implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(EventWorker.class);
 
     private final EventType eventType;
-    private final String param;
+    private final Object param;
 
-    public EventWorker(EventType eventType, String param) {
+    public EventWorker(EventType eventType, Object param) {
         this.eventType = eventType;
         this.param = param;
     }
 
     @Override
     public void run() {
-        log.info("process event type = {},param = {}", eventType, param);
+        log.info("process event type = {},param = {}", eventType, param.toString());
 
-        Consumer<String> processor = EventThreadPool.processor(eventType);
+        Consumer<Object> processor = EventThreadPool.processor(eventType);
         if (processor == null) {
             throw new NoSuchEventException("eventType " + eventType + " is not exit");
         }

@@ -51,13 +51,13 @@ public class ShardListener implements CuratorCacheListener {
     public void event(CuratorCacheListener.Type type, ChildData before, ChildData after) {
         switch (type) {
             case NODE_CREATED:
-                EventThreadPool.submit(new EventWorker(EventType.SHARD_ADD, new String(after.getData())));
+//                EventThreadPool.submit(new EventWorker(EventType.SHARD_BEGIN, new String(after.getData())));
                 break;
             case NODE_CHANGED:
-                EventThreadPool.submit(new EventWorker(EventType.SHARD_CHANGE, new String(after.getData())));
+//                EventThreadPool.submit(new EventWorker(EventType.SHARD_CHANGE, new String(after.getData())));
                 break;
             case NODE_DELETED:
-                EventThreadPool.submit(new EventWorker(EventType.SHARD_DEL, new String(before.getData())));
+//                EventThreadPool.submit(new EventWorker(EventType.SHARD_DEL, new String(before.getData())));
                 break;
             default:
                 throw new RuntimeException("unknown node event type " + type.name());
@@ -89,10 +89,11 @@ public class ShardListener implements CuratorCacheListener {
         }
     }
 
-    public void ack() throws Exception {
+    public boolean ack() throws Exception {
         log.info("get new scope,{}", jobInstance);
         log.info("wait the leader ack all node!");
         String address = IPUtils.getHost() + ":" + port;
         zookeeperService.createNodeWithoutParent(CommonConstants.ZK_SHARD + "/" + address, address, CreateMode.EPHEMERAL);
+        return true;
     }
 }
