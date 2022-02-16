@@ -21,7 +21,6 @@ import com.github.krystalics.d10.scheduler.rpc.protocol.MessageHeader;
 import com.github.krystalics.d10.scheduler.rpc.protocol.RpcProtocol;
 import com.github.krystalics.d10.scheduler.rpc.serializer.RpcSerializer;
 import com.github.krystalics.d10.scheduler.rpc.serializer.Serializer;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

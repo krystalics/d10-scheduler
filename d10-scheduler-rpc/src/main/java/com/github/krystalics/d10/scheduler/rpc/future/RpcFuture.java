@@ -60,7 +60,7 @@ public class RpcFuture implements Future<Object> {
     @Override
     public RpcResponse get() throws InterruptedException {
         // the timeout period should be defined by the business party
-        boolean success = latch.await(5, TimeUnit.SECONDS);
+        boolean success = latch.await(50, TimeUnit.SECONDS);
         if (!success) {
             throw new RuntimeException("Timeout exception. Request id: " + this.requestId
                     + ". Request class name: " + this.request.getClassName()

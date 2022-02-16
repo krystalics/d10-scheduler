@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-@RpcService("IShardService")
+//@RpcService("IShardService")
 public class IShardServiceImpl implements IShardService {
 
     @Autowired
@@ -42,6 +42,8 @@ public class IShardServiceImpl implements IShardService {
 
     @Autowired
     private JobInstance instance;
+
+    IRebalanceService service;
 
 
     /**
@@ -65,7 +67,7 @@ public class IShardServiceImpl implements IShardService {
 //            } else {
             Host host = new Host(jobInstance.getAddress());
             IRpcClient client = new RpcClient();
-            final IRebalanceService service = client.create(IRebalanceService.class, host);
+            service = client.create(IRebalanceService.class, host);
             service.shardBegin(jobInstance);
 //                RetryerUtils.retryCall(() -> service.shardBegin(jobInstance), true);
 //            }
@@ -80,7 +82,7 @@ public class IShardServiceImpl implements IShardService {
             } else {
                 Host host = new Host(jobInstance.getAddress());
                 IRpcClient client = new RpcClient();
-                final IRebalanceService service = client.create(IRebalanceService.class, host);
+                service = client.create(IRebalanceService.class, host);
                 RetryerUtils.retryCall(service::shardEnd, true);
             }
         }
