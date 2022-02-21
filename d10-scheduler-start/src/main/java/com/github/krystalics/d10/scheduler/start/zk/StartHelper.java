@@ -7,6 +7,7 @@ import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
 import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
 import com.github.krystalics.d10.scheduler.start.event.EventType;
 import com.github.krystalics.d10.scheduler.start.event.EventWorker;
+import com.github.krystalics.d10.scheduler.start.sharding.ShardService;
 import com.github.krystalics.d10.scheduler.start.zk.listener.AllNodesChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.ConnectionStateChangeListener;
 import com.github.krystalics.d10.scheduler.start.zk.listener.LeaderChangeListener;
@@ -39,6 +40,9 @@ public class StartHelper {
 
     @Autowired
     private LeaderChangeListener leaderChangeListener;
+
+    @Autowired
+    private ShardService shardService;
 
     @Autowired
     private AllNodesChangeListener allNodesChangeListener;
@@ -122,7 +126,7 @@ public class StartHelper {
             try {
                 liveNodesChangeListener.add(param);
             } catch (Exception e) {
-                log.error("live node add error: {}", e);
+                log.error("live node add error: ", e);
             }
         });
 
@@ -130,7 +134,7 @@ public class StartHelper {
             try {
                 liveNodesChangeListener.delete(param);
             } catch (Exception e) {
-                log.error("live node delete error: {}", e);
+                log.error("live node delete error: ", e);
             }
         });
 
@@ -139,27 +143,25 @@ public class StartHelper {
             D10Scheduler.getInstance().stop();
         });
 
-        EventThreadPool.register(EventType.SHARD_CHANGE, (param) -> {
-            try {
-                shardListener.shardReceive(param);
-            } catch (Exception e) {
-                log.error("shard receive error: {}", e);
-
-            }
-        });
 
         EventThreadPool.register(EventType.SHARD_ADD, (param) -> {
-            log.info("stop the scheduler because of {}", EventType.SHARD_ADD);
-            D10Scheduler.getInstance().stop();
+            log.info("stop the scheduler because of {},{}", EventType.SHARD_ADD, param);
+            shardService.begin();
         });
 
-        EventThreadPool.register(EventType.SHARD_DEL, (param) -> {
+        EventThreadPool.register(EventType.SHARD_CHANGE, (param) -> {
             try {
-                log.info("start the scheduler because of {}", EventType.SHARD_DEL);
-                D10Scheduler.getInstance().start();
-            } catch (InterruptedException e) {
-                log.error("shard delete error {}", e);
+                shardService.receiveShardResult(param);
+            } catch (Exception e) {
+                log.error("shard receive error:", e);
+
             }
+        });
+
+
+        EventThreadPool.register(EventType.SHARD_DEL, (param) -> {
+            log.info("start the scheduler because of {},{}", EventType.SHARD_DEL, param);
+            shardService.end();
         });
     }
 }

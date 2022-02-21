@@ -6,15 +6,23 @@ package com.github.krystalics.d10.scheduler.start.sharding;
  * @description
  */
 public interface ShardService {
-    /**
-     * 当节点发生变化，重新平衡各个节点上负责的taskId范围
-     * @param address 发生变化的节点
-     * @throws Exception
-     */
-    void shard(String address) throws Exception;
 
     /**
-     * 停止shard
+     * leader 进行shard
      */
-    void stop();
+    void shard() throws Exception;
+
+    /**
+     * follower 知道leader在shard后、进行以下动作
+     * 1。将scheduler暂停
+     * 2。变更负责的分片范围
+     * 3。重新开始调度
+     *
+     * 这些动作节点需要和leader的的shard进行配合，比不是连贯的
+     */
+    void begin();
+
+    void receiveShardResult(String result);
+
+    void end();
 }

@@ -49,7 +49,6 @@ public class ElectionListener implements LeaderLatchListener {
     @Override
     public void notLeader() {
         log.warn("i'm not the leader like before!need stop something");
-        shardService.stop();
     }
 
 

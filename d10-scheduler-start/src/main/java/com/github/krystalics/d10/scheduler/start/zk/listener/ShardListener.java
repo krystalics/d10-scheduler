@@ -29,16 +29,6 @@ import java.util.List;
 @Slf4j
 public class ShardListener implements CuratorCacheListener {
 
-
-    @Autowired
-    private ZookeeperHelper zookeeperService;
-
-    @Autowired
-    private JobInstance jobInstance;
-
-    @Value("${server.port}")
-    private int port;
-
     /**
      * shard节点会由leader在 /live 节点数量发生变化的时候进行创建，其他节点需要在shard期间暂停工作
      *
@@ -64,35 +54,4 @@ public class ShardListener implements CuratorCacheListener {
         }
     }
 
-    public void shardReceive(String result) throws Exception {
-        log.info("sharding result is {}", result);
-        final List<JobInstance> jobInstances = JSON.parseArray(result, JobInstance.class);
-        for (JobInstance instance : jobInstances) {
-            if (instance.getAddress().equals(jobInstance.getAddress())) {
-                jobInstance.setTaskIds(instance.getTaskIds());
-                if (D10Scheduler.getInstance().checkStop()) {
-                    ack();
-                } else {
-                    log.error("scheduler don't stop yet! try to stop by hand after 1000 ms!");
-                    Thread.sleep(1000);
-                    D10Scheduler.getInstance().stop();
-                    if (!D10Scheduler.getInstance().checkStop()) {
-                        log.error("stop scheduler failed! system error, exit !!!!!");
-                        System.exit(1);
-                    } else {
-                        ack();
-                    }
-                }
-
-                break;
-            }
-        }
-    }
-
-    public void ack() throws Exception {
-        log.info("get new scope,{}", jobInstance);
-        log.info("wait the leader ack all node!");
-        String address = IPUtils.getHost() + ":" + port;
-        zookeeperService.createNodeWithoutParent(CommonConstants.ZK_SHARD + "/" + address, address, CreateMode.EPHEMERAL);
-    }
 }

@@ -5,7 +5,6 @@ import com.github.krystalics.d10.scheduler.common.constant.Pair;
 import com.github.krystalics.d10.scheduler.common.utils.IPUtils;
 import com.github.krystalics.d10.scheduler.core.init.Initiation;
 import com.github.krystalics.d10.scheduler.core.schedule.D10Scheduler;
-import com.github.krystalics.d10.scheduler.rpc.config.NettyServerConfig;
 import com.github.krystalics.d10.scheduler.rpc.remote.NettyServer;
 import com.github.krystalics.d10.scheduler.start.event.EventThreadPool;
 import com.github.krystalics.d10.scheduler.start.event.EventType;
