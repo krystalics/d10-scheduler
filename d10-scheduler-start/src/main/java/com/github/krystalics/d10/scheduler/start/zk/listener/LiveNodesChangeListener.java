@@ -67,7 +67,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         log.info("new node is {}", node);
         checkLeaderExist();
         if (leaderLatch.hasLeadership()) {
-            shardService.begin();
+            shardService.shard();
         }
     }
 
@@ -76,7 +76,7 @@ public class LiveNodesChangeListener implements PathChildrenCacheListener {
         log.info("node has been deleted {}", node);
         checkLeaderExist();
         if (leaderLatch.hasLeadership()) {
-            shardService.begin();
+            shardService.shard();
         }
 
     }
